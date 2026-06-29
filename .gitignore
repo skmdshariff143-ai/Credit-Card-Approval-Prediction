@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Anaconda / Virtual Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+conda-bld/
+.ipynb_checkpoints
+
+# IDEs
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project Specific
+data/raw/*.csv
+data/processed/*.csv
+data/processed/*.joblib
+models/trained/*.joblib
+models/artifacts/*.joblib
+reports/figures/*.png
+logs/
+*.log
+
+# Sensitive Info
+.env
+config.yaml
+ibm_cloud_config.yaml

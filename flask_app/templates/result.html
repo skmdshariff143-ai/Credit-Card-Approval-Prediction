@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="text-center mb-5">
+            <h1 class="display-5 font-outfit text-white fw-bold">Evaluation Results</h1>
+            <p class="text-white-50">Decision derived from candidate feature values using registered model <code>{{ model_name }}</code>.</p>
+        </div>
+
+        <!-- Result Box -->
+        {% if result == 'Approved' %}
+        <div class="card card-result-approved shadow-lg border-0 rounded-4 mb-4">
+            <div class="card-body p-5 text-center text-white">
+                <i class="fa-solid fa-circle-check display-1 mb-4 text-success-custom animate-bounce"></i>
+                <h2 class="display-6 font-outfit fw-bold mb-3">Application APPROVED</h2>
+                <p class="lead text-white-80">Congratulations! The model has assessed this profile as low-risk and recommends instant approval.</p>
+                
+                <div class="gauge-container my-4">
+                    <div class="progress progress-custom bg-dark-custom mx-auto" style="height: 25px; max-width: 400px; border-radius: 50px;">
+                        <div class="progress-bar bg-success-custom progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ probability }}%; border-radius: 50px;" aria-valuenow="{{ probability }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ probability }}% Approval Confidence
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="card card-result-rejected shadow-lg border-0 rounded-4 mb-4">
+            <div class="card-body p-5 text-center text-white">
+                <i class="fa-solid fa-circle-xmark display-1 mb-4 text-danger-custom animate-bounce"></i>
+                <h2 class="display-6 font-outfit fw-bold mb-3">Application REJECTED</h2>
+                <p class="lead text-white-80">This applicant profile has been flagged as high-risk. Further review may be required.</p>
+                
+                <div class="gauge-container my-4">
+                    <div class="progress progress-custom bg-dark-custom mx-auto" style="height: 25px; max-width: 400px; border-radius: 50px;">
+                        <div class="progress-bar bg-danger-custom progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ 100.0 - probability }}%; border-radius: 50px;" aria-valuenow="{{ 100.0 - probability }}" aria-valuemin="0" aria-valuemax="100">
+                            {{ 100.0 - probability }}% Risk Probability
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Details Summary Card -->
+        <div class="card card-custom shadow-lg border-0 rounded-4 mb-5">
+            <div class="card-body p-4">
+                <h4 class="section-title mb-4 font-outfit text-white"><i class="fa-solid fa-file-invoice me-2 text-accent"></i> Submitted Application Summary</h4>
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover table-custom mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="text-white-50">Annual Income</th>
+                                <td class="text-white font-monospace">${{ "{:,.2f}".format(raw_data['AMT_INCOME_TOTAL']) }}</td>
+                                <th class="text-white-50">Gender</th>
+                                <td class="text-white">{{ 'Female' if raw_data['CODE_GENDER'] == 'F' else 'Male' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-white-50">Age</th>
+                                <td class="text-white">{{ -raw_data['DAYS_BIRTH'] // 365 }} Years</td>
+                                <th class="text-white-50">Employment Status</th>
+                                <td class="text-white">{{ 'Unemployed / Retired' if raw_data['DAYS_EMPLOYED'] == 365243 else '{:.1f} Years'.format(-raw_data['DAYS_EMPLOYED'] / 365.25) }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-white-50">Education</th>
+                                <td class="text-white">{{ raw_data['NAME_EDUCATION_TYPE'] }}</td>
+                                <th class="text-white-50">Income Source</th>
+                                <td class="text-white">{{ raw_data['NAME_INCOME_TYPE'] }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-white-50">Car Ownership</th>
+                                <td class="text-white">{{ 'Yes' if raw_data['FLAG_OWN_CAR'] == 'Y' else 'No' }}</td>
+                                <th class="text-white-50">Property Owner</th>
+                                <td class="text-white">{{ 'Yes' if raw_data['FLAG_OWN_REALTY'] == 'Y' else 'No' }}</td>
+                            </tr>
+                            <tr>
+                                <th class="text-white-50">Family Size</th>
+                                <td class="text-white">{{ raw_data['CNT_FAM_MEMBERS'] }} members</td>
+                                <th class="text-white-50">Children</th>
+                                <td class="text-white">{{ raw_data['CNT_CHILDREN'] }} children</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="text-center mb-5">
+            <a href="{{ url_for('routes.index') }}" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-bold font-outfit shadow-sm"><i class="fa-solid fa-arrows-rotate me-2"></i> Submit Another Application</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

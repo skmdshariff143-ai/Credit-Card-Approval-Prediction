@@ -1,0 +1,32 @@
+{
+    "model_name": "random_forest",
+    "date_registered": "2026-06-29 16:02:30",
+    "parameters": {
+        "bootstrap": "True",
+        "ccp_alpha": "0.0",
+        "class_weight": "balanced",
+        "criterion": "gini",
+        "max_depth": "20",
+        "max_features": "sqrt",
+        "max_leaf_nodes": "None",
+        "max_samples": "None",
+        "min_impurity_decrease": "0.0",
+        "min_samples_leaf": "1",
+        "min_samples_split": "5",
+        "min_weight_fraction_leaf": "0.0",
+        "monotonic_cst": "None",
+        "n_estimators": "100",
+        "n_jobs": "-1",
+        "oob_score": "False",
+        "random_state": "42",
+        "verbose": "0",
+        "warm_start": "False"
+    },
+    "metrics": {
+        "Accuracy": 0.917,
+        "Precision": 0.3333333333333333,
+        "Recall": 0.10666666666666667,
+        "F1-Score": 0.16161616161616163,
+        "ROC-AUC": 0.7037189189189189
+    }
+}
