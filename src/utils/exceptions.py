@@ -12,6 +12,10 @@ class DataValidationError(CreditCardApprovalException):
     """Raised when schema validation rules fail."""
     pass
 
+class ValidationError(DataValidationError):
+    """Raised when API input validation checks fail."""
+    pass
+
 class DataPreprocessingError(CreditCardApprovalException):
     """Raised when cleaning, imputing, outlier correction, or pipeline transforms fail."""
     pass

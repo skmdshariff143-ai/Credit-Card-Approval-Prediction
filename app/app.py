@@ -25,11 +25,11 @@ def create_app() -> Flask:
     # Error Handlers
     @app.errorhandler(404)
     def not_found_error(error):
-        return render_template('error.html', error_code=404, message="Page not found. The URL was mistyped or removed."), 404
+        return render_template('404.html'), 404
         
     @app.errorhandler(500)
     def internal_error(error):
-        return render_template('error.html', error_code=500, message="Internal server error. Ensure models are trained before starting Flask."), 500
+        return render_template('500.html'), 500
         
     return app
 

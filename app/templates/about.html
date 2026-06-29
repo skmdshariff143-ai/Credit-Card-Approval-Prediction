@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-4">
+                <h2 class="fw-bold mb-3"><i class="bi bi-file-earmark-text text-primary"></i> Project Overview & Business Problem</h2>
+                <p>In retail banking, credit card issuance represents a balance between maximizing credit access and minimizing default rates. Traditional manually-reviewed risk assessment is slow and prone to subjective inconsistencies.</p>
+                <p><strong>CreditGuard AI</strong> implements a supervised machine learning binary classifier that evaluates applicant information at scale. By using historical repayment records, the system flags default default risk ($\ge 60$ days delinquent status) as <strong>Class 1 (Rejected)</strong>, and stable repayment profiles as <strong>Class 0 (Approved)</strong>.</p>
+                
+                <h4 class="fw-semibold mt-4 mb-3">Machine Learning Workflow</h4>
+                <div class="row text-center g-3 my-2">
+                    <div class="col-sm-3">
+                        <div class="p-3 bg-light rounded-3 border border-light-subtle h-100">
+                            <i class="bi bi-file-earmark-arrow-down text-primary fs-3"></i>
+                            <h6 class="fw-bold mt-2">1. Ingestion</h6>
+                            <small class="text-muted">Validate bounds and shape schemas.</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="p-3 bg-light rounded-3 border border-light-subtle h-100">
+                            <i class="bi bi-tools text-primary fs-3"></i>
+                            <h6 class="fw-bold mt-2">2. Processing</h6>
+                            <small class="text-muted">Cap outliers, impute nulls, engineer features.</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="p-3 bg-light rounded-3 border border-light-subtle h-100">
+                            <i class="bi bi-calculator text-primary fs-3"></i>
+                            <h6 class="fw-bold mt-2">3. Modeling</h6>
+                            <small class="text-muted">Train baseline, cross-validate, GridSearch tune.</small>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="p-3 bg-light rounded-3 border border-light-subtle h-100">
+                            <i class="bi bi-hdd-network text-primary fs-3"></i>
+                            <h6 class="fw-bold mt-2">4. Serving</h6>
+                            <small class="text-muted">REST API endpoints and Flask scoring.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3"><i class="bi bi-graph-up text-primary"></i> Model Performance & Auditing</h4>
+                <p>The models were trained on 5-fold Stratified Cross-Validation on the balanced training partition and evaluated on an unseen test partition. Because credit card defaults represent severe loss, we prioritized <strong>Recall</strong> (the ratio of high-risk defaults detected) over simple Accuracy.</p>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle border border-light-subtle">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>F1-Score</th>
+                                <th>ROC-AUC</th>
+                                <th>Recall</th>
+                                <th>Balanced Accuracy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="table-primary">
+                                <td class="fw-bold">Logistic Regression (Deployed)</td>
+                                <td>0.2387</td>
+                                <td>0.7409</td>
+                                <td>66.67%</td>
+                                <td>0.6744</td>
+                            </tr>
+                            <tr>
+                                <td>XGBoost Classifier</td>
+                                <td>0.2047</td>
+                                <td>0.7001</td>
+                                <td>17.33%</td>
+                                <td>0.5656</td>
+                            </tr>
+                            <tr>
+                                <td>Decision Tree Classifier</td>
+                                <td>0.1975</td>
+                                <td>0.5683</td>
+                                <td>21.33%</td>
+                                <td>0.5683</td>
+                            </tr>
+                            <tr>
+                                <td>Random Forest Classifier</td>
+                                <td>0.1930</td>
+                                <td>0.7174</td>
+                                <td>14.67%</td>
+                                <td>0.5582</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <small class="text-muted">Note: Tree-based ensemble models suffer from majority class overfitting, predicting very few default cases. Logistic Regression with balanced weighting generalizes best to default risk.</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 mb-4 bg-dark text-white">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3"><i class="bi bi-database-fill-gear"></i> Dataset Summary</h4>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i> <strong>Source:</strong> Kaggle Credit Card Approval</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i> <strong>Total Demographics:</strong> 5,000 application rows</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i> <strong>Total History:</strong> 163,037 monthly records</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i> <strong>Approved Class (0):</strong> 92.50%</li>
+                    <li class="mb-0"><i class="bi bi-check-circle text-primary me-2"></i> <strong>Default Class (1):</strong> 7.50%</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3"><i class="bi bi-rocket-takeoff text-primary"></i> Future Improvements</h4>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-transparent border-0 px-0 mb-1">
+                        <i class="bi bi-check-lg text-primary me-2"></i> <strong>Credit History Windowing:</strong> Incorporate temporal trend features.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 px-0 mb-1">
+                        <i class="bi bi-check-lg text-primary me-2"></i> <strong>Anonymization:</strong> Apply differential privacy to applicant features.
+                    </li>
+                    <li class="list-group-item bg-transparent border-0 px-0 mb-0">
+                        <i class="bi bi-check-lg text-primary me-2"></i> <strong>Model Retraining Loop:</strong> Automatic pipeline updates on new monthly credit logs.
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

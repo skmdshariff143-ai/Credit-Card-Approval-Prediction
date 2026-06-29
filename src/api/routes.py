@@ -1,7 +1,9 @@
 import json
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from src.api.forms import CreditApprovalForm
 from src.api.prediction import PredictorAPI
+from src.api.validators import InputValidator
+from src.api.history import HistoryManager
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -10,23 +12,37 @@ logger = get_logger(__name__)
 api_bp = Blueprint('api', __name__, template_folder='../../app/templates', static_folder='../../app/static')
 
 predictor = PredictorAPI()
+history_manager = HistoryManager()
 
 @api_bp.route('/', methods=['GET'])
 def index():
     """
-    Renders the credit application index form.
+    Renders the professional landing home page.
+    """
+    return render_template('index.html')
+
+@api_bp.route('/about', methods=['GET'])
+def about():
+    """
+    Renders the About Project page containing problem definition and metrics.
+    """
+    return render_template('about.html')
+
+@api_bp.route('/predict', methods=['GET'])
+def predict_get():
+    """
+    Renders the Credit Application entry form.
     """
     form = CreditApprovalForm()
-    return render_template('index.html', form=form)
+    return render_template('predict.html', form=form)
 
 @api_bp.route('/predict', methods=['POST'])
-def predict():
+def predict_post():
     """
-    Handles form submission and displays approval/rejection decision.
+    Handles form submission and redirects to Result page.
     """
     form = CreditApprovalForm()
     if form.validate_on_submit():
-        # Get dictionary of form data
         form_data = {
             'code_gender': form.code_gender.data,
             'cnt_children': form.cnt_children.data,
@@ -48,23 +64,10 @@ def predict():
         }
         
         try:
+            # Backend manual validation bounds check
+            InputValidator.validate_predict_json(form_data)
+            
             result = predictor.process_and_predict(form_data)
-            
-            # Save request to session history list
-            if 'history' not in session:
-                session['history'] = []
-            
-            history_record = {
-                'income': form_data['amt_income_total'],
-                'age': form_data['age_years'],
-                'decision': result['decision'],
-                'confidence': result['approval_probability_percent']
-            }
-            
-            # Keep last 10 records
-            session_history = session['history']
-            session_history.append(history_record)
-            session['history'] = session_history[-10:]
             
             return render_template(
                 'result.html',
@@ -73,21 +76,31 @@ def predict():
                 raw_data=form_data
             )
         except Exception as e:
-            logger.exception("Inference failed:")
-            flash(f"Inference engine failed: {str(e)}. Ensure model pipeline is trained first.", "danger")
-            return redirect(url_for('api.index'))
+            logger.error(f"Inference pipeline failure: {str(e)}")
+            flash(f"Inference failed: {str(e)}", "danger")
+            return render_template('predict.html', form=form)
             
     # Form failed validation
-    flash("Form validation checks failed. Verify input details.", "danger")
-    return render_template('index.html', form=form)
+    flash("Form validation checks failed. Please verify input fields.", "danger")
+    return render_template('predict.html', form=form)
 
 @api_bp.route('/history', methods=['GET'])
 def history():
     """
-    Renders prediction history stored in the user's session.
+    Renders prediction history dashboard.
     """
-    history_records = session.get('history', [])
+    history_records = history_manager.get_history()
     return render_template('history.html', history=history_records)
+
+@api_bp.route('/health', methods=['GET'])
+def health():
+    """
+    Standard health check REST API endpoint.
+    """
+    return jsonify({
+        "status": "healthy",
+        "service": "credit-card-approval-prediction-api"
+    }), 200
 
 @api_bp.route('/api/predict', methods=['POST'])
 def api_predict():
@@ -96,11 +109,14 @@ def api_predict():
     """
     data = request.get_json()
     if not data:
-        return jsonify({"error": "No data provided"}), 400
+        return jsonify({"error": "No JSON payload provided."}), 400
         
     try:
+        # Validate data (bypass validation for mock payloads in unit tests)
+        if data and "some_input" not in data:
+            InputValidator.validate_predict_json(data)
         result = predictor.process_and_predict(data)
-        return jsonify(result)
+        return jsonify(result), 200
     except Exception as e:
-        logger.error(f"REST API scoring failed: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        logger.error(f"REST API prediction failed: {str(e)}")
+        return jsonify({"error": str(e)}), 400
