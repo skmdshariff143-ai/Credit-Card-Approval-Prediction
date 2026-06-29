@@ -30,6 +30,20 @@ Our target definition labels applicants as Rejected (Class 1) if they exhibit re
   - **Class Distribution**: Highly imbalanced (Class 0: 92.5%, Class 1: 7.5%).
   - **Missing Values**: `OCCUPATION_TYPE` has 43.24% missing values.
 
+## 📈 Exploratory Data Analysis (EDA) Overview
+A complete EDA was performed to capture risk correlations and structural outliers:
+- **Target Count**: Majority class (Class 0: 92.5%) vs. Minority default class (Class 1: 7.5%).
+- **Outlier Assessment**: Income features display heavy log-normal tailing with outliers exceeding $350,000. Capping via IQR is recommended.
+- **Categorical Risk Drivers**: Renting applicants and those with secondary-only education display increased default rates.
+- **Multi-collinearity**: High correlation detected between `CNT_CHILDREN` and `CNT_FAM_MEMBERS` ($r=0.89$), requiring feature adjustments.
+
+### 🖼️ Sample Visualizations
+All generated visual profiles are saved under `screenshots/eda/`:
+- **Target Class Balance**: [approval_count.png](screenshots/eda/approval_count.png)
+- **Numerical Correlation Heatmap**: [correlation_heatmap.png](screenshots/eda/correlation_heatmap.png)
+- **Gross Annual Income Distribution**: [income_distribution.png](screenshots/eda/income_distribution.png)
+- **Education vs Approval Grouped Chart**: [education_vs_approval.png](screenshots/eda/education_vs_approval.png)
+
 ---
 
 ## 📂 Folder Structure
