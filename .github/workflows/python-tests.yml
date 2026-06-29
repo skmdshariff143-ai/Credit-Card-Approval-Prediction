@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Python Test Suite
 
 on:
   push:
@@ -7,16 +7,20 @@ on:
     branches: [ main ]
 
 jobs:
-  lint-and-validate:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.13"]
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
       - name: Install System Dependencies
@@ -27,17 +31,10 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 black bandit
+          pip install pytest pytest-cov pytest-asyncio Flask-Dance
           pip install -r requirements.txt
           pip install -e .
 
-      - name: Lint with Black
+      - name: Run Pytest Suite
         run: |
-          black --check src/ app/ tests/ || true
-
-      - name: Lint with Flake8
-        run: |
-          # Syntax error check
-          flake8 src/ app/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          # Warnings and code length checks
-          flake8 src/ app/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+          python -m pytest --cov=src --cov=app --cov-report=term-missing

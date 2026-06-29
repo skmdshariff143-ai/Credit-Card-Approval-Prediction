@@ -1,9 +1,10 @@
+# =========================================================
+# SYSTEM & BUSINESS IGNORES
+# =========================================================
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
 
 # Distribution / packaging
@@ -27,9 +28,15 @@ MANIFEST
 
 # Jupyter Notebook
 .ipynb_checkpoints/
+*/.ipynb_checkpoints/
+.ipynb_checkpoints
+*~
+*.ipynb
 
 # Virtual Environments
 .env
+.env.local
+.env.*
 .venv
 env/
 venv/
@@ -37,21 +44,38 @@ ENV/
 env.bak/
 venv.bak/
 
-# Logs
+# IDE / Editor Settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Testing & Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.nox/
+.tox/
+
+# Logs & Diagnostics
 logs/
 *.log
+.cache/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# OS-specific
+DS_Store
+Thumbs.db
+
+# Docker & Containerization
+.dockerignore
+# Do not ignore Dockerfiles or Compose files
 
 # Model artifacts
-models/*.pkl
-models/*.joblib
-models/*.json
-
-# Data
-data/raw/*
-data/processed/*
-data/interim/*
-data/external/*
-!data/raw/.gitkeep
-!data/processed/.gitkeep
-!data/interim/.gitkeep
-!data/external/.gitkeep
+# Ignore heavy serialized artifacts if required, but keep metadata & comparison files
+# models/*.pkl
+# models/*.joblib

@@ -1,0 +1,6 @@
+ID,CODE_GENDER,FLAG_OWN_CAR,FLAG_OWN_REALTY,CNT_CHILDREN,AMT_INCOME_TOTAL,NAME_INCOME_TYPE,NAME_EDUCATION_TYPE,NAME_FAMILY_STATUS,NAME_HOUSING_TYPE,DAYS_BIRTH,DAYS_EMPLOYED,FLAG_MOBIL,FLAG_WORK_PHONE,FLAG_PHONE,FLAG_EMAIL,OCCUPATION_TYPE,CNT_FAM_MEMBERS,STATUS_TARGET,AGE_YEARS,FLAG_UNEMPLOYED,YEARS_EMPLOYED,INCOME_PER_MEMBER,INCOME_GROUP,AGE_GROUP,EXPERIENCE_BUCKET,FINANCIAL_STABILITY_SCORE
+10001,M,Y,Y,0,120000.0,Working,Secondary / secondary special,Married,House / apartment,-12000,-1200,1,0,0,0,Laborers,2,0,32.85,0,3.29,60000.0,medium,youth,mid,2.0
+10002,F,N,Y,1,90000.0,Commercial associate,Higher education,Single / not married,House / apartment,-15000,-3000,1,1,0,1,,1,0,41.07,0,8.21,90000.0,low,adult,mid,1.0
+10003,M,N,N,2,300000.0,Pensioner,Incomplete higher,Civil marriage,Rented apartment,-20000,365243,1,0,1,0,,3,1,54.76,1,0.0,100000.0,high,adult,entry,1.0
+10004,F,Y,N,-1,-150000.0,Working,Secondary / secondary special,Married,House / apartment,-10000,-500,1,0,0,0,Core staff,0,0,27.38,0,1.37,-150000.0,nan,youth,entry,1.0
+10005,F,N,Y,0,200000.0,State servant,Higher education,Single / not married,House / apartment,-18000,-1000,1,1,0,0,Accountants,2,1,49.28,0,2.74,100000.0,medium,adult,entry,2.0
