@@ -11,8 +11,24 @@
 
 </div>
 
-## 📌 Project Overview
-**CreditGuard AI** is a production-grade, end-to-end Machine Learning pipeline that predicts credit card application approvals. The system automates credit risk evaluation by analyzing applicant demographics and socio-economic profiles.
+## 📌 Project Objective
+Construct a high-performance, automated credit risk evaluation system (**CreditGuard AI**) utilizing classification models to predict whether to approve or reject credit card applications in real-time, based on applicant demographics, financial profile, and repayment history.
+
+## 💼 Business Problem Statement
+Retail banks face massive default risks when issuing credit cards. Manually reviewing card applications is slow, costly, and prone to human error. 
+Using automated screening reduces overhead, but classification errors carry costs:
+- **False Positives (Bad Approval)**: High-risk borrowers default on debts, causing direct write-offs of principal.
+- **False Negatives (Bad Rejection)**: Low-risk applicants are turned away, causing loss of fee revenue and customer frustration.
+Our target definition labels applicants as Rejected (Class 1) if they exhibit repayment delays of 60 days or more, and Approved (Class 0) otherwise.
+
+## 📊 Dataset Information
+- **Dataset Source**: [Kaggle Credit Card Approval Prediction Dataset](https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction)
+- **License**: CC0: Public Domain
+- **Characteristics**:
+  - `application_record.csv`: Demographic and socio-economic variables (5,000 samples, 18 features).
+  - `credit_record.csv`: Repayment history offset records (163,037 monthly balance rows, 3 features).
+  - **Class Distribution**: Highly imbalanced (Class 0: 92.5%, Class 1: 7.5%).
+  - **Missing Values**: `OCCUPATION_TYPE` has 43.24% missing values.
 
 ---
 
