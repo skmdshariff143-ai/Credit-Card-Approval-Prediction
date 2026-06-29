@@ -1,41 +1,32 @@
-# Demo Video Script
-
-**Duration**: ~3 Minutes  
-**Presenter**: Mahammad Shariff Shaik  
+# CreditGuard AI: Credit Card Approval Prediction Demo Script
+**Video Script (Duration: 5–8 minutes)**
 
 ---
 
-## Scene 1: Introduction & Problem Statement (~45 Seconds)
-- **Visual**: Show repo landing page in browser.
-- **Presenter Script**:
-  > "Hello! Today I'm demonstrating CreditGuard AI, an end-to-end Machine Learning system that predicts credit card approval status. 
-  > We evaluate credit risk based on demographic data and monthly payment history. 
-  > Rejections are defined as having late payments of 60 days or more."
+## 0:00 - 1:00: Introduction & Overview
+- **Visual**: Show the landing page of the application (`index.html`) running locally.
+- **Audio**: "Hello! Welcome to the walkthrough of CreditGuard AI, an end-to-end Machine Learning credit card approval system. Our platform automates credit risk ratings and issuing decisions. In retail banking, delinquency is a critical risk factor. Our project is designed to evaluate demographics and monthly payment logs to calculate default risk probabilities with sub-millisecond latency."
 
 ---
 
-## Scene 2: Code Walkthrough (~60 Seconds)
-- **Visual**: Show VS Code editor configurations and ML pipelines.
-- **Presenter Script**:
-  > "Our system follows enterprise-grade modular coding standards. 
-  > We centrally manage configuration settings in `configs/config.py` and constants in `configs/constants.py`.
-  > Our preprocessing pipeline wraps missing value imputation, IQR outlier capping, categorical encoding, and standardization.
-  > We train and compare Logistic Regression, Decision Trees, Random Forests, and XGBoost, registering the best model in the model registry."
+## 1:00 - 2:30: Codebase and Folder Structure
+- **Visual**: Open VS Code displaying the folder hierarchy. Point out `data/`, `src/`, `app/`, `tests/`, and `configs/`.
+- **Audio**: "The codebase follows enterprise standards. The `src/` directory houses raw data validators, preprocessing pipelines, model trainer interfaces, and feature selectors. Configurations are dynamic and class-based, located under `configs/`. Visual screenshots and model evaluations are logged under `screenshots/`."
 
 ---
 
-## Scene 3: Live Application Demo (~45 Seconds)
-- **Visual**: Show Flask web application form. Submit low-risk and high-risk applications.
-- **Presenter Script**:
-  > "Let's test the web app. We fill in a low-risk applicant profile. 
-  > Upon submission, client-side validation triggers, followed by ML prediction. 
-  > The system recommends Approval with high confidence. 
-  > For a high-risk profile, the system flags the applicant and recommends Rejection."
+## 2:30 - 4:00: Preprocessing & Model Selection
+- **Visual**: Show `reports/Model_Comparison.md` metrics table.
+- **Audio**: "Our raw dataset is highly imbalanced with only 7.5% defaults. We applied class random oversampling to the training split. We compared four algorithms: Logistic Regression, Decision Trees, Random Forests, and XGBoost. Because missing a high-risk applicant is extremely costly, we prioritized Recall. Logistic Regression achieved the best balance with a Recall of 66.67% and F1-Score of 0.2387."
 
 ---
 
-## Scene 4: Docker & Cloud Integration (~30 Seconds)
-- **Visual**: Show Dockerfile and deploy.py.
-- **Presenter Script**:
-  > "The app is containerized using Docker and uses GitHub Actions for continuous integration. 
-  > We also include python deployment scripts to register and host this model on IBM Watson Machine Learning."
+## 4:00 - 5:30: Flask Web App & REST API Demo
+- **Visual**: Go to the browser. Click 'Start Prediction', fill out the fields (e.g. Age: 35, Income: $120,000, own car: Yes), and click 'Run Risk Prediction'. Show the 'Approved' decision card. Show the 'Prediction History Logs' table.
+- **Audio**: "Here is the active Flask web interface. The form collects demographics and financial stability scores. When submitted, the backend validates values, standard scales inputs, and displays the risk rating and decision. The transaction is saved inside the persistent prediction history logs."
+
+---
+
+## 5:30 - 6:30: Docker & CI/CD Deployment
+- **Visual**: Show the `Dockerfile` and Gunicorn configuration. Show the GitHub Actions badges.
+- **Audio**: "The application is containerized utilizing Gunicorn and Docker. GitHub Actions CI/CD workflows validate code linting, run unit tests, and build Docker images on every push, ensuring continuous integration. Thank you for watching!"
