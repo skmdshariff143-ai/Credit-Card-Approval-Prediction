@@ -1,4 +1,5 @@
 import os
+import time
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
@@ -7,22 +8,19 @@ from configs.config import config
 from configs.constants import RANDOM_STATE
 from src.utils.logger import get_logger
 from src.utils.exceptions import ModelTrainingError
-from src.utils.helper import save_pkl
 
 logger = get_logger(__name__)
 
 class ModelTrainer:
     """
-    Handles training of base classifiers and serializes model objects.
+    Handles fitting and timing of baseline risk classifiers.
     """
     def __init__(self):
-        paths = config.get_paths()
-        self.models_dir = paths["models_dir"]
         self.random_state = RANDOM_STATE
         
-    def get_baseline_models(self):
+    def get_baseline_models(self) -> dict:
         """
-        Instantiates baseline Logistic Regression, Decision Tree, Random Forest, and XGBoost models.
+        Instantiates Logistic Regression, Decision Tree, Random Forest, and XGBoost classifiers.
         """
         models = {
             "logistic_regression": LogisticRegression(
@@ -46,22 +44,32 @@ class ModelTrainer:
         }
         return models
 
-    def train_model(self, name, model, X_train, y_train):
+    def train_and_time_model(self, name: str, model, X_train, y_train) -> tuple:
         """
-        Fits a classifier on training dataset splits.
+        Fits a classifier, measuring the training time elapsed.
         """
         logger.info(f"Training model '{name}'...")
+        start_time = time.time()
         try:
             model.fit(X_train, y_train)
-            logger.info(f"Model '{name}' trained successfully.")
-            return model
+            train_time = time.time() - start_time
+            logger.info(f"Model '{name}' training complete in {train_time:.4f} seconds.")
+            return model, train_time
         except Exception as e:
             logger.error(f"Failed to train model '{name}': {str(e)}")
             raise ModelTrainingError(f"Model training failed for {name}: {str(e)}")
 
-    def save_model(self, name, model):
+    def measure_inference_speed(self, model, X_test) -> tuple:
         """
-        Serializes trained model to the models folder.
+        Runs predictions on test split and measures total inference duration.
         """
-        file_path = os.path.join(self.models_dir, f"{name}.pkl")
-        save_pkl(model, file_path)
+        start_time = time.time()
+        y_pred = model.predict(X_test)
+        inference_time = time.time() - start_time
+        
+        y_prob = None
+        if hasattr(model, "predict_proba"):
+            y_prob_raw = model.predict_proba(X_test)
+            y_prob = y_prob_raw[:, 1] if hasattr(y_prob_raw, "ndim") and y_prob_raw.ndim > 1 else [p[1] for p in y_prob_raw]
+            
+        return y_pred, y_prob, inference_time

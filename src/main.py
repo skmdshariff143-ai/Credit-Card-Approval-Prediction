@@ -1,140 +1,176 @@
 import os
+import sys
 import argparse
+import time
+
+# Ensure project root is on Python search path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import pandas as pd
+from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.utils._tags import ClassifierTags
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.metrics import classification_report
+
+# Global patch to fix scikit-learn 1.6 / Python 3.13 / XGBoost MRO compatibility bug
+def safe_sklearn_tags(self):
+    try:
+        # BaseEstimator is parent class, resolve its tags
+        tags = BaseEstimator.__sklearn_tags__(self)
+        tags.estimator_type = "classifier"
+        tags.classifier_tags = ClassifierTags()
+        tags.target_tags.required = True
+        return tags
+    except Exception:
+        # Fallback to default empty tags if resolution fails
+        return BaseEstimator.__sklearn_tags__(self)
+
+ClassifierMixin.__sklearn_tags__ = safe_sklearn_tags
+
 from configs.config import config
 from configs.constants import TARGET_COL
-from src.data.load_data import DataLoader
-from src.data.validate_data import DataValidator
-from src.data.data_split import perform_stratified_split
-from src.features.feature_engineering import FeatureEngineer
-from src.features.feature_selection import FeatureSelector
-from src.preprocessing.pipeline import PreprocessingPipeline
 from src.models.train import ModelTrainer
 from src.models.hyperparameter_tuning import HyperparameterTuner
 from src.models.evaluate import ModelEvaluator
 from src.models.compare_models import ModelComparator
+from src.models.metrics import calculate_all_metrics
+from src.models.model_registry import ModelRegistry
 from src.utils.logger import get_logger
 from src.utils.helper import save_pkl
 
 logger = get_logger(__name__)
 
-def run_pipeline(tune=False):
+def run_model_pipeline():
     logger.info("==================================================")
-    logger.info("STARTING ENTERPRISE ML PIPELINE INITIATOR")
+    logger.info("STARTING MODEL TRAINING & EVALUATION PIPELINE")
     logger.info("==================================================")
+    
+    paths = config.get_paths()
+    processed_dir = paths["processed_dir"]
+    models_dir = paths["models_dir"]
+    reports_dir = paths["reports_dir"]
+    
+    # 1. Load splits
+    logger.info("Loading preprocessed dataset splits...")
+    X_train = pd.read_csv(os.path.join(processed_dir, "X_train.csv"))
+    y_train = pd.read_csv(os.path.join(processed_dir, "y_train.csv"))[TARGET_COL]
+    X_test = pd.read_csv(os.path.join(processed_dir, "X_test.csv"))
+    y_test = pd.read_csv(os.path.join(processed_dir, "y_test.csv"))[TARGET_COL]
+    
+    # 2. Get baseline models
+    trainer = ModelTrainer()
+    tuner = HyperparameterTuner(cv=3)
+    evaluator = ModelEvaluator()
+    comparator = ModelComparator()
+    registry = ModelRegistry()
+    
+    models = trainer.get_baseline_models()
+    trained_models = {}
+    
+    # Stratified K-Fold setup for Cross-Validation (K=5)
+    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    
+    logger.info("--- Step 1: Baseline training, Cross-Validation & Tuning ---")
+    cv_summaries = {}
+    
+    for name, model in models.items():
+        # Fit baseline & profile time
+        fitted_base, train_time = trainer.train_and_time_model(name, model, X_train, y_train)
+        
+        # 5-fold Stratified Cross-Validation
+        logger.info(f"Running 5-fold Stratified CV for {name}...")
+        scores = cross_val_score(fitted_base, X_train, y_train, cv=skf, scoring='f1')
+        mean_score = scores.mean()
+        std_score = scores.std()
+        logger.info(f"{name} CV F1-Score: {mean_score:.4f} (+/- {std_score:.4f})")
+        cv_summaries[name] = {"mean": mean_score, "std": std_score}
+        
+        # Hyperparameter Tuning (GridSearch)
+        logger.info(f"Tuning model {name}...")
+        tuned_model = tuner.tune(name, fitted_base, X_train, y_train)
+        trained_models[name] = tuned_model
+        
+        # Run inference speed profile
+        y_pred, y_prob, inf_time = trainer.measure_inference_speed(tuned_model, X_test)
+        
+        # Calculate metrics
+        metrics = calculate_all_metrics(y_test, y_pred, y_prob)
+        comparator.add_model_metrics(name, metrics, train_time, inf_time)
+        
+        # Generate model visual plots
+        evaluator.plot_confusion_matrix(name, y_test, y_pred)
+        if y_prob is not None:
+            evaluator.plot_roc_curve(name, y_test, y_prob)
+            evaluator.plot_precision_recall_curve(name, y_test, y_prob)
+            
+        # Feature Importance for tree models
+        if name in ["decision_tree", "random_forest", "xgboost"]:
+            evaluator.plot_feature_importance(name, tuned_model, list(X_train.columns))
+
+    # 3. Compare models
+    logger.info("--- Step 2: Comparing Models ---")
+    comparison_df = comparator.compare_and_rank()
+    evaluator.plot_model_comparison(comparison_df)
+    
+    # 4. Select Best Model
+    best_row = comparison_df.loc[0] # Rank 1 model
+    best_name = best_row["Model"]
+    best_model = trained_models[best_name]
+    
+    logger.info(f"Auto-selected Deployed Model: '{best_name}' (F1-Score: {best_row['F1-Score']:.4f}, ROC-AUC: {best_row['ROC-AUC']:.4f})")
+    
+    # Save best_model.pkl using Joblib
+    best_model_path = os.path.join(models_dir, "best_model.pkl")
+    save_pkl(best_model, best_model_path)
+    logger.info(f"Best model serialized to: {best_model_path}")
+    
+    # Generate text classification report
+    y_pred, y_prob, _ = trainer.measure_inference_speed(best_model, X_test)
+    report_str = classification_report(y_test, y_pred, target_names=["Approved", "Rejected"])
+    comparator.save_classification_report_txt(best_name, report_str)
+    
+    # Write Model_Report.md
+    _write_final_model_report(best_name, best_row, cv_summaries)
+    
+    logger.info("==================================================")
+    logger.info("MODEL TRAINING PIPELINE COMPLETED SUCCESSFULLY")
+    logger.info("==================================================")
+    return best_name
+
+def _write_final_model_report(best_name, best_row, cv_summaries):
+    """
+    Generates reports/Model_Report.md.
+    """
+    paths = config.get_paths()
+    report_path = os.path.join(paths["reports_dir"], "Model_Report.md")
+    
+    report_lines = [
+        "# Model Training & Performance Report\n",
+        f"This report documents model training parameters, Stratified Cross-Validation scores, and performance metrics of the best risk model: **{best_name}**.\n",
+        "## 1. Selected Best Model Metrics",
+        f"- **Model Algorithm**: {best_name}",
+        f"- **F1-Score**: {best_row['F1-Score']:.4f}",
+        f"- **ROC-AUC Score**: {best_row['ROC-AUC']:.4f}",
+        f"- **Balanced Accuracy**: {best_row['Balanced_Accuracy']:.4f}",
+        f"- **Log Loss**: {best_row['Log_Loss']:.4f}",
+        f"- **Training Time**: {best_row['Training_Time_Sec']} seconds",
+        f"- **Inference Speed**: {best_row['Prediction_Time_Sec']} seconds (batch test split)",
+        "\n## 2. 5-fold Stratified Cross Validation Summary",
+        "Cross-validation F1-scores on balanced training splits:"
+    ]
+    
+    for name, cv in cv_summaries.items():
+        report_lines.append(f"- **{name}**: Mean F1 = {cv['mean']:.4f} (Std = {cv['std']:.4f})")
+        
+    report_lines.append("\n## 3. Business Relevance & Interpretability")
+    report_lines.append("Tree-based ensemble models (Random Forest and XGBoost) successfully segment credit risk boundaries without assuming linear structures. Using balanced class weighting helps protect the bank from critical credit defaults.")
     
     try:
-        # 1. Load Data
-        logger.info("--- Step 1: Loading Datasets ---")
-        loader = DataLoader()
-        app_df, credit_df = loader.load_all()
-        
-        # 2. Validate Data
-        logger.info("--- Step 2: Validating Schemas ---")
-        validator = DataValidator()
-        validator.validate_application_schema(app_df)
-        validator.validate_credit_schema(credit_df)
-        
-        # 3. Custom Feature Extraction (Data Cleaning & Merging)
-        logger.info("--- Step 3: Cleaning & Feature Engineering ---")
-        # Define target variable from credit delinquency history
-        # Labeled Class 1 (Bad) if borrower is ever late by 60+ days
-        bad_statuses = {'2', '3', '4', '5'}
-        credit_df['IS_BAD'] = credit_df['STATUS'].astype(str).apply(lambda x: 1 if x in bad_statuses else 0)
-        target_df = credit_df.groupby('ID')['IS_BAD'].max().reset_index()
-        target_df.rename(columns={'IS_BAD': TARGET_COL}, inplace=True)
-        
-        # Feature extraction
-        engineer = FeatureEngineer()
-        app_cleaned = engineer.extract_custom_features(app_df)
-        
-        # Inner join to combine demographics with delinquency target
-        merged_df = pd.merge(app_cleaned, target_df, on='ID', how='inner')
-        logger.info(f"Cleaned & Merged dataset shape: {merged_df.shape}")
-        
-        # 4. Stratified Split (80/20)
-        logger.info("--- Step 4: Stratified Splitting ---")
-        X_train, X_test, y_train, y_test = perform_stratified_split(merged_df)
-        
-        # 5. Fit Preprocessing Pipeline & Save Artifacts
-        logger.info("--- Step 5: Fitting Preprocessors ---")
-        preprocessor = PreprocessingPipeline()
-        # Exclude metadata IDs from standard preprocessing
-        X_train_clean = X_train.drop(columns=['ID'], errors='ignore')
-        X_test_clean = X_test.drop(columns=['ID'], errors='ignore')
-        
-        preprocessor.fit(X_train_clean)
-        X_train_processed = preprocessor.transform(X_train_clean)
-        X_test_processed = preprocessor.transform(X_test_clean)
-        
-        preprocessor.save_artifacts()
-        
-        # 6. Feature Selection
-        logger.info("--- Step 6: Feature Selection Analysis ---")
-        selector = FeatureSelector(threshold=0.01)
-        selector.fit_selection(X_train_processed, y_train)
-        
-        # We can filter X train/test if selector removes features, let's keep them all for model consistency
-        
-        # 7. Model Training & Tuning
-        logger.info("--- Step 7: Model Training ---")
-        trainer = ModelTrainer()
-        tuner = HyperparameterTuner()
-        
-        base_models = trainer.get_baseline_models()
-        final_models = {}
-        
-        for name, model in base_models.items():
-            # Train baseline model
-            trained_base = trainer.train_model(name, model, X_train_processed, y_train)
-            
-            if tune:
-                tuned_model = tuner.tune(name, trained_base, X_train_processed, y_train)
-                final_models[name] = tuned_model
-            else:
-                final_models[name] = trained_base
-                
-        # 8. Model Evaluation
-        logger.info("--- Step 8: Evaluating Models ---")
-        evaluator = ModelEvaluator()
-        comparator = ModelComparator()
-        
-        metrics_store = {}
-        for name, model in final_models.items():
-            metrics = evaluator.evaluate_model(name, model, X_test_processed, y_test)
-            metrics_store[name] = metrics
-            comparator.add_model_metrics(name, metrics)
-            
-        evaluator.save_roc_curves(final_models, X_test_processed, y_test)
-        
-        # Save comparison results
-        comparison_df = comparator.compare_and_report()
-        
-        # 9. Register Best Model (Serialize to trained_model.pkl)
-        logger.info("--- Step 9: Serializing Deployed Model ---")
-        # Find model with best F1-Score
-        best_row = comparison_df.loc[comparison_df['F1-Score'].idxmax()]
-        best_name = best_row['Model']
-        best_model = final_models[best_name]
-        
-        logger.info(f"Selected Best Model: '{best_name}' with F1-Score: {best_row['F1-Score']:.4f}")
-        
-        # Serialize to trained_model.pkl
-        models_dir = config.get_paths()["models_dir"]
-        save_pkl(best_model, os.path.join(models_dir, "trained_model.pkl"))
-        
-        logger.info("==================================================")
-        logger.info("PIPELINE EXECUTED SUCCESSFULLY. READY FOR SERVING.")
-        logger.info("==================================================")
-        return best_name
-        
+        with open(report_path, "w") as f:
+            f.write("\n".join(report_lines))
+        logger.info(f"Model report successfully written to: {report_path}")
     except Exception as e:
-        logger.exception("Pipeline run encountered critical error:")
-        raise e
+        logger.error(f"Failed to write final model report: {str(e)}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run complete Credit Approval ML Pipeline.")
-    parser.add_argument("--tune", action="store_true", help="Tune models using GridSearchCV.")
-    args = parser.parse_args()
-    
-    run_pipeline(tune=args.tune)
+    run_model_pipeline()

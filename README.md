@@ -59,6 +59,33 @@ We implemented a reusable, object-oriented preprocessing pipeline (`Preprocessin
 
 - **Fitted Artifacts**: Serialized [scaler.pkl](models/scaler.pkl), [encoder.pkl](models/encoder.pkl), and [preprocessing_pipeline.pkl](models/preprocessing_pipeline.pkl) inside `models/` directory for production inferences.
 
+## 🤖 Machine Learning Model Performance
+We trained and compared 4 classification models using 5-fold Stratified Cross Validation and hyperparameter tuning:
+- **Logistic Regression** (Auto-selected as the Deployed Model)
+- **Decision Tree Classifier**
+- **Random Forest Classifier**
+- **XGBoost Classifier**
+
+### 📊 Model Performance Comparison Table
+
+| Rank | Model | F1-Score | ROC-AUC | Accuracy | Precision | Recall | Balanced Accuracy | Training Time (s) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **1** | **Logistic Regression** | **0.2387** | **0.7409** | 0.6810 | 0.1453 | 0.6667 | 0.6744 | 1.6865 |
+| **2** | XGBoost | 0.2047 | 0.7001 | 0.8990 | 0.2500 | 0.1733 | 0.5656 | 0.3524 |
+| **3** | Decision Tree | 0.1975 | 0.5683 | 0.8700 | 0.1839 | 0.2133 | 0.5683 | 0.1822 |
+| **4** | Random Forest | 0.1930 | 0.7174 | 0.9080 | 0.2821 | 0.1467 | 0.5582 | 0.6675 |
+
+### 🔍 Best Model Selection Justification
+- **Recall Optimization**: In credit risk scoring, missing a high-risk applicant (False Negative) is much more costly than checking a low-risk applicant (False Positive).
+- **Ensemble Limitation**: Tree-based models overfit the majority class, predicting very few default flags (Recalls $\approx$ 15%). **Logistic Regression** with balanced class weighting achieves the highest F1-Score (**0.2387**), a strong ROC-AUC (**0.7409**), and the highest Recall (**66.67%**).
+
+### 🖼️ Sample Model Visualizations
+All model evaluation plots are saved under `screenshots/models/`:
+- **Receiver Operating Characteristic (ROC)**: [logistic_regression_roc_curve.png](screenshots/models/logistic_regression_roc_curve.png)
+- **Confusion Matrix Heatmap**: [logistic_regression_confusion_matrix.png](screenshots/models/logistic_regression_confusion_matrix.png)
+- **Precision-Recall Curve**: [logistic_regression_precision_recall_curve.png](screenshots/models/logistic_regression_precision_recall_curve.png)
+- **Feature Importance Chart**: [random_forest_feature_importance.png](screenshots/models/random_forest_feature_importance.png)
+
 ---
 
 ## 📂 Folder Structure

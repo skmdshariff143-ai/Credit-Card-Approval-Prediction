@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import numpy as np
 from configs.config import config
 from src.utils.logger import get_logger
 from src.utils.helper import load_pkl
@@ -8,65 +7,125 @@ from src.utils.exceptions import ModelTrainingError
 
 logger = get_logger(__name__)
 
-class InferenceEngine:
+class RiskPredictor:
     """
-    Handles single/batch predictions by loading serialized preprocessors and model.
+    Handles model predictions, feature standardizations, and JSON schema validations.
     """
-    def __init__(self, models_dir=None):
+    def __init__(self):
         paths = config.get_paths()
-        self.models_dir = models_dir if models_dir is not None else paths["models_dir"]
-        
-        self.preprocessor_path = os.path.join(self.models_dir, "preprocessor_pipeline.pkl")
-        self.model_path = os.path.join(self.models_dir, "trained_model.pkl")
-        
-        self.preprocessor = None
+        self.models_dir = paths["models_dir"]
+        self.pipeline_path = os.path.join(self.models_dir, "preprocessing_pipeline.pkl")
+        self.model_path = os.path.join(self.models_dir, "best_model.pkl")
+        self.pipeline = None
         self.model = None
         
-    def load_artifacts(self):
+    def load_pipeline(self):
         """
-        Loads the preprocessor pipeline and trained model from models directory.
+        Loads the fitted preprocessing pipeline object.
         """
-        logger.info("Loading inference artifacts...")
-        try:
-            if self.preprocessor is None:
-                self.preprocessor = load_pkl(self.preprocessor_path)
-            if self.model is None:
-                self.model = load_pkl(self.model_path)
-            logger.info("Inference artifacts loaded successfully.")
-        except Exception as e:
-            logger.error(f"Failed to load inference artifacts: {str(e)}")
-            raise FileNotFoundError(f"Inference artifacts not loaded: {str(e)}")
+        if self.pipeline is None:
+            logger.info(f"Loading pipeline from {self.pipeline_path}...")
+            self.pipeline = load_pkl(self.pipeline_path)
+        return self.pipeline
 
-    def predict(self, input_df: pd.DataFrame) -> dict:
+    def load_model(self):
         """
-        Executes preprocessing and model scoring for an input DataFrame.
+        Loads the best trained classifier object.
         """
-        self.load_artifacts()
-        try:
-            # 1. Apply preprocessors
-            X_inf = self.preprocessor.transform(input_df)
-            
-            # Ensure correct columns order
-            cols = self.preprocessor.feature_names
-            X_inf = X_inf[cols]
-            
-            # 2. Run prediction
-            pred = int(self.model.predict(X_inf)[0])
-            
-            # 3. Retrieve probability
-            if hasattr(self.model, "predict_proba"):
-                prob_bad = float(self.model.predict_proba(X_inf)[0][1])
-            else:
-                prob_bad = 1.0 if pred == 1 else 0.0
-                
-            approval_probability = (1.0 - prob_bad) * 100.0
-            result = "Approved" if pred == 0 else "Rejected"
-            
+        if self.model is None:
+            logger.info(f"Loading model from {self.model_path}...")
+            self.model = load_pkl(self.model_path)
+        return self.model
+
+    def validate_input(self, input_data: dict) -> bool:
+        """
+        Validates that input dictionary contains all required fields.
+        """
+        required_fields = {
+            'code_gender', 'cnt_children', 'cnt_fam_members', 'age_years', 
+            'amt_income_total', 'flag_own_car', 'flag_own_realty', 
+            'name_income_type', 'name_education_type', 'name_family_status', 
+            'name_housing_type', 'years_employed', 'flag_unemployed'
+        }
+        missing = required_fields - set(input_data.keys())
+        if missing:
+            logger.error(f"Input verification failed. Missing fields: {missing}")
+            return False
+        return True
+
+    def predict(self, input_df: pd.DataFrame):
+        """
+        Runs binary class predictions. If single-sample DataFrame, returns a formatted dictionary
+        for REST/client serving compatibility. Otherwise returns list of predictions.
+        """
+        pipeline = self.load_pipeline()
+        model = self.load_model()
+        
+        # In case the input DataFrame still has ID column, transform drops it
+        X_trans = pipeline.transform(input_df)
+        preds = model.predict(X_trans)
+        
+        if len(input_df) == 1:
+            prob_1 = 0.0
+            if hasattr(model, "predict_proba"):
+                prob_raw = model.predict_proba(X_trans)
+                try:
+                    # Index 2D array/list first
+                    prob_1 = prob_raw[0][1]
+                except Exception:
+                    try:
+                        # Index 1D list/array
+                        prob_1 = prob_raw[0]
+                    except Exception:
+                        prob_1 = 0.0
+            decision = "Approved" if preds[0] == 0 else "Rejected"
+            # Ensure prob_1 is float type
+            try:
+                prob_1_val = float(prob_1)
+            except Exception:
+                prob_1_val = 0.0
+            approval_prob = (1.0 - prob_1_val) * 100.0
             return {
-                "decision": result,
-                "class_code": pred,
-                "approval_probability_percent": round(approval_probability, 2)
+                "decision": decision,
+                "approval_probability_percent": float(round(approval_prob, 2))
             }
-        except Exception as e:
-            logger.error(f"Inference scoring failed: {str(e)}")
-            raise ModelTrainingError(f"Inference failed: {str(e)}")
+        return list(preds)
+
+
+    def predict_probability(self, input_df: pd.DataFrame) -> list:
+        """
+        Runs risk probability calculations (percent risk of default / Class 1).
+        """
+        pipeline = self.load_pipeline()
+        model = self.load_model()
+        
+        X_trans = pipeline.transform(input_df)
+        if hasattr(model, "predict_proba"):
+            probs = model.predict_proba(X_trans)[:, 1]
+        else:
+            # Fallback for models without probabilities
+            preds = model.predict(X_trans)
+            probs = [1.0 if p == 1 else 0.0 for p in preds]
+        return list(probs)
+
+# Functional API wrapper endpoints for external services
+_predictor = RiskPredictor()
+
+def load_pipeline():
+    return _predictor.load_pipeline()
+
+def load_model():
+    return _predictor.load_model()
+
+def validate_input(input_data: dict) -> bool:
+    return _predictor.validate_input(input_data)
+
+def predict(input_df: pd.DataFrame) -> list:
+    return _predictor.predict(input_df)
+
+def predict_probability(input_df: pd.DataFrame) -> list:
+    return _predictor.predict_probability(input_df)
+
+# Backward compatibility alias
+InferenceEngine = RiskPredictor
+
