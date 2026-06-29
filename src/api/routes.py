@@ -95,11 +95,28 @@ def history():
 @api_bp.route('/health', methods=['GET'])
 def health():
     """
-    Standard health check REST API endpoint.
+    Standard health check REST API endpoint detailing status and model versions.
     """
+    from datetime import datetime
+    try:
+        # Load model name dynamically from metadata if possible
+        import os
+        from configs.config import config
+        paths = config.get_paths()
+        meta_path = os.path.join(paths["models_dir"], "logistic_regression_metadata.json")
+        model_loaded = "logistic_regression"
+        if os.path.exists(meta_path):
+            with open(meta_path, 'r') as f:
+                meta = json.load(f)
+                model_loaded = meta.get("model_name", "logistic_regression")
+    except Exception:
+        model_loaded = "logistic_regression"
+        
     return jsonify({
         "status": "healthy",
-        "service": "credit-card-approval-prediction-api"
+        "version": "1.0.0",
+        "model_loaded": model_loaded,
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }), 200
 
 @api_bp.route('/api/predict', methods=['POST'])

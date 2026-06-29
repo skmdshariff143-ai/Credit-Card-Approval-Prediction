@@ -15,8 +15,17 @@ def create_app() -> Flask:
     """
     app = Flask(__name__, template_folder="templates", static_folder="static")
     
-    # Configure session and CSRF secrets
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'default_development_secret_key_12345')
+    # Configure environment configurations
+    env = os.getenv("FLASK_ENV", "development")
+    if env == "production":
+        from configs.production import ProductionConfig
+        app.config.from_object(ProductionConfig)
+    elif env == "testing":
+        from configs.testing import TestingConfig
+        app.config.from_object(TestingConfig)
+    else:
+        from configs.development import DevelopmentConfig
+        app.config.from_object(DevelopmentConfig)
     
     # Import and register API Blueprints containing routes
     from src.api.routes import api_bp

@@ -186,6 +186,75 @@ pip install -e .
    pytest tests/ -v
    ```
 
+## 🚀 Production Deployment & CI/CD
+This project is configured for cloud deployment, containerization, and automated workflows:
+
+### 1. GitHub Actions Workflows
+CI/CD configs check builds and runs tests on commits:
+- [![CI Linting](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/lint.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions)
+- [![CI Unit Tests](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/python-app.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions)
+
+### 2. Docker & Container Orchestration
+Build the Docker image:
+```bash
+docker build -t credit-card-approval-prediction:latest .
+```
+Start the container stack with Docker Compose:
+```bash
+docker-compose up -d
+```
+
+### 3. Render Web Service Deployment
+Render hosting utilizes Gunicorn production WSGI servers:
+- **Build Command**: `pip install -r requirements.txt`
+- **Start Command**: `gunicorn app.app:app`
+- **Configuration blueprint**: [render.yaml](render.yaml)
+
+### 4. IBM Cloud & Watson Machine Learning
+To publish predictions models to Watson Studio WML:
+1. Configure Watson variables inside `.env`.
+2. Execute the model publication utility:
+   ```bash
+   python deploy_ibm.py
+   ```
+Detailed instructions are provided in [IBM_Deployment_Guide.md](reports/IBM_Deployment_Guide.md).
+
+---
+
+## 🔌 API Documentation
+The Flask web server exposes the following REST endpoint:
+
+### `POST /api/predict`
+Calculates risk predictions from a JSON request.
+
+#### Request JSON Example:
+```json
+{
+  "code_gender": "M",
+  "cnt_children": 0,
+  "cnt_fam_members": 2,
+  "age_years": 35.0,
+  "amt_income_total": 150000.0,
+  "flag_own_car": "Y",
+  "flag_own_realty": "Y",
+  "name_income_type": "Working",
+  "name_education_type": "Higher education",
+  "name_family_status": "Married",
+  "name_housing_type": "House / apartment",
+  "years_employed": 5.5,
+  "flag_unemployed": 0
+}
+```
+
+#### Response JSON Example (200 OK):
+```json
+{
+  "decision": "Approved",
+  "approval_probability_percent": 98.54
+}
+```
+Detailed API endpoints list in [API_Documentation.md](reports/API_Documentation.md).
+
 ---
 
 ## 🗺️ Roadmap & Future Work
