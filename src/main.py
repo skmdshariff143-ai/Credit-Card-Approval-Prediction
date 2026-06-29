@@ -124,6 +124,25 @@ def run_model_pipeline():
     save_pkl(best_model, best_model_path)
     logger.info(f"Best model serialized to: {best_model_path}")
     
+    # Log experiment run using ExperimentTracker
+    try:
+        from src.utils.tracker import ExperimentTracker
+        tracker = ExperimentTracker()
+        run_params = best_model.get_params() if hasattr(best_model, "get_params") else {}
+        # Serialize params to avoid JSON errors
+        serializable_params = {str(k): str(v) for k, v in run_params.items()}
+        run_metrics = {
+            "F1-Score": float(best_row["F1-Score"]),
+            "ROC-AUC": float(best_row["ROC-AUC"]),
+            "Balanced_Accuracy": float(best_row["Balanced_Accuracy"]),
+            "Log_Loss": float(best_row["Log_Loss"]),
+            "Training_Time_Sec": float(best_row["Training_Time_Sec"])
+        }
+        tracker.log_run(best_name, serializable_params, run_metrics)
+        logger.info("Experiment run details logged to tracker history.")
+    except Exception as e:
+        logger.error(f"Failed to log experiment run: {str(e)}")
+
     # Generate text classification report
     y_pred, y_prob, _ = trainer.measure_inference_speed(best_model, X_test)
     report_str = classification_report(y_test, y_pred, target_names=["Approved", "Rejected"])

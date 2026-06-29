@@ -1,0 +1,110 @@
+openapi: 3.0.3
+info:
+  title: CreditGuard AI - API Documentation
+  description: Versioned credit card risk classification scoring REST APIs.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api/v1
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      responses:
+        '200':
+          description: Healthy status return
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  version:
+                    type: string
+                    example: 1.0.0
+                  model_loaded:
+                    type: string
+                    example: logistic_regression
+  /history:
+    get:
+      summary: Get prediction history from SQLite
+      responses:
+        '200':
+          description: Array of past predictions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+  /predict:
+    post:
+      summary: Score applicant default risk
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - age_years
+                - amt_income_total
+              properties:
+                code_gender:
+                  type: string
+                  example: M
+                cnt_children:
+                  type: integer
+                  example: 0
+                cnt_fam_members:
+                  type: integer
+                  example: 2
+                age_years:
+                  type: number
+                  example: 35
+                amt_income_total:
+                  type: number
+                  example: 150000
+                flag_own_car:
+                  type: string
+                  example: Y
+                flag_own_realty:
+                  type: string
+                  example: Y
+                name_income_type:
+                  type: string
+                  example: Working
+                name_education_type:
+                  type: string
+                  example: Higher education
+                name_family_status:
+                  type: string
+                  example: Married
+                name_housing_type:
+                  type: string
+                  example: House / apartment
+                years_employed:
+                  type: number
+                  example: 5.5
+                flag_unemployed:
+                  type: integer
+                  example: 0
+      responses:
+        '200':
+          description: Successful scoring output
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  decision:
+                    type: string
+                    example: Approved
+                  approval_probability_percent:
+                    type: number
+                    example: 98.54
+                  explanation:
+                    type: object
+        '400':
+          description: Schema/validation error

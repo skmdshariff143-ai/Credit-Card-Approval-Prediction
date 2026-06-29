@@ -3,24 +3,24 @@
     "download_date": "2026-06-29",
     "dataset_source": "Kaggle Credit Card Approval Prediction Dataset",
     "license": "CC0: Public Domain",
-    "application_records": 5000,
+    "application_records": 5,
     "application_columns": 18,
-    "credit_records": 163037,
+    "credit_records": 7,
     "credit_columns": 4,
-    "merged_records": 5000,
+    "merged_records": 5,
     "application_duplicates": 0,
     "credit_duplicates": 0,
     "application_missing_fields": {
-        "OCCUPATION_TYPE": 2162
+        "OCCUPATION_TYPE": 2
     },
     "target_classes_distribution": {
         "Approved (Good)": {
-            "count": 4625,
-            "percentage": 92.5
+            "count": 3,
+            "percentage": 60.0
         },
         "Rejected (Bad)": {
-            "count": 375,
-            "percentage": 7.5
+            "count": 2,
+            "percentage": 40.0
         }
     }
 }

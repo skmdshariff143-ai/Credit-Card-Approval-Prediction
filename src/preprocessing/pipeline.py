@@ -185,8 +185,11 @@ class PreprocessingPipeline:
             # Check ID column
             df_cleaned = df.drop(columns=['ID'], errors='ignore')
             
+            # Apply feature engineering transformations first
+            df_engineered = self.engineer.transform(df_cleaned)
+            
             # Impute, cap, encode, scale
-            df_imputed = self.imputer.transform(df_cleaned)
+            df_imputed = self.imputer.transform(df_engineered)
             df_capped = self.capper.transform(df_imputed)
             df_encoded = self.encoder.transform(df_capped)
             df_scaled = self.scaler.transform(df_encoded)
@@ -199,3 +202,9 @@ class PreprocessingPipeline:
         except Exception as e:
             logger.error(f"Inference preprocessing failed: {str(e)}")
             raise DataPreprocessingError(f"Inference preprocessing failure: {str(e)}")
+
+    def get_feature_names_out(self) -> list:
+        """
+        Returns list of processed column names after encoding and scaling.
+        """
+        return self.feature_names

@@ -15,6 +15,23 @@
 
 ---
 
+## 🌐 Live Demo & Portfolio
+This project is configured with automatic multi-environment deployments:
+- 🚀 **Live Application (Flask Web App)**: [credit-card-approval-prediction.onrender.com](https://credit-card-approval-prediction.onrender.com) (Hosted on Render)
+- 🖥️ **Static Portfolio Website (GitHub Pages)**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/) (GitHub Actions Automated Deploy)
+- 📈 **Deployment Badge**: [![GitHub Pages Deployment](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/pages.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/pages.yml)
+- ⚙️ **GitHub Actions Badge**: [![CI pytest](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/main.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions)
+
+### 🛠️ GitHub Pages Activation Instructions
+To host the static portfolio website via GitHub Pages on your repository:
+1. Navigate to your repository on **GitHub**.
+2. Click on **Settings** in the top navigation tab.
+3. In the left sidebar, click on **Pages** under the "Code and automation" section.
+4. Under **Build and deployment** -> **Source**, select **GitHub Actions** from the dropdown menu (instead of "Deploy from a branch").
+5. The deployment will now run automatically on every `git push` to the `main` branch via the [.github/workflows/pages.yml](.github/workflows/pages.yml) workflow.
+
+---
+
 ## 📋 Project Overview
 **CreditGuard AI** is a production-grade machine learning platform designed to automate retail credit card risk assessment, predicting payment default default probabilities with sub-millisecond scoring latency.
 

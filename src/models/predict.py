@@ -4,6 +4,7 @@ from configs.config import config
 from src.utils.logger import get_logger
 from src.utils.helper import load_pkl
 from src.utils.exceptions import ModelTrainingError
+from src.models.explainability import ExplanationEngine
 
 logger = get_logger(__name__)
 
@@ -20,27 +21,21 @@ class RiskPredictor:
         self.model = None
         
     def load_pipeline(self):
-        """
-        Loads the fitted preprocessing pipeline object.
-        """
+        """Loads the fitted preprocessing pipeline object."""
         if self.pipeline is None:
             logger.info(f"Loading pipeline from {self.pipeline_path}...")
             self.pipeline = load_pkl(self.pipeline_path)
         return self.pipeline
 
     def load_model(self):
-        """
-        Loads the best trained classifier object.
-        """
+        """Loads the best trained classifier object."""
         if self.model is None:
             logger.info(f"Loading model from {self.model_path}...")
             self.model = load_pkl(self.model_path)
         return self.model
 
     def validate_input(self, input_data: dict) -> bool:
-        """
-        Validates that input dictionary contains all required fields.
-        """
+        """Validates that input dictionary contains all required fields."""
         required_fields = {
             'code_gender', 'cnt_children', 'cnt_fam_members', 'age_years', 
             'amt_income_total', 'flag_own_car', 'flag_own_realty', 
@@ -56,12 +51,11 @@ class RiskPredictor:
     def predict(self, input_df: pd.DataFrame):
         """
         Runs binary class predictions. If single-sample DataFrame, returns a formatted dictionary
-        for REST/client serving compatibility. Otherwise returns list of predictions.
+        for REST/client serving compatibility with local explainability outputs.
         """
         pipeline = self.load_pipeline()
         model = self.load_model()
         
-        # In case the input DataFrame still has ID column, transform drops it
         X_trans = pipeline.transform(input_df)
         preds = model.predict(X_trans)
         
@@ -70,32 +64,37 @@ class RiskPredictor:
             if hasattr(model, "predict_proba"):
                 prob_raw = model.predict_proba(X_trans)
                 try:
-                    # Index 2D array/list first
                     prob_1 = prob_raw[0][1]
                 except Exception:
                     try:
-                        # Index 1D list/array
                         prob_1 = prob_raw[0]
                     except Exception:
                         prob_1 = 0.0
             decision = "Approved" if preds[0] == 0 else "Rejected"
-            # Ensure prob_1 is float type
             try:
                 prob_1_val = float(prob_1)
             except Exception:
                 prob_1_val = 0.0
+            
             approval_prob = (1.0 - prob_1_val) * 100.0
+            
+            # Generate explanation map
+            try:
+                explainer = ExplanationEngine(model, pipeline)
+                explanation = explainer.explain_instance(input_df)
+            except Exception as e:
+                logger.error(f"Failed to calculate local explanation: {str(e)}")
+                explanation = {"error": str(e)}
+                
             return {
                 "decision": decision,
-                "approval_probability_percent": float(round(approval_prob, 2))
+                "approval_probability_percent": float(round(approval_prob, 2)),
+                "explanation": explanation
             }
         return list(preds)
 
-
     def predict_probability(self, input_df: pd.DataFrame) -> list:
-        """
-        Runs risk probability calculations (percent risk of default / Class 1).
-        """
+        """Runs risk probability calculations."""
         pipeline = self.load_pipeline()
         model = self.load_model()
         
@@ -103,7 +102,6 @@ class RiskPredictor:
         if hasattr(model, "predict_proba"):
             probs = model.predict_proba(X_trans)[:, 1]
         else:
-            # Fallback for models without probabilities
             preds = model.predict(X_trans)
             probs = [1.0 if p == 1 else 0.0 for p in preds]
         return list(probs)
@@ -128,4 +126,3 @@ def predict_probability(input_df: pd.DataFrame) -> list:
 
 # Backward compatibility alias
 InferenceEngine = RiskPredictor
-

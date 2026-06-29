@@ -1,9 +1,22 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card shadow-sm border-0">
-    <div class="card-header bg-dark text-white p-3 d-flex justify-content-between align-items-center">
+    <div class="card-header bg-dark text-white p-3 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
         <h4 class="fw-bold mb-0"><i class="bi bi-clock-history me-2"></i> Prediction History Logs</h4>
-        <span class="badge bg-secondary">{{ history|length }} Total Predictions</span>
+        <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-secondary py-2 px-3">{{ history|length }} Total Predictions</span>
+            {% if history %}
+            <div class="dropdown">
+                <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-download me-1"></i> Export Logs
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="exportDropdown">
+                    <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('api.export_history_csv') }}"><i class="bi bi-filetype-csv text-primary me-2"></i> Download CSV</a></li>
+                    <li><a class="dropdown-item d-flex align-items-center" href="{{ url_for('api.export_history_json') }}"><i class="bi bi-filetype-json text-warning me-2"></i> Download JSON</a></li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
     </div>
     <div class="card-body p-0">
         {% if history %}
