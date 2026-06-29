@@ -1,31 +1,34 @@
-import logging
-import yaml
 import os
-from config.logging_config import setup_logging
+import yaml
+import logging.config
+from pathlib import Path
 
-# Load config to get log file path and level
-config_path = "e:/Credit-Card-Approval-Prediction/config/config.yaml"
-log_file = "e:/Credit-Card-Approval-Prediction/logs/project.log"
-log_level_str = "INFO"
+# Load config path
+configs_dir = Path(__file__).resolve().parent.parent.parent / "configs"
+yaml_path = configs_dir / "logging.yaml"
+logs_dir = Path(__file__).resolve().parent.parent.parent / "logs"
 
-if os.path.exists(config_path):
-    try:
-        with open(config_path, "r") as f:
-            cfg = yaml.safe_load(f)
-            if cfg and "logging" in cfg:
-                log_file = cfg["logging"].get("log_file", log_file)
-                log_level_str = cfg["logging"].get("level", log_level_str)
-    except Exception:
-        pass
+# Ensure logs dir exists
+os.makedirs(logs_dir, exist_ok=True)
 
-# Map string level to logging level
-log_level = getattr(logging, log_level_str.upper(), logging.INFO)
+if os.path.exists(yaml_path):
+    with open(yaml_path, 'r') as f:
+        log_config = yaml.safe_load(f)
+        
+        # Override log file path to ensure absolute naming
+        if "handlers" in log_config and "file" in log_config["handlers"]:
+            log_config["handlers"]["file"]["filename"] = str(logs_dir / "app.log")
+            
+        logging.config.dictConfig(log_config)
+else:
+    # Fallback to basic configuration
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s"
+    )
 
-# Run setup
-setup_logging(log_file_path=log_file, log_level=log_level)
-
-def get_logger(logger_name):
+def get_logger(name):
     """
-    Returns a configured logger with the given name.
+    Returns a logger instance configure according to configurations/logging.yaml.
     """
-    return logging.getLogger(logger_name)
+    return logging.getLogger(name)

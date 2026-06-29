@@ -1,4 +1,4 @@
-# Multi-stage production-grade Dockerfile
+# Multi-stage production Dockerfile
 FROM python:3.10-slim AS builder
 
 WORKDIR /app
@@ -34,4 +34,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:5000/ || exit 1
 
 # Start the Flask app using Gunicorn WSGI server
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "flask_app.app:create_app()"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app.app:app"]

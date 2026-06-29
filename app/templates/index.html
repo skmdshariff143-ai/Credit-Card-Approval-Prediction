@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center py-5">
+    <div class="col-lg-6 col-md-12 text-center text-lg-start mb-5 mb-lg-0">
+        <h1 class="display-3 font-outfit text-white fw-bold lh-sm mb-3">Enterprise-Grade Risk Prediction</h1>
+        <p class="lead text-white-50 mb-4">Leverage machine learning algorithms to assess applicant risk and determine credit card approval status with high confidence and transparency.</p>
+        
+        <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start">
+            <a href="#assessmentSection" class="btn btn-accent btn-lg px-5 py-3 font-outfit rounded-pill fw-bold shadow-lg">Evaluate Applicant</a>
+            <a href="{{ url_for('api.history') }}" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-bold font-outfit"><i class="fa-solid fa-clock-rotate-left me-1"></i> View History</a>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-8 text-center">
+        <!-- Dashboard Illustration Card -->
+        <div class="card card-custom p-4 border-custom rounded-4 shadow-lg text-start">
+            <div class="d-flex align-items-center mb-4">
+                <i class="fa-solid fa-square-poll-vertical text-accent fs-3 me-2"></i>
+                <h5 class="text-white mb-0 font-outfit fw-bold">System Capabilities</h5>
+            </div>
+            <ul class="list-unstyled text-white-50">
+                <li class="mb-3"><i class="fa-solid fa-circle-check text-accent me-2"></i> <strong>Multi-model Comparison</strong>: Evaluates Logistic Regression, Random Forest, Decision Tree, and XGBoost.</li>
+                <li class="mb-3"><i class="fa-solid fa-circle-check text-accent me-2"></i> <strong>Dynamic Preprocessing</strong>: Handles missing values, outliers, encoding, and standardization.</li>
+                <li class="mb-3"><i class="fa-solid fa-circle-check text-accent me-2"></i> <strong>Real-time API</strong>: Exposes prediction REST interfaces for automated batch evaluations.</li>
+                <li class="mb-3"><i class="fa-solid fa-circle-check text-accent me-2"></i> <strong>Transparent Analytics</strong>: Computes precision, recall, and F1 scores on imbalanced defaults.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<hr class="border-custom my-5">
+
+<!-- Assessment Form Section -->
+<div id="assessmentSection" class="row justify-content-center py-5">
+    <div class="col-lg-10">
+        <div class="text-center mb-5">
+            <h2 class="display-6 font-outfit text-white fw-bold">Risk Assessment Portal</h2>
+            <p class="text-white-50">Fill in the fields below to run online scoring against the best trained model in the registry.</p>
+        </div>
+
+        <div class="card card-custom border-custom shadow-lg rounded-4">
+            <div class="card-body p-4 p-md-5">
+                <form id="predictionForm" method="POST" action="{{ url_for('api.predict') }}">
+                    {{ form.hidden_tag() }}
+
+                    <!-- SECTION 1: Personal Profile -->
+                    <div class="form-section mb-5">
+                        <h4 class="section-title mb-4 font-outfit"><i class="fa-solid fa-user me-2 text-accent"></i> 1. Personal Profile</h4>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="code_gender" class="form-label">Gender</label>
+                                {{ form.code_gender(class="form-select form-control-custom") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="age_years" class="form-label">Age (Years)</label>
+                                {{ form.age_years(class="form-control form-control-custom", type="number", step="0.5") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="name_family_status" class="form-label">Family Status</label>
+                                {{ form.name_family_status(class="form-select form-control-custom") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cnt_children" class="form-label">Number of Children</label>
+                                {{ form.cnt_children(class="form-control form-control-custom", type="number") }}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="cnt_fam_members" class="form-label">Total Family Members</label>
+                                {{ form.cnt_fam_members(class="form-control form-control-custom", type="number") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: Financial Background -->
+                    <div class="form-section mb-5">
+                        <h4 class="section-title mb-4 font-outfit"><i class="fa-solid fa-coins me-2 text-accent"></i> 2. Financial Profile</h4>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="amt_income_total" class="form-label">Total Annual Income ($)</label>
+                                {{ form.amt_income_total(class="form-control form-control-custom", type="number", step="100") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="name_income_type" class="form-label">Income Type</label>
+                                {{ form.name_income_type(class="form-select form-control-custom") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="name_education_type" class="form-label">Education Type</label>
+                                {{ form.name_education_type(class="form-select form-control-custom") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="name_housing_type" class="form-label">Housing Situation</label>
+                                {{ form.name_housing_type(class="form-select form-control-custom") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="flag_own_car" class="form-label">Owns Car</label>
+                                {{ form.flag_own_car(class="form-select form-control-custom") }}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="flag_own_realty" class="form-label">Owns Real Estate / Property</label>
+                                {{ form.flag_own_realty(class="form-select form-control-custom") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: Professional Profile -->
+                    <div class="form-section mb-5">
+                        <h4 class="section-title mb-4 font-outfit"><i class="fa-solid fa-briefcase me-2 text-accent"></i> 3. Employment Details</h4>
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <div class="form-check form-switch form-switch-custom mb-3">
+                                    {{ form.flag_unemployed(class="form-check-input", id="unemployedSwitch") }}
+                                    <label class="form-check-label text-white-50" for="unemployedSwitch">Applicant is unemployed / retired</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6" id="empYearsGroup">
+                                <label for="years_employed" class="form-label">Years of Employment</label>
+                                {{ form.years_employed(class="form-control form-control-custom", type="number", step="0.1", id="empYearsInput") }}
+                            </div>
+                            <div class="col-md-6" id="occupationGroup">
+                                <label for="occupation_type" class="form-label">Occupation Type</label>
+                                {{ form.occupation_type(class="form-select form-control-custom", id="occupationSelect") }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: Contact Flags -->
+                    <div class="form-section mb-5">
+                        <h4 class="section-title mb-4 font-outfit"><i class="fa-solid fa-address-book me-2 text-accent"></i> 4. Contact & Telemetry</h4>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card card-option p-3 text-center border-custom">
+                                    <label class="form-check-label d-block mb-2 text-white-50" for="flag_work_phone">
+                                        <i class="fa-solid fa-building-user d-block fs-3 mb-2 text-accent"></i> Work Phone
+                                    </label>
+                                    <div class="form-check d-inline-block">
+                                        {{ form.flag_work_phone(class="form-check-input float-none") }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-option p-3 text-center border-custom">
+                                    <label class="form-check-label d-block mb-2 text-white-50" for="flag_phone">
+                                        <i class="fa-solid fa-phone d-block fs-3 mb-2 text-accent"></i> Personal Phone
+                                    </label>
+                                    <div class="form-check d-inline-block">
+                                        {{ form.flag_phone(class="form-check-input float-none") }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-option p-3 text-center border-custom">
+                                    <label class="form-check-label d-block mb-2 text-white-50" for="flag_email">
+                                        <i class="fa-solid fa-envelope d-block fs-3 mb-2 text-accent"></i> Email Registered
+                                    </label>
+                                    <div class="form-check d-inline-block">
+                                        {{ form.flag_email(class="form-check-input float-none") }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="text-center mt-5">
+                        {{ form.submit(class="btn btn-accent btn-lg px-5 py-3 font-outfit rounded-pill fw-bold shadow-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loader Screen Overlay -->
+<div id="loadingOverlay" class="d-none">
+    <div class="text-center text-white">
+        <div class="spinner-border text-accent mb-3" style="width: 4rem; height: 4rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <h4 class="font-outfit fw-bold">Evaluating Scoring boundary...</h4>
+        <p class="text-white-50">Mapping custom indicators and calculating metrics.</p>
+    </div>
+</div>
+{% endblock %}

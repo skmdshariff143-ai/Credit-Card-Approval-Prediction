@@ -1,9 +1,12 @@
-# Python
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# C extensions
 *.so
-.Python
+
+# Distribution / packaging
 build/
 develop-eggs/
 dist/
@@ -22,7 +25,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Anaconda / Virtual Environment
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Virtual Environments
 .env
 .venv
 env/
@@ -30,33 +36,22 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-conda-bld/
-.ipynb_checkpoints
 
-# IDEs
-.vscode/
-.idea/
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.swp
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Project Specific
-data/raw/*.csv
-data/processed/*.csv
-data/processed/*.joblib
-models/trained/*.joblib
-models/artifacts/*.joblib
-reports/figures/*.png
+# Logs
 logs/
 *.log
 
-# Sensitive Info
-.env
-config.yaml
-ibm_cloud_config.yaml
+# Model artifacts
+models/*.pkl
+models/*.joblib
+models/*.json
+
+# Data
+data/raw/*
+data/processed/*
+data/interim/*
+data/external/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/interim/.gitkeep
+!data/external/.gitkeep

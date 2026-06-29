@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 text-center py-5">
+        <i class="fa-solid fa-square-check text-accent display-1 mb-4 animate-bounce"></i>
+        <h2 class="display-6 font-outfit text-white fw-bold">Active Scoring Portal</h2>
+        <p class="lead text-white-50">You can run risk evaluations directly from the landing page. Click the button below to head back to the main portal form.</p>
+        
+        <div class="mt-4">
+            <a href="{{ url_for('api.index') }}#assessmentSection" class="btn btn-accent btn-lg px-5 py-3 rounded-pill fw-bold font-outfit shadow-lg"><i class="fa-solid fa-circle-arrow-left me-2"></i> Go to Assessment Form</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
