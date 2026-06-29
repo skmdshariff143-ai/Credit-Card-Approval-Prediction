@@ -44,6 +44,21 @@ All generated visual profiles are saved under `screenshots/eda/`:
 - **Gross Annual Income Distribution**: [income_distribution.png](screenshots/eda/income_distribution.png)
 - **Education vs Approval Grouped Chart**: [education_vs_approval.png](screenshots/eda/education_vs_approval.png)
 
+## ⚙️ Data Preprocessing & Feature Engineering
+We implemented a reusable, object-oriented preprocessing pipeline (`PreprocessingPipeline`) containing:
+1. **Cleansing & Ingestion**: absolute scaling of negative incomes, clipping negative child fields, and duplicate records handling.
+2. **Missing values**: training-median imputation (numerical) and training-mode/Unknown imputation (categorical).
+3. **Outliers**: capping extreme income values using fitted 1.5 IQR boundary limits.
+4. **Feature Engineering**:
+   - `INCOME_PER_MEMBER`: income divided by family size.
+   - `FINANCIAL_STABILITY_SCORE`: asset index (car/realty ownership and high income).
+   - `INCOME_GROUP`, `AGE_GROUP`, `EXPERIENCE_BUCKET`: binned categorical features.
+5. **Class Imbalance**: Pandas oversampling of default cases inside training split to prevent classification bias.
+6. **Feature Scaling & Encoding**: StandardScaler and OneHotEncoder serialization.
+7. **Feature Selection**: Random Forest Importance ranking combined with Mutual Information calculations.
+
+- **Fitted Artifacts**: Serialized [scaler.pkl](models/scaler.pkl), [encoder.pkl](models/encoder.pkl), and [preprocessing_pipeline.pkl](models/preprocessing_pipeline.pkl) inside `models/` directory for production inferences.
+
 ---
 
 ## 📂 Folder Structure
