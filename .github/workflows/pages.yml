@@ -1,9 +1,10 @@
-name: Deploy GitHub Pages
+name: Rebuild and Deploy GitHub Pages
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -16,27 +17,40 @@ concurrency:
 
 jobs:
   build:
+    name: Build Pages Site Artifact
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
 
-      - uses: actions/configure-pages@v5
+      - name: Configure GitHub Pages Settings
+        uses: actions/configure-pages@v5
         continue-on-error: true
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Verify Docs Subdirectory Structure
+        run: |
+          if [ ! -d "./docs" ]; then
+            echo "Error: docs/ folder not found!"
+            exit 1
+          fi
+          if [ ! -f "./docs/index.html" ]; then
+            echo "Error: docs/index.html not found!"
+            exit 1
+          fi
+
+      - name: Package and Upload Site Artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./docs
 
   deploy:
+    name: Deploy to GitHub Pages Environments
     needs: build
-
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-
     steps:
-      - id: deployment
+      - name: Publish Artifact to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
