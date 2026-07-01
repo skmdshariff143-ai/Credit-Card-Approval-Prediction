@@ -6,7 +6,7 @@ class ProductionConfig:
     """
     TESTING = False
     DEBUG = False
-    SECRET_KEY = os.getenv("SECRET_KEY")
+    SECRET_KEY = os.getenv("SECRET_KEY", "prod-creditguard-fallback-secret-987-xyz")
     WTF_CSRF_ENABLED = True
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True

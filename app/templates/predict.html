@@ -2,147 +2,157 @@
 {% block content %}
 <div class="row justify-content-center">
     <div class="col-lg-10">
-        <div class="card shadow-sm border-0">
-            <div class="card-header bg-dark text-white p-3">
-                <h4 class="fw-bold mb-0"><i class="bi bi-cpu-fill me-2"></i> Credit Card Approval Prediction System</h4>
-                <small class="text-muted">Enter applicant demographic and socio-economic details to calculate delinquency risk.</small>
+        <div class="card card-glass border-0">
+            <div class="card-header bg-dark text-white p-4 border-0 rounded-top-4">
+                <h4 class="fw-bold mb-0 d-flex align-items-center">
+                    <i class="bi bi-cpu-fill text-primary me-2"></i> Credit Card Approval Prediction System
+                </h4>
+                <p class="text-muted small mb-0 mt-1">Enter applicant demographic and socio-economic details to calculate delinquency risk vector.</p>
             </div>
-            <div class="card-body p-4">
+            <div class="card-body p-4 p-md-5">
                 <form action="{{ url_for('api.predict_post') }}" method="POST" class="needs-validation" novalidate>
                     {{ form.hidden_tag() }}
                     
-                    <div class="row g-3">
+                    <div class="row g-4">
                         <!-- Personal Info Section -->
-                        <div class="col-12 border-bottom border-light-subtle pb-2 mb-2">
-                            <h5 class="fw-bold text-dark"><i class="bi bi-person-fill me-1 text-primary"></i> Demographic Profile</h5>
+                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2">
+                            <h5 class="fw-bold d-flex align-items-center text-gradient">
+                                <i class="bi bi-person-fill me-2"></i> Demographic Profile
+                            </h5>
                         </div>
                         
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Gender</label>
+                            <label class="form-label">Gender</label>
                             {{ form.code_gender(class="form-select") }}
                             {% if form.code_gender.errors %}
-                                <div class="text-danger mt-1">{% for err in form.code_gender.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.code_gender.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
                         
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Age (Years)</label>
+                            <label class="form-label">Age (Years)</label>
                             {{ form.age_years(class="form-control", placeholder="e.g. 35", type="number", min="18", max="120", step="1") }}
                             {% if form.age_years.errors %}
-                                <div class="text-danger mt-1">{% for err in form.age_years.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.age_years.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Marital Status</label>
+                            <label class="form-label">Marital Status</label>
                             {{ form.name_family_status(class="form-select") }}
                             {% if form.name_family_status.errors %}
-                                <div class="text-danger mt-1">{% for err in form.name_family_status.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.name_family_status.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Family Members</label>
+                            <label class="form-label">Family Members</label>
                             {{ form.cnt_fam_members(class="form-control", type="number", min="1", max="20", step="1") }}
                             {% if form.cnt_fam_members.errors %}
-                                <div class="text-danger mt-1">{% for err in form.cnt_fam_members.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.cnt_fam_members.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Number of Children</label>
+                            <label class="form-label">Number of Children</label>
                             {{ form.cnt_children(class="form-control", type="number", min="0", max="20", step="1") }}
                             {% if form.cnt_children.errors %}
-                                <div class="text-danger mt-1">{% for err in form.cnt_children.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.cnt_children.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <!-- Socio-Economic Section -->
-                        <div class="col-12 border-bottom border-light-subtle pb-2 mb-2 mt-4">
-                            <h5 class="fw-bold text-dark"><i class="bi bi-wallet2 me-1 text-primary"></i> Financial & Assets Status</h5>
+                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2 mt-5">
+                            <h5 class="fw-bold d-flex align-items-center text-gradient">
+                                <i class="bi bi-wallet2 me-2"></i> Financial & Assets Status
+                            </h5>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Annual Income ($)</label>
+                            <label class="form-label">Annual Income ($)</label>
                             {{ form.amt_income_total(class="form-control", placeholder="e.g. 150000", type="number", min="1", step="1") }}
                             {% if form.amt_income_total.errors %}
-                                <div class="text-danger mt-1">{% for err in form.amt_income_total.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.amt_income_total.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Own Car?</label>
+                            <label class="form-label">Own Car?</label>
                             {{ form.flag_own_car(class="form-select") }}
                             {% if form.flag_own_car.errors %}
-                                <div class="text-danger mt-1">{% for err in form.flag_own_car.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.flag_own_car.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Own Property / Realty?</label>
+                            <label class="form-label">Own Property / Realty?</label>
                             {{ form.flag_own_realty(class="form-select") }}
                             {% if form.flag_own_realty.errors %}
-                                <div class="text-danger mt-1">{% for err in form.flag_own_realty.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.flag_own_realty.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Income Type</label>
+                            <label class="form-label">Income Type</label>
                             {{ form.name_income_type(class="form-select") }}
                             {% if form.name_income_type.errors %}
-                                <div class="text-danger mt-1">{% for err in form.name_income_type.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.name_income_type.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Education Level</label>
+                            <label class="form-label">Education Level</label>
                             {{ form.name_education_type(class="form-select") }}
                             {% if form.name_education_type.errors %}
-                                <div class="text-danger mt-1">{% for err in form.name_education_type.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.name_education_type.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Housing Situation</label>
+                            <label class="form-label">Housing Situation</label>
                             {{ form.name_housing_type(class="form-select") }}
                             {% if form.name_housing_type.errors %}
-                                <div class="text-danger mt-1">{% for err in form.name_housing_type.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.name_housing_type.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <!-- Employment Section -->
-                        <div class="col-12 border-bottom border-light-subtle pb-2 mb-2 mt-4">
-                            <h5 class="fw-bold text-dark"><i class="bi bi-briefcase-fill me-1 text-primary"></i> Employment Profile</h5>
+                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2 mt-5">
+                            <h5 class="fw-bold d-flex align-items-center text-gradient">
+                                <i class="bi bi-briefcase-fill me-2"></i> Employment Profile
+                            </h5>
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Occupation Class</label>
+                            <label class="form-label">Occupation Class</label>
                             {{ form.occupation_type(class="form-select") }}
                             {% if form.occupation_type.errors %}
-                                <div class="text-danger mt-1">{% for err in form.occupation_type.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.occupation_type.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold">Years Employed</label>
+                            <label class="form-label">Years Employed</label>
                             {{ form.years_employed(class="form-control", placeholder="e.g. 5", type="number", min="0", max="80", step="0.5") }}
                             {% if form.years_employed.errors %}
-                                <div class="text-danger mt-1">{% for err in form.years_employed.errors %}{{ err }} {% endfor %}</div>
+                                <div class="text-danger small mt-1">{% for err in form.years_employed.errors %}{{ err }} {% endfor %}</div>
                             {% endif %}
                         </div>
 
-                        <div class="col-md-4 d-flex align-items-center mt-4">
-                            <div class="form-check">
+                        <div class="col-md-4 d-flex align-items-center mt-md-5 mt-4">
+                            <div class="form-check form-switch">
                                 {{ form.flag_unemployed(class="form-check-input", type="checkbox") }}
                                 <label class="form-check-label fw-semibold" for="flag_unemployed">
-                                    Currently Unemployed / Retired Pensioner?
+                                    Currently Unemployed / Pensioner?
                                 </label>
                             </div>
                         </div>
 
                         <!-- Contact Flags Section -->
-                        <div class="col-12 border-bottom border-light-subtle pb-2 mb-2 mt-4">
-                            <h5 class="fw-bold text-dark"><i class="bi bi-telephone-inbound-fill me-1 text-primary"></i> Contact Metadata</h5>
+                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2 mt-5">
+                            <h5 class="fw-bold d-flex align-items-center text-gradient">
+                                <i class="bi bi-telephone-inbound-fill me-2"></i> Contact Metadata
+                            </h5>
                         </div>
 
                         <div class="col-md-4">
@@ -167,8 +177,8 @@
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2 mt-5">
-                        <button class="btn btn-primary btn-lg shadow-sm" type="submit" id="submitBtn">
+                    <div class="d-grid gap-2 mt-5 pt-3">
+                        <button class="btn btn-premium btn-lg shadow" type="submit" id="submitBtn">
                             <i class="bi bi-shield-shaded me-1"></i> Run Risk Prediction
                         </button>
                     </div>

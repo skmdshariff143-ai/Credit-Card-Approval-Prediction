@@ -8,8 +8,8 @@ This report documents model training parameters, Stratified Cross-Validation sco
 - **ROC-AUC Score**: 0.7409
 - **Balanced Accuracy**: 0.6744
 - **Log Loss**: 0.5896
-- **Training Time**: 1.6865 seconds
-- **Inference Speed**: 0.0028 seconds (batch test split)
+- **Training Time**: 3.1413 seconds
+- **Inference Speed**: 0.0037 seconds (batch test split)
 
 ## 2. 5-fold Stratified Cross Validation Summary
 Cross-validation F1-scores on balanced training splits:

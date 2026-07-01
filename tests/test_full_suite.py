@@ -459,6 +459,29 @@ def test_explanation_engine():
     assert len(res["risk_factors"]) > 0
     assert len(res["support_factors"]) > 0
 
+def test_explanation_engine_surrogate():
+    from src.models.explainability import ExplanationEngine
+    
+    # Mock preprocessor/pipeline
+    mock_pipeline = MagicMock()
+    mock_pipeline.transform.return_value = np.array([[0.5, 0.2]])
+    mock_pipeline.get_feature_names_out.return_value = ["num__feat1", "num__feat2"]
+    
+    # Mock model without coef_ (triggers surrogate paths)
+    mock_model = MagicMock()
+    # It must return shape (50, 2) on predict_proba
+    mock_model.predict_proba.return_value = np.array([[0.7, 0.3]] * 50)
+    # Remove coef_ attribute if MagicMock auto-creates it
+    if hasattr(mock_model, "coef_"):
+        del mock_model.coef_
+        
+    engine = ExplanationEngine(mock_model, mock_pipeline)
+    res = engine.explain_instance(pd.DataFrame([{"feat1": 1}]))
+    
+    assert "intercept" in res
+    assert "risk_factors" in res
+    assert len(res["risk_factors"]) > 0 or len(res["support_factors"]) > 0
+
 @patch('src.models.predict.load_pkl')
 @patch('os.path.exists')
 def test_predictor_api(mock_exists, mock_load):

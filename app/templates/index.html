@@ -1,92 +1,101 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="p-5 mb-4 bg-light rounded-3 shadow-sm border border-light-subtle">
-    <div class="container-fluid py-5">
+<div class="p-5 mb-5 rounded-4 shadow-sm border border-light-subtle card-glass position-relative overflow-hidden">
+    <!-- Accent background glow -->
+    <div class="position-absolute top-0 end-0 p-5 bg-primary bg-gradient rounded-circle opacity-10 filter-blur" style="width: 250px; height: 250px; transform: translate(30%, -30%); filter: blur(60px);"></div>
+    
+    <div class="container-fluid py-4 position-relative z-1">
         <div class="row align-items-center">
             <div class="col-lg-8">
-                <h1 class="display-4 fw-bold text-dark mb-3">Credit Card Approval Prediction</h1>
-                <h4 class="text-primary mb-3">Risk Assessment Portal</h4>
-                <p class="col-md-10 fs-5 text-muted">A production-grade Machine Learning classification platform designed to evaluate customer creditworthiness, measure delinquency probabilities, and automate card issuance decisions with sub-millisecond latency.</p>
-                <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
-                    <a href="{{ url_for('api.predict_get') }}" class="btn btn-primary btn-lg px-4 me-md-2 fw-semibold shadow-sm"><i class="bi bi-cpu me-1"></i> Start Prediction</a>
-                    <a href="{{ url_for('api.about') }}" class="btn btn-outline-secondary btn-lg px-4"><i class="bi bi-info-circle me-1"></i> About Project</a>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle mb-3 px-3 py-2 fw-semibold rounded-pill">
+                    <i class="bi bi-shield-fill-check me-1"></i> Version 1.0.0 (Stable)
+                </span>
+                <h1 class="display-4 fw-extrabold mb-3">Credit Card Approval Prediction</h1>
+                <h4 class="text-primary mb-3 fw-bold">Enterprise Risk Assessment Dashboard</h4>
+                <p class="col-md-10 fs-5 text-muted mb-4">A production-grade Machine Learning classification platform designed to evaluate customer creditworthiness, measure delinquency probabilities, and automate card issuance decisions with explainable AI local attributions.</p>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-2">
+                    <a href="{{ url_for('api.predict_get') }}" class="btn btn-premium btn-lg px-4 me-md-2"><i class="bi bi-cpu-fill me-1"></i> Start Prediction</a>
+                    <a href="{{ url_for('api.about') }}" class="btn btn-secondary btn-lg px-4 card-glass"><i class="bi bi-info-circle me-1"></i> About System</a>
                 </div>
             </div>
             <div class="col-lg-4 text-center d-none d-lg-block">
-                <i class="bi bi-shield-check text-primary" style="font-size: 10rem;"></i>
+                <i class="bi bi-shield-check text-primary animate-pulse" style="font-size: 11rem; filter: drop-shadow(0 8px 16px rgba(13, 110, 253, 0.2));"></i>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row g-4 py-5">
+<div class="row g-4 py-3">
     <div class="col-md-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <div class="d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 rounded-3 p-3 mb-3">
+        <div class="card h-100 card-glass border-0">
+            <div class="card-body p-4">
+                <div class="d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 rounded-4 p-3 mb-3 shadow">
                     <i class="bi bi-gear-fill"></i>
                 </div>
-                <h3 class="fs-4 fw-semibold text-dark">Balanced Sampling Engine</h3>
-                <p class="text-muted">Features automated class imbalance mitigation (random oversampling) to resolve severe raw target delinquency skew (92.5% Approved vs. 7.5% Rejected).</p>
+                <h3 class="fs-4 fw-bold mb-2">Balanced Sampling Engine</h3>
+                <p class="text-muted mb-0">Features automated class imbalance mitigation (random oversampling) to resolve severe raw target delinquency skew (92.5% Approved vs. 7.5% Rejected).</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <div class="d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 rounded-3 p-3 mb-3">
+        <div class="card h-100 card-glass border-0">
+            <div class="card-body p-4">
+                <div class="d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 rounded-4 p-3 mb-3 shadow">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
-                <h3 class="fs-4 fw-semibold text-dark">Stratified CV & Tuning</h3>
-                <p class="text-muted">Evaluated on stratified k-fold splits ($K=5$) and optimized using GridSearchCV to guarantee model generalization on unseen bank applicants.</p>
+                <h3 class="fs-4 fw-bold mb-2">Stratified CV & Tuning</h3>
+                <p class="text-muted mb-0">Evaluated on stratified k-fold splits ($K=5$) and optimized using GridSearchCV to guarantee model generalization on unseen bank applicants.</p>
             </div>
         </div>
     </div>
     <div class="col-md-4">
-        <div class="card h-100 shadow-sm border-0">
-            <div class="card-body">
-                <div class="d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 rounded-3 p-3 mb-3">
-                    <i class="bi bi-key-fill"></i>
+        <div class="card h-100 card-glass border-0">
+            <div class="card-body p-4">
+                <div class="d-inline-flex align-items-center justify-content-center text-bg-primary bg-gradient fs-2 rounded-4 p-3 mb-3 shadow">
+                    <i class="bi bi-shield-shaded"></i>
                 </div>
-                <h3 class="fs-4 fw-semibold text-dark">Secure Serving API</h3>
-                <p class="text-muted">Includes complete REST scoring API endpoint (`POST /api/predict`) with schema validators, error logs, and persistent prediction history tracking.</p>
+                <h3 class="fs-4 fw-bold mb-2">Local Explainability (SHAP)</h3>
+                <p class="text-muted mb-0">Integrates a local surrogate explanation engine providing candidate risk and support attribution factors to explain decision outcomes transparently.</p>
             </div>
         </div>
     </div>
 </div>
 
-<div class="card shadow-sm border-0 my-4">
-    <div class="card-header bg-dark text-white fw-semibold">
+<div class="card card-glass border-0 my-5">
+    <div class="card-header bg-dark text-white fw-bold py-3 border-0 rounded-top-4">
         <i class="bi bi-stack me-1"></i> Core Technology Stack & Algorithms
     </div>
-    <div class="card-body">
-        <div class="row align-items-center">
+    <div class="card-body p-4">
+        <div class="row align-items-center g-4">
             <div class="col-md-6">
-                <h5 class="fw-semibold">Algorithms Implemented & Audited:</h5>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0">
+                <h5 class="fw-bold mb-3">Algorithms Implemented & Audited:</h5>
+                <ul class="list-group list-group-flush bg-transparent">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 px-0 py-2">
                         <span><i class="bi bi-chevron-right text-primary me-2"></i> Logistic Regression (Deployed)</span>
-                        <span class="badge bg-primary rounded-pill">F1: 0.2387</span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill">F1: 0.2387</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 px-0 py-2">
                         <span><i class="bi bi-chevron-right text-primary me-2"></i> XGBoost Classifier</span>
-                        <span class="badge bg-secondary rounded-pill">F1: 0.2047</span>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle rounded-pill">F1: 0.2047</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 px-0 py-2">
                         <span><i class="bi bi-chevron-right text-primary me-2"></i> Decision Tree Classifier</span>
-                        <span class="badge bg-secondary rounded-pill">F1: 0.1975</span>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle rounded-pill">F1: 0.1975</span>
                     </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0">
+                    <li class="list-group-item d-flex justify-content-between align-items-center bg-transparent border-0 px-0 py-2">
                         <span><i class="bi bi-chevron-right text-primary me-2"></i> Random Forest Classifier</span>
-                        <span class="badge bg-secondary rounded-pill">F1: 0.1930</span>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle rounded-pill">F1: 0.1930</span>
                     </li>
                 </ul>
             </div>
-            <div class="col-md-6 border-start border-light-subtle">
-                <h5 class="fw-semibold">System Engineering Technologies:</h5>
-                <p class="text-muted mb-1"><strong>Frontend:</strong> Bootstrap 5, Javascript logic, responsive layout tables.</p>
-                <p class="text-muted mb-1"><strong>Backend Framework:</strong> Flask WSGI Application Factory.</p>
-                <p class="text-muted mb-0"><strong>ML Pipeline:</strong> scikit-learn, joblib serialization, Pandas, XGBoost.</p>
+            <div class="col-md-6 border-start border-secondary-subtle">
+                <div class="ps-md-4">
+                    <h5 class="fw-bold mb-3">System Engineering Technologies:</h5>
+                    <p class="mb-2"><strong>Frontend:</strong> Bootstrap 5, Glassmorphism design tokens, client-side scripts.</p>
+                    <p class="mb-2"><strong>Backend Framework:</strong> Flask WSGI Application Factory, Blueprint routing.</p>
+                    <p class="mb-2"><strong>ML Pipeline:</strong> scikit-learn, joblib serialization, Pandas, XGBoost.</p>
+                    <p class="mb-0"><strong>Containerization:</strong> Docker multi-stage environment config.</p>
+                </div>
             </div>
         </div>
     </div>

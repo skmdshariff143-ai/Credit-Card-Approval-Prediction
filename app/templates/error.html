@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-lg-8 text-center py-5">
-        <i class="fa-solid fa-triangle-exclamation text-danger display-1 mb-4 animate-bounce"></i>
-        <h1 class="display-4 font-outfit text-white fw-bold">Error {{ error_code }}</h1>
-        <p class="lead text-white-50 mt-3">{{ message }}</p>
-        
-        <div class="mt-5">
-            <a href="{{ url_for('api.index') }}" class="btn btn-accent btn-lg px-5 py-3 rounded-pill fw-bold font-outfit shadow-lg"><i class="fa-solid fa-house me-2"></i> Back to Home</a>
+<div class="row justify-content-center py-5">
+    <div class="col-md-7 text-center">
+        <div class="card card-glass border-0 p-5">
+            <div class="card-body">
+                <div class="d-inline-flex align-items-center justify-content-center bg-danger-subtle text-danger rounded-circle p-4 mb-3" style="width: 100px; height: 100px;">
+                    <i class="bi bi-exclamation-triangle fs-1"></i>
+                </div>
+                <h1 class="display-4 fw-extrabold text-gradient mt-2">Error {{ error_code }}</h1>
+                <p class="lead text-muted mt-3 mb-4">{{ message }}</p>
+                <div class="mt-4">
+                    <a href="{{ url_for('api.index') }}" class="btn btn-premium btn-lg shadow"><i class="bi bi-house-door-fill me-2"></i> Back to Home</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -29,13 +29,13 @@ This guide provides step-by-step instructions for running and deploying the **Cr
 
 4. **Run the training and tuning pipeline:**
    ```bash
-   python src/pipeline/ml_pipeline.py --tune
+   python src/main.py
    ```
-   This will train all four classifiers, tune their parameters, plot metrics to `reports/figures/`, and register the best model under `models/trained/`.
+   This will train all four classifiers (Logistic Regression, Decision Tree, Random Forest, XGBoost), tune their parameters, run cross-validation, save metric comparison plots under `screenshots/models/`, and serialize the best model as `models/best_model.pkl`.
 
 5. **Start the Flask web application:**
    ```bash
-   python flask_app/app.py
+   python app/app.py
    ```
    Access the web interface at: `http://localhost:5000`
 
@@ -61,7 +61,7 @@ This guide provides step-by-step instructions for running and deploying the **Cr
    Access the web app at `http://localhost:5000`. You can check the container status and logs:
    ```bash
    docker ps
-   docker logs creditguard_app
+   docker logs <container_id>
    ```
 
 ---
@@ -90,16 +90,6 @@ This guide provides step-by-step instructions for running and deploying the **Cr
 3. **Deploy the best model to the cloud:**
    Run the deployment script:
    ```bash
-   python deployment/ibm_cloud/deploy.py
+   python deploy_ibm.py
    ```
-   This script registers the best model from `models/trained/` with Watson ML and provisions an online scoring service. It will output the `Scoring Endpoint URL` (e.g. `https://us-south.ml.cloud.ibm.com/ml/v4/deployments/.../predictions`).
-
-4. **Integrate and Test Cloud Scoring:**
-   Add the scoring URL to your `.env`:
-   ```env
-   IBM_SCORING_URL=your_scoring_url
-   ```
-   You can score inputs online against Watson ML via the API endpoint or using the cloud scoring script:
-   ```bash
-   python deployment/ibm_cloud/score.py
-   ```
+   This script registers the best model from `models/` with Watson ML and provisions an online scoring service. It will output the `Scoring Endpoint URL` (e.g. `https://us-south.ml.cloud.ibm.com/ml/v4/deployments/.../predictions`).
