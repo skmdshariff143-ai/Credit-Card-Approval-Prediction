@@ -1,16 +1,19 @@
 import pandas as pd
+
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 def generate_summary_stats(df: pd.DataFrame) -> pd.DataFrame:
     """
     Returns statistical description of DataFrame features.
     """
     logger.info("Computing EDA summary statistics...")
-    summary = df.describe(include='all').transpose()
+    summary = df.describe(include="all").transpose()
     logger.info(f"Summary computed for shape: {df.shape}")
     return summary
+
 
 def calculate_missing_matrix(df: pd.DataFrame) -> pd.Series:
     """

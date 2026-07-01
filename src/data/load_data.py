@@ -1,21 +1,25 @@
 import os
+
 import pandas as pd
+
 from configs.config import config
-from src.utils.logger import get_logger
 from src.utils.exceptions import DataLoadingError
+from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 class DataLoader:
     """
     Ingests and loads raw credit card and application history CSV files.
     """
+
     def __init__(self):
         paths = config.get_paths()
         self.raw_dir = paths["raw_dir"]
         self.app_path = os.path.join(self.raw_dir, "application_record.csv")
         self.credit_path = os.path.join(self.raw_dir, "credit_record.csv")
-        
+
     def load_application_records(self) -> pd.DataFrame:
         """
         Loads the application record CSV dataset.

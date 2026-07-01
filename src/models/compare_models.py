@@ -1,23 +1,27 @@
-import os
 import json
+import os
+
 import pandas as pd
+
 from configs.config import config
-from src.utils.logger import get_logger
 from src.utils.helper import save_json
+from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 class ModelComparator:
     """
     Compares and ranks models on training/inference times and standard classification scores.
     Saves outputs to models/ directory and generates comparison reports.
     """
+
     def __init__(self):
         paths = config.get_paths()
         self.models_dir = paths["models_dir"]
         self.reports_dir = paths["reports_dir"]
         self.results = []
-        
+
     def add_model_metrics(self, name: str, metrics: dict, train_time: float, inference_time: float):
         """
         Appends metrics dict and execution speeds of a model to comparison store.
@@ -32,39 +36,51 @@ class ModelComparator:
             "Balanced_Accuracy": metrics.get("Balanced_Accuracy", metrics["Accuracy"]),
             "Log_Loss": metrics.get("Log_Loss", 0.0),
             "Training_Time_Sec": round(train_time, 4),
-            "Prediction_Time_Sec": round(inference_time, 4)
+            "Prediction_Time_Sec": round(inference_time, 4),
         }
         self.results.append(record)
-        
+
     def compare_and_rank(self) -> pd.DataFrame:
         """
-        Creates a comparison table, ranks models by F1-Score / ROC-AUC, 
+        Creates a comparison table, ranks models by F1-Score / ROC-AUC,
         and serializes artifacts to models/ and reports/ folders.
         """
         logger.info("Executing comparison ranking logic...")
         df = pd.DataFrame(self.results)
-        
+
         # Sort by F1-Score and ROC-AUC descending
         df = df.sort_values(by=["F1-Score", "ROC-AUC"], ascending=False).reset_index(drop=True)
         df["Rank"] = df.index + 1
-        
+
         # Reorder columns
-        cols = ["Rank", "Model", "F1-Score", "ROC-AUC", "Accuracy", "Precision", "Recall", "Balanced_Accuracy", "Log_Loss", "Training_Time_Sec", "Prediction_Time_Sec"]
+        cols = [
+            "Rank",
+            "Model",
+            "F1-Score",
+            "ROC-AUC",
+            "Accuracy",
+            "Precision",
+            "Recall",
+            "Balanced_Accuracy",
+            "Log_Loss",
+            "Training_Time_Sec",
+            "Prediction_Time_Sec",
+        ]
         df = df[cols]
-        
+
         # Save model_comparison.csv
         csv_path = os.path.join(self.models_dir, "model_comparison.csv")
         df.to_csv(csv_path, index=False)
         logger.info(f"Model comparison table saved to: {csv_path}")
-        
+
         # Save model_metrics.json
         meta_json_path = os.path.join(self.models_dir, "model_metrics.json")
         save_json(self.results, meta_json_path)
         logger.info(f"Model metrics JSON saved to: {meta_json_path}")
-        
+
         # Write reports file Model_Comparison.md
         self._write_comparison_report(df)
-        
+
         return df
 
     def _write_comparison_report(self, df: pd.DataFrame):
@@ -72,13 +88,10 @@ class ModelComparator:
         Generates Model_Comparison.md detailing strengths/weaknesses and selections.
         """
         report_path = os.path.join(self.reports_dir, "Model_Comparison.md")
-        
+
         # Native markdown table formatter
         headers = list(df.columns)
-        md_table_lines = [
-            "| " + " | ".join(headers) + " |",
-            "| " + " | ".join(["---"] * len(headers)) + " |"
-        ]
+        md_table_lines = ["| " + " | ".join(headers) + " |", "| " + " | ".join(["---"] * len(headers)) + " |"]
         for _, row in df.iterrows():
             row_vals = []
             for col in headers:
@@ -89,7 +102,7 @@ class ModelComparator:
                     row_vals.append(str(val))
             md_table_lines.append("| " + " | ".join(row_vals) + " |")
         md_table_str = "\n".join(md_table_lines)
-        
+
         report_content = [
             "# Model Comparison & Ranking Report\n",
             "This report compares and ranks candidate risk models based on F1-Score, ROC-AUC, and processing time profiles.\n",
@@ -109,16 +122,16 @@ class ModelComparator:
             "- **Strengths**: State-of-the-art boosting formulation, optimizes F1 target objectives, robust missing values handling.",
             "- **Weaknesses**: Hyperparameter space requires extensive tuning; complex to interpret visually.",
             "\n## 3. Final Recommendation Summary",
-            f"The best model selected by F1-Score objective is **{df.loc[0, 'Model']}** (Rank 1)."
+            f"The best model selected by F1-Score objective is **{df.loc[0, 'Model']}** (Rank 1).",
         ]
-        
+
         try:
             with open(report_path, "w") as f:
                 f.write("\n".join(report_content))
             logger.info(f"Comparison report saved to: {report_path}")
         except Exception as e:
             logger.error(f"Failed to write comparison report: {str(e)}")
-            
+
     def save_classification_report_txt(self, name: str, report_str: str):
         """
         Saves the text classification report to models/classification_report.txt.
@@ -131,7 +144,7 @@ class ModelComparator:
             logger.info(f"Classification report text saved to: {txt_path}")
         except Exception as e:
             logger.error(f"Failed to save classification report text: {str(e)}")
-        
+
         # Save to reports folder as well
         eval_report_path = os.path.join(self.reports_dir, "Evaluation_Report.md")
         try:
@@ -145,4 +158,6 @@ class ModelComparator:
             logger.info(f"Evaluation report saved to: {eval_report_path}")
         except Exception as e:
             logger.error(f"Failed to write evaluation report: {str(e)}")
+
+
 ClassModelComparator = ModelComparator

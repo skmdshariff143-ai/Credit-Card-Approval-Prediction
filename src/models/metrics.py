@@ -1,11 +1,19 @@
 import numpy as np
 from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score, 
-    roc_auc_score, balanced_accuracy_score, matthews_corrcoef, log_loss
+    accuracy_score,
+    balanced_accuracy_score,
+    f1_score,
+    log_loss,
+    matthews_corrcoef,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
+
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 def calculate_all_metrics(y_true, y_pred, y_prob=None) -> dict:
     """
@@ -16,29 +24,29 @@ def calculate_all_metrics(y_true, y_pred, y_prob=None) -> dict:
     recall = recall_score(y_true, y_pred, zero_division=0)
     f1 = f1_score(y_true, y_pred, zero_division=0)
     balanced_acc = balanced_accuracy_score(y_true, y_pred)
-    
+
     # Optional Matthews correlation coefficient
     try:
         mcc = matthews_corrcoef(y_true, y_pred)
     except Exception:
         mcc = 0.0
-        
+
     metrics = {
         "Accuracy": float(accuracy),
         "Precision": float(precision),
         "Recall": float(recall),
         "F1-Score": float(f1),
         "Balanced_Accuracy": float(balanced_acc),
-        "Matthews_Correlation_Coefficient": float(mcc)
+        "Matthews_Correlation_Coefficient": float(mcc),
     }
-    
+
     if y_prob is not None:
         try:
             metrics["ROC-AUC"] = float(roc_auc_score(y_true, y_prob))
         except Exception as e:
             logger.warning(f"Failed to calculate ROC-AUC score: {str(e)}")
             metrics["ROC-AUC"] = 0.5
-            
+
         try:
             metrics["Log_Loss"] = float(log_loss(y_true, y_prob))
         except Exception as e:
@@ -47,5 +55,5 @@ def calculate_all_metrics(y_true, y_pred, y_prob=None) -> dict:
     else:
         metrics["ROC-AUC"] = 0.5
         metrics["Log_Loss"] = 0.0
-        
+
     return metrics

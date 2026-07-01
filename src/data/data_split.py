@@ -1,10 +1,12 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from configs.constants import RANDOM_STATE, TEST_SIZE, TARGET_COL
-from src.utils.logger import get_logger
+
+from configs.constants import RANDOM_STATE, TARGET_COL, TEST_SIZE
 from src.utils.exceptions import DataPreprocessingError
+from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
 
 def perform_stratified_split(df: pd.DataFrame):
     """
@@ -14,11 +16,11 @@ def perform_stratified_split(df: pd.DataFrame):
     if TARGET_COL not in df.columns:
         logger.error(f"Target column '{TARGET_COL}' not found in dataframe.")
         raise DataPreprocessingError(f"Target column '{TARGET_COL}' missing.")
-        
+
     try:
         X = df.drop(columns=[TARGET_COL])
         y = df[TARGET_COL]
-        
+
         X_train, X_test, y_train, y_test = train_test_split(
             X, y, test_size=TEST_SIZE, stratify=y, random_state=RANDOM_STATE
         )

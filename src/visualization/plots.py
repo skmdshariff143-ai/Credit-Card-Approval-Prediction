@@ -1,23 +1,27 @@
 import os
+
 import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
+import seaborn as sns
+
 from configs.config import config
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class VizPlotter:
     """
-    Enterprise-grade plotting utility for generating and saving Univariate, 
+    Enterprise-grade plotting utility for generating and saving Univariate,
     Bivariate, Multivariate, and Outlier detection charts during EDA.
     """
+
     def __init__(self):
         paths = config.get_paths()
         # Direct folder screenshots/eda/ as required
         self.eda_screenshots_dir = os.path.join(paths["raw_dir"].parent.parent, "screenshots", "eda")
         os.makedirs(self.eda_screenshots_dir, exist_ok=True)
-        
+
     def plot_distribution(self, df: pd.DataFrame, column: str, filename: str):
         """
         Generates and saves a histogram distribution with KDE overlay for a numeric column.
@@ -25,12 +29,12 @@ class VizPlotter:
         logger.info(f"Generating distribution plot for '{column}'...")
         try:
             plt.figure(figsize=(8, 5))
-            sns.histplot(df[column], kde=True, bins=30, color='skyblue')
-            plt.title(f"Distribution of {column}", fontsize=14, fontweight='bold')
+            sns.histplot(df[column], kde=True, bins=30, color="skyblue")
+            plt.title(f"Distribution of {column}", fontsize=14, fontweight="bold")
             plt.xlabel(column)
             plt.ylabel("Frequency")
             plt.tight_layout()
-            
+
             output_path = os.path.join(self.eda_screenshots_dir, filename)
             plt.savefig(output_path, dpi=300)
             plt.close()
@@ -46,11 +50,11 @@ class VizPlotter:
         try:
             plt.figure(figsize=(6, 5))
             sns.countplot(x=y, palette="Set2")
-            plt.title("Target Class Distribution (STATUS_TARGET)", fontsize=14, fontweight='bold')
+            plt.title("Target Class Distribution (STATUS_TARGET)", fontsize=14, fontweight="bold")
             plt.xlabel("Approval Class Target (0 = Approved, 1 = Rejected)")
             plt.ylabel("Count")
             plt.tight_layout()
-            
+
             output_path = os.path.join(self.eda_screenshots_dir, filename)
             plt.savefig(output_path, dpi=300)
             plt.close()
@@ -64,12 +68,12 @@ class VizPlotter:
         """
         logger.info("Generating correlation matrix heatmap...")
         try:
-            num_df = df.select_dtypes(include=['number'])
+            num_df = df.select_dtypes(include=["number"])
             plt.figure(figsize=(10, 8))
             sns.heatmap(num_df.corr(), annot=True, fmt=".2f", cmap="coolwarm", cbar=True)
-            plt.title("Numerical Features Correlation Matrix", fontsize=14, fontweight='bold')
+            plt.title("Numerical Features Correlation Matrix", fontsize=14, fontweight="bold")
             plt.tight_layout()
-            
+
             output_path = os.path.join(self.eda_screenshots_dir, filename)
             plt.savefig(output_path, dpi=300)
             plt.close()
@@ -85,13 +89,13 @@ class VizPlotter:
         try:
             plt.figure(figsize=(10, 6))
             sns.countplot(data=df, x=col, hue=target_col, palette="viridis")
-            plt.title(f"{col} vs Approval Status", fontsize=14, fontweight='bold')
-            plt.xticks(rotation=45, ha='right')
+            plt.title(f"{col} vs Approval Status", fontsize=14, fontweight="bold")
+            plt.xticks(rotation=45, ha="right")
             plt.xlabel(col)
             plt.ylabel("Count")
             plt.legend(title=target_col, labels=["Approved (0)", "Rejected (1)"])
             plt.tight_layout()
-            
+
             output_path = os.path.join(self.eda_screenshots_dir, filename)
             plt.savefig(output_path, dpi=300)
             plt.close()
@@ -107,11 +111,11 @@ class VizPlotter:
         try:
             plt.figure(figsize=(7, 5))
             sns.boxplot(data=df, x=target_col, y=num_col, palette="Set1")
-            plt.title(f"{num_col} Distribution by Approval Status", fontsize=14, fontweight='bold')
+            plt.title(f"{num_col} Distribution by Approval Status", fontsize=14, fontweight="bold")
             plt.xlabel("Approval Status (0 = Approved, 1 = Rejected)")
             plt.ylabel(num_col)
             plt.tight_layout()
-            
+
             output_path = os.path.join(self.eda_screenshots_dir, filename)
             plt.savefig(output_path, dpi=300)
             plt.close()
@@ -126,11 +130,11 @@ class VizPlotter:
         logger.info(f"Generating outlier boxplot for '{num_col}'...")
         try:
             plt.figure(figsize=(6, 4))
-            sns.boxplot(y=df[num_col], color='lightcoral')
-            plt.title(f"Outlier Boxplot - {num_col}", fontsize=14, fontweight='bold')
+            sns.boxplot(y=df[num_col], color="lightcoral")
+            plt.title(f"Outlier Boxplot - {num_col}", fontsize=14, fontweight="bold")
             plt.ylabel(num_col)
             plt.tight_layout()
-            
+
             output_path = os.path.join(self.eda_screenshots_dir, filename)
             plt.savefig(output_path, dpi=300)
             plt.close()

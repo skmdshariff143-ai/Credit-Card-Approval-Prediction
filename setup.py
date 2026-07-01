@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 setup(
     name="credit_card_approval_prediction",
@@ -20,7 +20,7 @@ setup(
         "pyyaml>=6.0.0",
         "requests>=2.31.0",
         "scipy>=1.11.0",
-        "imbalanced-learn>=0.11.0"
+        "imbalanced-learn>=0.11.0",
     ],
     python_requires=">=3.10",
 )

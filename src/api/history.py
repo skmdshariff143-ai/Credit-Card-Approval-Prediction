@@ -1,25 +1,28 @@
-import os
 import json
+import os
 from datetime import datetime
+
 from configs.config import config
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class HistoryManager:
     """
     Manages in-memory and local file persistence of credit risk scoring history.
     """
+
     def __init__(self):
         paths = config.get_paths()
         # Direct folder models/ or processed/
         self.history_path = os.path.join(paths["processed_dir"], "prediction_history.json")
         self.history = self._load_history()
-        
+
     def _load_history(self) -> list:
         if os.path.exists(self.history_path):
             try:
-                with open(self.history_path, 'r') as f:
+                with open(self.history_path, "r") as f:
                     return json.load(f)
             except Exception as e:
                 logger.error(f"Failed to read history JSON file: {str(e)}")
@@ -28,7 +31,7 @@ class HistoryManager:
 
     def save_history(self):
         try:
-            with open(self.history_path, 'w') as f:
+            with open(self.history_path, "w") as f:
                 json.dump(self.history, f, indent=4)
         except Exception as e:
             logger.error(f"Failed to write history JSON file: {str(e)}")
@@ -41,7 +44,7 @@ class HistoryManager:
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "input": {k: v for k, v in input_data.items() if k != "ID"},
             "decision": decision,
-            "probability_percent": round(probability, 2)
+            "probability_percent": round(probability, 2),
         }
         # Insert at front of history list
         self.history.insert(0, entry)

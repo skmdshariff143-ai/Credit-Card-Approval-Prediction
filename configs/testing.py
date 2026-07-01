@@ -2,6 +2,7 @@ class TestingConfig:
     """
     Unit test and pytest Flask settings.
     """
+
     TESTING = True
     DEBUG = False
     SECRET_KEY = "test_secret_key_99999"
