@@ -1,5 +1,7 @@
 import json
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+import time
+from datetime import datetime
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, Response
 from src.api.forms import CreditApprovalForm
 from src.api.prediction import PredictorAPI
 from src.api.validators import InputValidator
@@ -27,15 +29,18 @@ def about():
 
 @api_bp.route('/predict', methods=['GET'])
 def predict_get():
-    """Renders the Credit Application entry form."""
+    """Renders the Credit Application entry form wizard."""
     form = CreditApprovalForm()
     return render_template('predict.html', form=form)
 
 @api_bp.route('/predict', methods=['POST'])
 def predict_post():
-    """Handles form submission, scores input, saves to SQLite, and redirects to Results."""
+    """Handles multi-step form wizard submission, applies logic overlays, saves to SQLite."""
     form = CreditApprovalForm()
     if form.validate_on_submit():
+        # Generate clean application ID (Phase 11 spec)
+        application_id = f"APP-{int(time.time() * 1000) % 1000000:06d}"
+        
         form_data = {
             'code_gender': form.code_gender.data,
             'cnt_children': form.cnt_children.data,
@@ -56,27 +61,105 @@ def predict_post():
             'flag_email': form.flag_email.data
         }
         
+        # New scoring parameters (Phase 11 spec)
+        existing_debt = form.existing_debt.data or 0.0
+        loan_amount = form.loan_amount.data or 0.0
+        credit_history = form.credit_history.data
+        income_source = form.income_source.data
+        employment_type = form.employment_type.data
+        
+        start_time = time.time()
         try:
-            # Backend manual validation bounds check
+            # Backend schema check
             InputValidator.validate_predict_json(form_data)
             
+            # Predict base probability
             result = predictor.process_and_predict(form_data)
             
-            # Save predictions transaction to SQLite database
-            db_manager.add_prediction(form_data, result['decision'], result['approval_probability_percent'])
+            probability = result['approval_probability_percent']
+            decision = result['decision']
             
-            # Extract SHAP explanation details if present
+            # Business rules overlay (DTI and Credit rating checks)
+            reasons = []
+            recommendations = []
+            
+            if credit_history == 'Bad':
+                decision = "Rejected"
+                probability = min(probability, 18.5)
+                reasons.append("Prior payment default records registered in Credit Bureau.")
+                recommendations.append("Applicant must maintain a clean repayment record for 6+ months.")
+            
+            # Debt to Income Ratio Check
+            dti = existing_debt / (form_data['amt_income_total'] + 1e-5)
+            if dti > 0.45:
+                decision = "Rejected"
+                probability = min(probability, 25.0)
+                reasons.append("Debt-to-Income (DTI) ratio exceeds critical threshold.")
+                recommendations.append("Reduce outstanding liabilities below 35% of gross annual income.")
+            
+            # Success logic explanation
+            if decision == "Approved":
+                reasons.append("Low DTI ratio with strong annual gross income flow.")
+                reasons.append("Stable socio-economic profile and asset coverage.")
+                if credit_history == 'Good':
+                    reasons.append("Excellent credit bureau history with zero defaults.")
+                recommendations.append("Approve standard credit card facility limit.")
+                recommendations.append("Apply standard introductory APR parameters.")
+            else:
+                if years_employed < 2.0 and not form_data['flag_unemployed']:
+                    reasons.append("Short employment duration indicates potential cash flow instability.")
+                    recommendations.append("Establish a stable job profile with 2+ continuous years of employment.")
+                if len(reasons) == 0:
+                    reasons.append("Socio-demographic parameters classify profile as high default risk.")
+                    recommendations.append("Resubmit application with collateral backing or a co-signer.")
+
+            # Calculate risk level
+            if decision == "Rejected":
+                risk_level = "High" if probability < 15.0 else "Medium-High"
+            else:
+                risk_level = "Low" if probability > 80.0 else "Medium-Low"
+                
+            prediction_time_ms = round((time.time() - start_time) * 1000, 2)
+            
+            # Save predictions transaction to SQLite database using exact schema (Phase 11 spec)
+            db_manager.add_prediction(
+                input_features=form_data,
+                prediction=decision,
+                probability=probability,
+                app_id=application_id,
+                gender=form_data['code_gender'],
+                income=form_data['amt_income_total'],
+                employment=form_data['name_income_type'],
+                experience=form_data['years_employed'],
+                children=form_data['cnt_children'],
+                debt=existing_debt,
+                risk_level=risk_level,
+                model="Logistic Regression",
+                recommendation="; ".join(recommendations)
+            )
+            
+            # Extract SHAP explanations
             explanation = result.get("explanation", {})
             risk_factors = explanation.get("risk_factors", [])
             support_factors = explanation.get("support_factors", [])
             
             return render_template(
                 'result.html',
-                result=result['decision'],
-                probability=result['approval_probability_percent'],
+                result=decision,
+                probability=probability,
                 raw_data=form_data,
                 risk_factors=risk_factors,
-                support_factors=support_factors
+                support_factors=support_factors,
+                risk_level=risk_level,
+                prediction_time=prediction_time_ms,
+                model_used="Logistic Regression",
+                date=datetime.now().strftime("%Y-%m-%d"),
+                application_id=application_id,
+                reasons=reasons,
+                recommendations=recommendations,
+                existing_debt=existing_debt,
+                loan_amount=loan_amount,
+                credit_history=credit_history
             )
         except Exception as e:
             logger.error(f"Inference pipeline failure: {str(e)}")
@@ -89,81 +172,117 @@ def predict_post():
 
 @api_bp.route('/history', methods=['GET'])
 def history():
-    """Renders prediction history dashboard loading logs from SQLite."""
-    history_records = db_manager.get_predictions()
-    return render_template('history.html', history=history_records)
+    """Renders prediction history log list supporting filter, search, sort, pagination."""
+    search = request.args.get('search', '').strip()
+    sort_by = request.args.get('sort_by', 'id')
+    order = request.args.get('order', 'DESC')
+    page = int(request.args.get('page', 1))
+    limit = 10
+    
+    # Retrieve all matches from database
+    history_records = db_manager.get_predictions(limit=1000, search=search or None, sort_by=sort_by, order=order)
+    
+    # Simple list slice pagination
+    start = (page - 1) * limit
+    end = start + limit
+    paginated_history = history_records[start:end]
+    total_pages = (len(history_records) + limit - 1) // limit
+    
+    return render_template(
+        'history.html', 
+        history=paginated_history,
+        page=page,
+        total_pages=total_pages,
+        search=search,
+        sort_by=sort_by,
+        order=order
+    )
 
-@api_bp.route('/health', methods=['GET'])
-def health():
-    """Standard health check REST API endpoint."""
-    from datetime import datetime
-    try:
-        import os
-        from configs.config import config
-        paths = config.get_paths()
-        meta_path = os.path.join(paths["models_dir"], "logistic_regression_metadata.json")
-        model_loaded = "logistic_regression"
-        if os.path.exists(meta_path):
-            with open(meta_path, 'r') as f:
-                meta = json.load(f)
-                model_loaded = meta.get("model_name", "logistic_regression")
-    except Exception:
-        model_loaded = "logistic_regression"
-        
-    return jsonify({
-        "status": "healthy",
-        "version": "1.0.0",
-        "model_loaded": model_loaded,
-        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    }), 200
+@api_bp.route('/admin', methods=['GET'])
+def admin():
+    """Renders Admin Dashboard statistics panels (Phase 11 spec)."""
+    stats = db_manager.get_admin_stats()
+    recent = db_manager.get_predictions(limit=6)
+    return render_template('admin.html', stats=stats, recent=recent)
 
-# =========================================================
-# VERSIONED REST API (v1)
-# =========================================================
+@api_bp.route('/report/<application_id>', methods=['GET'])
+def get_report(application_id):
+    """Renders printable, clean PDF-ready credit report view (Phase 11 spec)."""
+    records = db_manager.get_predictions(limit=1000)
+    record = next((r for r in records if r["application_id"] == application_id), None)
+    if not record:
+        flash("Application record not found.", "danger")
+        return redirect(url_for('api.history'))
+    return render_template('report.html', record=record)
+
+# ==========================================
+# REST API (v1) ENDPOINTS
+# ==========================================
 
 @api_bp.route('/api/v1/health', methods=['GET'])
 @rate_limit(limit_count=60, period_seconds=60)
-def api_v1_health():
-    """Versioned health diagnostic REST API."""
-    return health()
+def health():
+    """Standard health check REST API endpoint."""
+    return jsonify({
+        "status": "healthy",
+        "version": "1.0.0",
+        "model_loaded": "logistic_regression",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }), 200
 
-@api_bp.route('/api/v1/history', methods=['GET'])
+@api_bp.route('/api/v1/admin/stats', methods=['GET'])
 @rate_limit(limit_count=30, period_seconds=60)
-def api_v1_history():
-    """Versioned history log transactions REST API loading from SQLite."""
-    history_records = db_manager.get_predictions()
-    return jsonify(history_records), 200
-
-@api_bp.route('/api/v1/predict', methods=['POST'])
-@rate_limit(limit_count=30, period_seconds=60)
-def api_v1_predict():
-    """Versioned model scoring REST API calculating delinquency risk."""
-    data = request.get_json()
-    if not data:
-        return jsonify({"error": "No JSON payload provided."}), 400
-        
-    try:
-        # Validate data (bypass validation for mock payloads in unit tests)
-        if data and "some_input" not in data:
-            InputValidator.validate_predict_json(data)
+def api_admin_stats():
+    """Returns aggregated stats formatted for Chart.js dashboards."""
+    records = db_manager.get_predictions(limit=1000)
+    
+    # 1. Income distribution bins
+    income_bins = {"< 50k": 0, "50k-100k": 0, "100k-150k": 0, "150k-200k": 0, "> 200k": 0}
+    # 2. Risk distribution counts
+    risk_bins = {"Low": 0, "Medium-Low": 0, "Medium-High": 0, "High": 0}
+    # 3. Monthly/daily trends
+    date_trends = {}
+    
+    for r in records:
+        inc = float(r.get("income", 0.0))
+        if inc < 50000:
+            income_bins["< 50k"] += 1
+        elif inc < 100000:
+            income_bins["50k-100k"] += 1
+        elif inc < 150000:
+            income_bins["100k-150k"] += 1
+        elif inc < 200000:
+            income_bins["150k-200k"] += 1
+        else:
+            income_bins["> 200k"] += 1
             
-        result = predictor.process_and_predict(data)
-        
-        # Save predictions transaction to SQLite database
-        if data and "some_input" not in data:
-            db_manager.add_prediction(data, result['decision'], result['approval_probability_percent'])
+        risk = r.get("risk_level", "Low")
+        if risk in risk_bins:
+            risk_bins[risk] += 1
             
-        return jsonify(result), 200
-    except Exception as e:
-        logger.error(f"REST API prediction failed: {str(e)}")
-        return jsonify({"error": str(e)}), 400
+        day = r.get("timestamp", "").split(" ")[0]
+        if day:
+            date_trends[day] = date_trends.get(day, 0) + 1
+            
+    # Sort dates
+    sorted_dates = sorted(date_trends.items())
+    dates_labels = [item[0] for item in sorted_dates[-10:]]
+    dates_data = [item[1] for item in sorted_dates[-10:]]
+    
+    return jsonify({
+        "income_labels": list(income_bins.keys()),
+        "income_data": list(income_bins.values()),
+        "risk_labels": list(risk_bins.keys()),
+        "risk_data": list(risk_bins.values()),
+        "trend_labels": dates_labels,
+        "trend_data": dates_data
+    }), 200
 
 @api_bp.route('/history/export/csv', methods=['GET'])
 @rate_limit(limit_count=10, period_seconds=60)
 def export_history_csv():
     """Exports prediction logs history from SQLite as a CSV attachment."""
     try:
-        from flask import Response
         import io
         import csv
         
@@ -175,37 +294,25 @@ def export_history_csv():
         
         # CSV Header
         writer.writerow([
-            "Prediction ID", "Timestamp", "Decision", "Probability Percent", 
-            "Gender", "Num Children", "Num Family Members", "Age Years", 
-            "Annual Income", "Owns Car", "Owns Realty", "Income Type", 
-            "Education Type", "Family Status", "Housing Type", "Years Employed", 
-            "Is Unemployed", "Occupation Type", "Work Phone", "Phone", "Email"
+            "Prediction ID", "Timestamp", "Gender", "Annual Income", "Employment",
+            "Years Experience", "Number of Children", "Outstanding Debt", "Decision", 
+            "Probability", "Risk Level", "Model"
         ])
         
         for item in history_records:
-            inp = item.get("input", {})
             writer.writerow([
-                item.get("id"),
+                item.get("application_id"),
                 item.get("timestamp"),
-                item.get("decision"),
-                item.get("probability_percent"),
-                inp.get("code_gender"),
-                inp.get("cnt_children"),
-                inp.get("cnt_fam_members"),
-                inp.get("age_years"),
-                inp.get("amt_income_total"),
-                inp.get("flag_own_car"),
-                inp.get("flag_own_realty"),
-                inp.get("name_income_type"),
-                inp.get("name_education_type"),
-                inp.get("name_family_status"),
-                inp.get("name_housing_type"),
-                inp.get("years_employed"),
-                inp.get("flag_unemployed"),
-                inp.get("occupation_type"),
-                inp.get("flag_work_phone"),
-                inp.get("flag_phone"),
-                inp.get("flag_email")
+                item.get("gender"),
+                item.get("income"),
+                item.get("employment"),
+                item.get("experience"),
+                item.get("children"),
+                item.get("debt"),
+                item.get("prediction"),
+                item.get("probability"),
+                item.get("risk_level"),
+                item.get("model")
             ])
             
         output.seek(0)
@@ -224,8 +331,6 @@ def export_history_csv():
 def export_history_json():
     """Exports prediction logs history from SQLite as a JSON attachment."""
     try:
-        from flask import Response
-        
         history_records = db_manager.get_predictions(limit=1000)
         json_data = json.dumps(history_records, indent=2)
         
@@ -239,7 +344,25 @@ def export_history_json():
         flash(f"JSON Export failed: {str(e)}", "danger")
         return redirect(url_for('api.history'))
 
-# Backward compatibility alias for the old API route
 @api_bp.route('/api/predict', methods=['POST'])
 def api_predict():
-    return api_v1_predict()
+    """Backward compatibility scoring API endpoint."""
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No JSON payload provided."}), 400
+    try:
+        result = predictor.process_and_predict(data)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+@api_bp.route('/health', methods=['GET'])
+def legacy_health():
+    """Legacy health check endpoint for backwards compatibility."""
+    return health()
+
+@api_bp.route('/api/v1/history', methods=['GET'])
+def legacy_api_v1_history():
+    """Legacy JSON history logs list endpoint for backwards compatibility."""
+    records = db_manager.get_predictions(limit=1000)
+    return jsonify(records), 200

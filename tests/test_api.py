@@ -263,3 +263,98 @@ def test_input_validator_exceptions():
     data["flag_own_car"] = "X"
     with pytest.raises(ValidationError):
         InputValidator.validate_predict_json(data)
+
+def test_admin_dashboard(client):
+    """Test admin portal renders successfully."""
+    response = client.get('/admin')
+    assert response.status_code == 200
+    assert b"Operations Analytics" in response.data or b"Admin" in response.data
+
+def test_api_admin_stats(client):
+    """Test admin stats JSON API endpoint."""
+    response = client.get('/api/v1/admin/stats')
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert "income_labels" in data
+    assert "risk_labels" in data
+    assert "trend_labels" in data
+
+def test_report_page_not_found(client):
+    """Test report page returns 302 redirect if ID not found."""
+    response = client.get('/report/APP-NONEXISTENT', follow_redirects=False)
+    assert response.status_code == 302
+    assert 'history' in response.location
+
+def test_db_manager_methods():
+    """Test SQLite database manager methods directly."""
+    from src.api.routes import db_manager
+    db_manager.init_db()
+    
+    # Add prediction
+    row_id = db_manager.add_prediction(
+        input_features={"code_gender": "F"},
+        prediction="Approved",
+        probability=95.0,
+        app_id="APP-TEST99",
+        gender="F",
+        income=120000.0,
+        employment="Working",
+        experience=10.0,
+        children=1,
+        debt=5000.0,
+        risk_level="Low",
+        model="Logistic Regression",
+        recommendation="Approved"
+    )
+    assert row_id is not None
+    
+    # Get statistics
+    stats = db_manager.get_admin_stats()
+    assert stats["total"] >= 1
+    assert stats["approved"] >= 1
+    
+    # Get predictions with search & sort
+    results = db_manager.get_predictions(limit=5, search="APP-TEST99", sort_by="income", order="DESC")
+    assert len(results) >= 1
+    assert results[0]["application_id"] == "APP-TEST99"
+    
+    # Clear history
+    db_manager.clear_history()
+    stats_empty = db_manager.get_admin_stats()
+    assert stats_empty["total"] == 0
+
+def test_report_page_success(client):
+    """Test report page renders successfully when ID exists."""
+    from src.api.routes import db_manager
+    db_manager.add_prediction(
+        input_features={"code_gender": "F"},
+        prediction="Approved",
+        probability=95.0,
+        app_id="APP-SUCCESS-101",
+        gender="F",
+        income=120000.0,
+        employment="Working",
+        experience=10.0,
+        children=1,
+        debt=5000.0,
+        risk_level="Low",
+        model="Logistic Regression",
+        recommendation="Approved"
+    )
+    response = client.get('/report/APP-SUCCESS-101')
+    assert response.status_code == 200
+    assert b"Statement" in response.data or b"Report" in response.data
+
+def test_history_page_filters(client):
+    """Test history list with search query and sorting parameters."""
+    response = client.get('/history?search=APP-SUCCESS-101&sort_by=income&order=ASC')
+    assert response.status_code == 200
+    assert b"History" in response.data or b"Log" in response.data
+
+def test_500_error_page_request(client):
+    """Test 500 error page renders successfully when an error is raised by a route."""
+    client.application.config['PROPAGATE_EXCEPTIONS'] = False
+    with patch('src.api.routes.db_manager.get_predictions', side_effect=Exception("Database crash")):
+        response = client.get('/admin')
+        assert response.status_code == 500
+        assert b"500" in response.data or b"Error" in response.data

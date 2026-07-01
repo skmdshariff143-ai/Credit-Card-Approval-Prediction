@@ -1,190 +1,190 @@
 {% extends "base.html" %}
+{% block title %}Evaluate Risk - CreditGuard AI{% endblock %}
 {% block content %}
+
 <div class="row justify-content-center">
-    <div class="col-lg-10">
-        <div class="card card-glass border-0">
-            <div class="card-header bg-dark text-white p-4 border-0 rounded-top-4">
-                <h4 class="fw-bold mb-0 d-flex align-items-center">
-                    <i class="bi bi-cpu-fill text-primary me-2"></i> Credit Card Approval Prediction System
-                </h4>
-                <p class="text-muted small mb-0 mt-1">Enter applicant demographic and socio-economic details to calculate delinquency risk vector.</p>
-            </div>
-            <div class="card-body p-4 p-md-5">
-                <form action="{{ url_for('api.predict_post') }}" method="POST" class="needs-validation" novalidate>
-                    {{ form.hidden_tag() }}
+    <div class="col-lg-10" data-aos="fade-up">
+        <div class="text-center mb-4">
+            <h2>Credit Evaluation Form</h2>
+            <p class="text-muted">Submit profile features to score creditworthiness and default risks.</p>
+        </div>
+
+        <!-- Wizard Step Nodes -->
+        <div class="step-container">
+            <div class="step-progress-bar"></div>
+            <div class="step-node active">1</div>
+            <div class="step-label">Personal</div>
+            
+            <div class="step-node">2</div>
+            <div class="step-label" style="transform: translateX(-40%);">Employment</div>
+            
+            <div class="step-node">3</div>
+            <div class="step-label" style="transform: translateX(-40%);">Financials</div>
+            
+            <div class="step-node">4</div>
+            <div class="step-label">Review</div>
+        </div>
+
+        <!-- Main Form Glass Card -->
+        <div class="card card-glass p-5">
+            <form id="wizard-risk-form" method="POST" action="{{ url_for('api.predict_post') }}" class="needs-validation" novalidate>
+                {{ form.hidden_tag() }}
+
+                <!-- =======================================================
+                     STEP 1: PERSONAL INFORMATION
+                     ======================================================= -->
+                <div class="wizard-step active">
+                    <h4 class="text-primary mb-4 text-start"><i class="bi bi-person-fill me-2"></i>Step 1: Personal Profile</h4>
+                    <div class="row g-4 text-start">
+                        <div class="col-md-6">
+                            <label for="code_gender" class="form-label font-weight-bold"><i class="bi bi-gender-ambiguous me-1"></i>Gender</label>
+                            {{ form.code_gender(class="form-select form-control", id="code_gender") }}
+                            <div class="invalid-feedback">Gender is required.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="age_years" class="form-label"><i class="bi bi-calendar-event me-1"></i>Age (in Years)</label>
+                            {{ form.age_years(class="form-control", id="age_years", type="number", min="18", max="100", step="0.5") }}
+                            <div class="form-text">Must be between 18 and 100 years.</div>
+                            <div class="invalid-feedback">Age must be between 18 and 100.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name_family_status" class="form-label"><i class="bi bi-heart-fill me-1"></i>Marital / Family Status</label>
+                            {{ form.name_family_status(class="form-select form-control", id="name_family_status") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cnt_children" class="form-label"><i class="bi bi-people-fill me-1"></i>Number of Children</label>
+                            {{ form.cnt_children(class="form-control", id="cnt_children", type="number", min="0", max="20") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name_education_type" class="form-label"><i class="bi bi-mortarboard-fill me-1"></i>Education Level</label>
+                            {{ form.name_education_type(class="form-select form-control", id="name_education_type") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name_housing_type" class="form-label"><i class="bi bi-house-fill me-1"></i>Housing Type</label>
+                            {{ form.name_housing_type(class="form-select form-control", id="name_housing_type") }}
+                        </div>
+                        <div class="col-md-6 d-none">
+                            <!-- Hidden Compat Field -->
+                            <input type="number" name="cnt_fam_members" id="cnt_fam_members" value="2" class="form-control">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-5">
+                        <button type="button" class="btn btn-premium btn-next">Next step<i class="bi bi-arrow-right ms-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- =======================================================
+                     STEP 2: EMPLOYMENT INFORMATION
+                     ======================================================= -->
+                <div class="wizard-step">
+                    <h4 class="text-primary mb-4 text-start"><i class="bi bi-briefcase-fill me-2"></i>Step 2: Professional Profile</h4>
+                    <div class="row g-4 text-start">
+                        <div class="col-md-6">
+                            <label for="name_income_type" class="form-label"><i class="bi bi-building me-1"></i>Employment Sector</label>
+                            {{ form.name_income_type(class="form-select form-control", id="name_income_type") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="occupation_type" class="form-label"><i class="bi bi-award-fill me-1"></i>Occupation Category</label>
+                            {{ form.occupation_type(class="form-select form-control", id="occupation_type") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="employment_type" class="form-label"><i class="bi bi-file-earmark-person me-1"></i>Employment Type</label>
+                            {{ form.employment_type(class="form-select form-control", id="employment_type") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="years_employed" class="form-label"><i class="bi bi-clock-fill me-1"></i>Years of Experience</label>
+                            {{ form.years_employed(class="form-control", id="years_employed", type="number", min="0", max="60", step="0.5") }}
+                            <div class="invalid-feedback">Experience must be between 0 and 60.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="income_source" class="form-label"><i class="bi bi-wallet2 me-1"></i>Income Source</label>
+                            {{ form.income_source(class="form-select form-control", id="income_source") }}
+                        </div>
+                        <div class="col-md-6 d-flex align-items-center mt-auto pb-2">
+                            <div class="form-check form-switch p-3 bg-secondary-subtle rounded-3 w-100 text-start ps-5">
+                                {{ form.flag_unemployed(class="form-check-input", id="flag_unemployed") }}
+                                <label class="form-check-label fw-bold" for="flag_unemployed">Unemployed or Retired Pensioner</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-5">
+                        <button type="button" class="btn btn-outline-secondary btn-prev"><i class="bi bi-arrow-left me-2"></i>Back</button>
+                        <button type="button" class="btn btn-premium btn-next">Next step<i class="bi bi-arrow-right ms-2"></i></button>
+                    </div>
+                </div>
+
+                <!-- =======================================================
+                     STEP 3: FINANCIAL INFORMATION
+                     ======================================================= -->
+                <div class="wizard-step">
+                    <h4 class="text-primary mb-4 text-start"><i class="bi bi-cash-coin me-2"></i>Step 3: Financial Details</h4>
+                    <div class="row g-4 text-start">
+                        <div class="col-md-6">
+                            <label for="amt_income_total" class="form-label"><i class="bi bi-currency-dollar me-1"></i>Gross Annual Income</label>
+                            {{ form.amt_income_total(class="form-control", id="amt_income_total", type="number", min="1000", max="10000000") }}
+                            <div class="invalid-feedback">Annual income must be greater than $1,000.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="existing_debt" class="form-label"><i class="bi bi-credit-card-2-front me-1"></i>Outstanding Debt ($)</label>
+                            {{ form.existing_debt(class="form-control", id="existing_debt", type="number", min="0", max="10000000") }}
+                            <div class="invalid-feedback">Debt cannot be negative.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="loan_amount" class="form-label"><i class="bi bi-wallet me-1"></i>Requested Credit Limit ($)</label>
+                            {{ form.loan_amount(class="form-control", id="loan_amount", type="number", min="0", max="10000000") }}
+                            <div class="invalid-feedback">Requested loan cannot be negative.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="credit_history" class="form-label"><i class="bi bi-activity me-1"></i>Credit Bureau Rating</label>
+                            {{ form.credit_history(class="form-select form-control", id="credit_history") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="flag_own_car" class="form-label"><i class="bi bi-car-front-fill me-1"></i>Owns Car</label>
+                            {{ form.flag_own_car(class="form-select form-control", id="flag_own_car") }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="flag_own_realty" class="form-label"><i class="bi bi-houses me-1"></i>Owns Property</label>
+                            {{ form.flag_own_realty(class="form-select form-control", id="flag_own_realty") }}
+                        </div>
+                    </div>
                     
-                    <div class="row g-4">
-                        <!-- Personal Info Section -->
-                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2">
-                            <h5 class="fw-bold d-flex align-items-center text-gradient">
-                                <i class="bi bi-person-fill me-2"></i> Demographic Profile
-                            </h5>
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label">Gender</label>
-                            {{ form.code_gender(class="form-select") }}
-                            {% if form.code_gender.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.code_gender.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="col-md-4">
-                            <label class="form-label">Age (Years)</label>
-                            {{ form.age_years(class="form-control", placeholder="e.g. 35", type="number", min="18", max="120", step="1") }}
-                            {% if form.age_years.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.age_years.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
+                    <!-- Hidden Contact Checkboxes (Managed automatically) -->
+                    <div class="d-none">
+                        {{ form.flag_work_phone(checked=True) }}
+                        {{ form.flag_phone(checked=True) }}
+                        {{ form.flag_email(checked=True) }}
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-5">
+                        <button type="button" class="btn btn-outline-secondary btn-prev"><i class="bi bi-arrow-left me-2"></i>Back</button>
+                        <button type="button" class="btn btn-premium btn-next">Next step<i class="bi bi-arrow-right ms-2"></i></button>
+                    </div>
+                </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label">Marital Status</label>
-                            {{ form.name_family_status(class="form-select") }}
-                            {% if form.name_family_status.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.name_family_status.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Family Members</label>
-                            {{ form.cnt_fam_members(class="form-control", type="number", min="1", max="20", step="1") }}
-                            {% if form.cnt_fam_members.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.cnt_fam_members.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Number of Children</label>
-                            {{ form.cnt_children(class="form-control", type="number", min="0", max="20", step="1") }}
-                            {% if form.cnt_children.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.cnt_children.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Socio-Economic Section -->
-                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2 mt-5">
-                            <h5 class="fw-bold d-flex align-items-center text-gradient">
-                                <i class="bi bi-wallet2 me-2"></i> Financial & Assets Status
-                            </h5>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Annual Income ($)</label>
-                            {{ form.amt_income_total(class="form-control", placeholder="e.g. 150000", type="number", min="1", step="1") }}
-                            {% if form.amt_income_total.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.amt_income_total.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Own Car?</label>
-                            {{ form.flag_own_car(class="form-select") }}
-                            {% if form.flag_own_car.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.flag_own_car.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Own Property / Realty?</label>
-                            {{ form.flag_own_realty(class="form-select") }}
-                            {% if form.flag_own_realty.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.flag_own_realty.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Income Type</label>
-                            {{ form.name_income_type(class="form-select") }}
-                            {% if form.name_income_type.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.name_income_type.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Education Level</label>
-                            {{ form.name_education_type(class="form-select") }}
-                            {% if form.name_education_type.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.name_education_type.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Housing Situation</label>
-                            {{ form.name_housing_type(class="form-select") }}
-                            {% if form.name_housing_type.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.name_housing_type.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <!-- Employment Section -->
-                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2 mt-5">
-                            <h5 class="fw-bold d-flex align-items-center text-gradient">
-                                <i class="bi bi-briefcase-fill me-2"></i> Employment Profile
-                            </h5>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Occupation Class</label>
-                            {{ form.occupation_type(class="form-select") }}
-                            {% if form.occupation_type.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.occupation_type.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Years Employed</label>
-                            {{ form.years_employed(class="form-control", placeholder="e.g. 5", type="number", min="0", max="80", step="0.5") }}
-                            {% if form.years_employed.errors %}
-                                <div class="text-danger small mt-1">{% for err in form.years_employed.errors %}{{ err }} {% endfor %}</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4 d-flex align-items-center mt-md-5 mt-4">
-                            <div class="form-check form-switch">
-                                {{ form.flag_unemployed(class="form-check-input", type="checkbox") }}
-                                <label class="form-check-label fw-semibold" for="flag_unemployed">
-                                    Currently Unemployed / Pensioner?
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- Contact Flags Section -->
-                        <div class="col-12 border-bottom border-secondary-subtle pb-2 mb-2 mt-5">
-                            <h5 class="fw-bold d-flex align-items-center text-gradient">
-                                <i class="bi bi-telephone-inbound-fill me-2"></i> Contact Metadata
-                            </h5>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-check form-switch mt-2">
-                                {{ form.flag_work_phone(class="form-check-input", type="checkbox") }}
-                                <label class="form-check-label fw-semibold">Provided Work Phone?</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-check form-switch mt-2">
-                                {{ form.flag_phone(class="form-check-input", type="checkbox") }}
-                                <label class="form-check-label fw-semibold">Provided Landline Phone?</label>
-                            </div>
-                        </div>
-
-                        <div class="col-md-4">
-                            <div class="form-check form-switch mt-2">
-                                {{ form.flag_email(class="form-check-input", type="checkbox") }}
-                                <label class="form-check-label fw-semibold">Provided Email Address?</label>
-                            </div>
+                <!-- =======================================================
+                     STEP 4: REVIEW & CONFIRM
+                     ======================================================= -->
+                <div class="wizard-step">
+                    <h4 class="text-primary mb-4 text-start"><i class="bi bi-file-earmark-check-fill me-2"></i>Step 4: Review Application</h4>
+                    
+                    <div class="p-4 bg-body-tertiary rounded-4 mb-4 border border-secondary-subtle">
+                        <div id="review-summary-panel">
+                            <!-- Populated dynamically via main.js -->
                         </div>
                     </div>
-
-                    <div class="d-grid gap-2 mt-5 pt-3">
-                        <button class="btn btn-premium btn-lg shadow" type="submit" id="submitBtn">
-                            <i class="bi bi-shield-shaded me-1"></i> Run Risk Prediction
-                        </button>
+                    
+                    <div class="alert alert-info border-0 text-start py-3 small mb-0">
+                        <i class="bi bi-info-circle-fill me-2"></i>Confirming submission triggers the ML preprocessing pipelines and Logistic Regression default classifiers. Scoring completion logs results to SQLite.
                     </div>
-                </form>
-            </div>
+
+                    <div class="d-flex justify-content-between mt-5">
+                        <button type="button" class="btn btn-outline-secondary btn-prev"><i class="bi bi-arrow-left me-2"></i>Back</button>
+                        <button type="submit" class="btn btn-success px-4 py-2 fw-bold" id="btn-submit-wizard"><i class="bi bi-check-all me-1"></i>Submit Score Profile</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
 {% endblock %}
