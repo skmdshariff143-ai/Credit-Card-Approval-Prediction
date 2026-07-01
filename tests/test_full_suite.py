@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from pathlib import Path
@@ -13,36 +12,38 @@ mock_wml = MagicMock()
 sys.modules["ibm_watson_machine_learning"] = mock_wml
 
 # Import components to test
-from configs.config import config
-from configs.constants import TARGET_COL
-from src.api.history import HistoryManager
-from src.api.validators import InputValidator
-from src.data.data_split import perform_stratified_split
-from src.data.dataset_info import DatasetMetadataGenerator
-from src.data.load_data import DataLoader
-from src.data.validate_data import DataValidator
-from src.deployment.deploy import run_ibm_deployment
-from src.deployment.ibm_cloud import IBMCloudManager
-from src.features.feature_engineering import FeatureEngineer as FeatureEngineerModule
-from src.features.feature_selection import FeatureSelector
-from src.models.compare_models import ModelComparator
-from src.models.evaluate import ModelEvaluator
-from src.models.hyperparameter_tuning import HyperparameterTuner
-from src.models.metrics import calculate_all_metrics
-from src.models.model_registry import ModelRegistry
-from src.models.train import ModelTrainer
-from src.preprocessing.duplicates import DuplicateHandler
-from src.preprocessing.encoding import CategoricalEncoder
-from src.preprocessing.feature_engineering import FeatureEngineer as PreprocessFeatureEngineer
-from src.preprocessing.missing_values import MissingValueImputer
-from src.preprocessing.outliers import OutlierCapper
-from src.preprocessing.pipeline import PreprocessingPipeline
-from src.preprocessing.scaling import NumericalScaler
-from src.utils.exceptions import DataLoadingError, DataPreprocessingError, DataValidationError, ModelTrainingError
-from src.utils.helper import load_json, load_pkl, save_json, save_pkl
-from src.utils.tracker import ExperimentTracker
-from src.visualization.eda import calculate_missing_matrix, generate_summary_stats
-from src.visualization.plots import VizPlotter
+from configs.config import config  # noqa: E402
+from configs.constants import TARGET_COL  # noqa: E402
+from src.api.history import HistoryManager  # noqa: E402
+from src.api.validators import InputValidator  # noqa: E402
+from src.data.data_split import perform_stratified_split  # noqa: E402
+from src.data.dataset_info import DatasetMetadataGenerator  # noqa: E402
+from src.data.load_data import DataLoader  # noqa: E402
+from src.data.validate_data import DataValidator  # noqa: E402
+from src.deployment.deploy import run_ibm_deployment  # noqa: E402
+from src.deployment.ibm_cloud import IBMCloudManager  # noqa: E402
+from src.features.feature_engineering import FeatureEngineer as FeatureEngineerModule  # noqa: E402
+from src.features.feature_selection import FeatureSelector  # noqa: E402
+from src.models.compare_models import ModelComparator  # noqa: E402
+from src.models.evaluate import ModelEvaluator  # noqa: E402
+from src.models.hyperparameter_tuning import HyperparameterTuner  # noqa: E402
+from src.models.metrics import calculate_all_metrics  # noqa: E402
+from src.models.model_registry import ModelRegistry  # noqa: E402
+from src.models.train import ModelTrainer  # noqa: E402
+from src.preprocessing.duplicates import DuplicateHandler  # noqa: E402
+from src.preprocessing.encoding import CategoricalEncoder  # noqa: E402
+from src.preprocessing.feature_engineering import FeatureEngineer as PreprocessFeatureEngineer  # noqa: E402
+from src.preprocessing.pipeline import PreprocessingPipeline  # noqa: E402
+from src.preprocessing.scaling import NumericalScaler  # noqa: E402
+from src.utils.exceptions import (  # noqa: E402
+    DataLoadingError,
+    DataPreprocessingError,
+    DataValidationError,
+)
+from src.utils.helper import load_json, load_pkl, save_json, save_pkl  # noqa: E402
+from src.utils.tracker import ExperimentTracker  # noqa: E402
+from src.visualization.eda import calculate_missing_matrix, generate_summary_stats  # noqa: E402
+from src.visualization.plots import VizPlotter  # noqa: E402
 
 
 @pytest.fixture
@@ -505,7 +506,6 @@ def test_drift_validator():
 
 
 def test_feature_engineer_features(mock_app_df):
-    from src.features.feature_engineering import FeatureEngineer as FeatureEngineerModule
 
     engineer = FeatureEngineerModule()
     res = engineer.extract_custom_features(mock_app_df)

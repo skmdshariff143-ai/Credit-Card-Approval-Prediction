@@ -4,7 +4,6 @@ import pandas as pd
 
 from configs.config import config
 from src.models.explainability import ExplanationEngine
-from src.utils.exceptions import ModelTrainingError
 from src.utils.helper import load_pkl
 from src.utils.logger import get_logger
 

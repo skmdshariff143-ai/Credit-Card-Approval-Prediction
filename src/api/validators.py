@@ -1,4 +1,3 @@
-import pandas as pd
 
 from src.utils.exceptions import ValidationError
 from src.utils.logger import get_logger

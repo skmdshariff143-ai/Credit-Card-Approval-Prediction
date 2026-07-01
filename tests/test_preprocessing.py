@@ -2,10 +2,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from src.preprocessing.encoding import CategoricalEncoder
 from src.preprocessing.missing_values import MissingValueImputer
 from src.preprocessing.outliers import OutlierCapper
-from src.preprocessing.scaling import NumericalScaler
 
 
 @pytest.fixture

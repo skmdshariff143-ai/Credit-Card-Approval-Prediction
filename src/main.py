@@ -1,16 +1,14 @@
-import argparse
 import os
 import sys
-import time
 
 # Ensure project root is on Python search path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-import pandas as pd
-from sklearn.base import BaseEstimator, ClassifierMixin
-from sklearn.metrics import classification_report
-from sklearn.model_selection import StratifiedKFold, cross_val_score
-from sklearn.utils._tags import ClassifierTags
+import pandas as pd  # noqa: E402
+from sklearn.base import BaseEstimator, ClassifierMixin  # noqa: E402
+from sklearn.metrics import classification_report  # noqa: E402
+from sklearn.model_selection import StratifiedKFold, cross_val_score  # noqa: E402
+from sklearn.utils._tags import ClassifierTags  # noqa: E402
 
 
 # Global patch to fix scikit-learn 1.6 / Python 3.13 / XGBoost MRO compatibility bug
@@ -29,16 +27,15 @@ def safe_sklearn_tags(self):
 
 ClassifierMixin.__sklearn_tags__ = safe_sklearn_tags
 
-from configs.config import config
-from configs.constants import TARGET_COL
-from src.models.compare_models import ModelComparator
-from src.models.evaluate import ModelEvaluator
-from src.models.hyperparameter_tuning import HyperparameterTuner
-from src.models.metrics import calculate_all_metrics
-from src.models.model_registry import ModelRegistry
-from src.models.train import ModelTrainer
-from src.utils.helper import save_pkl
-from src.utils.logger import get_logger
+from configs.config import config  # noqa: E402
+from configs.constants import TARGET_COL  # noqa: E402
+from src.models.compare_models import ModelComparator  # noqa: E402
+from src.models.evaluate import ModelEvaluator  # noqa: E402
+from src.models.hyperparameter_tuning import HyperparameterTuner  # noqa: E402
+from src.models.metrics import calculate_all_metrics  # noqa: E402
+from src.models.train import ModelTrainer  # noqa: E402
+from src.utils.helper import save_pkl  # noqa: E402
+from src.utils.logger import get_logger  # noqa: E402
 
 logger = get_logger(__name__)
 
@@ -51,7 +48,6 @@ def run_model_pipeline():
     paths = config.get_paths()
     processed_dir = paths["processed_dir"]
     models_dir = paths["models_dir"]
-    reports_dir = paths["reports_dir"]
 
     # 1. Load splits
     logger.info("Loading preprocessed dataset splits...")
@@ -65,7 +61,6 @@ def run_model_pipeline():
     tuner = HyperparameterTuner(cv=3)
     evaluator = ModelEvaluator()
     comparator = ModelComparator()
-    registry = ModelRegistry()
 
     models = trainer.get_baseline_models()
     trained_models = {}
@@ -121,7 +116,8 @@ def run_model_pipeline():
     best_model = trained_models[best_name]
 
     logger.info(
-        f"Auto-selected Deployed Model: '{best_name}' (F1-Score: {best_row['F1-Score']:.4f}, ROC-AUC: {best_row['ROC-AUC']:.4f})"
+        f"Auto-selected Deployed Model: '{best_name}' "
+        f"(F1-Score: {best_row['F1-Score']:.4f}, ROC-AUC: {best_row['ROC-AUC']:.4f})"
     )
 
     # Save best_model.pkl using Joblib
@@ -172,7 +168,10 @@ def _write_final_model_report(best_name, best_row, cv_summaries):
 
     report_lines = [
         "# Model Training & Performance Report\n",
-        f"This report documents model training parameters, Stratified Cross-Validation scores, and performance metrics of the best risk model: **{best_name}**.\n",
+        (
+            f"This report documents model training parameters, Stratified Cross-Validation scores, "
+            f"and performance metrics of the best risk model: **{best_name}**.\n"
+        ),
         "## 1. Selected Best Model Metrics",
         f"- **Model Algorithm**: {best_name}",
         f"- **F1-Score**: {best_row['F1-Score']:.4f}",
@@ -190,7 +189,9 @@ def _write_final_model_report(best_name, best_row, cv_summaries):
 
     report_lines.append("\n## 3. Business Relevance & Interpretability")
     report_lines.append(
-        "Tree-based ensemble models (Random Forest and XGBoost) successfully segment credit risk boundaries without assuming linear structures. Using balanced class weighting helps protect the bank from critical credit defaults."
+        "Tree-based ensemble models (Random Forest and XGBoost) successfully segment credit risk boundaries "
+        "without assuming linear structures. Using balanced class weighting helps protect the bank from "
+        "critical credit defaults."
     )
 
     try:

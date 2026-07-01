@@ -1,10 +1,9 @@
 import os
 
-import numpy as np
 import pandas as pd
 
 from configs.config import config
-from configs.constants import CATEGORICAL_COLS, NUMERICAL_COLS, TARGET_COL
+from configs.constants import TARGET_COL
 from src.data.data_split import perform_stratified_split
 from src.data.load_data import DataLoader
 from src.preprocessing.duplicates import DuplicateHandler

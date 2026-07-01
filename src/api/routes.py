@@ -1,4 +1,5 @@
 import json
+import os
 import time
 from datetime import datetime
 
@@ -12,6 +13,8 @@ from src.utils.limiter import rate_limit
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
+
+START_TIME = time.time()
 
 # Register Blueprint
 api_bp = Blueprint("api", __name__, template_folder="../../app/templates", static_folder="../../app/static")
@@ -71,8 +74,6 @@ def predict_post():
         existing_debt = form.existing_debt.data or 0.0
         loan_amount = form.loan_amount.data or 0.0
         credit_history = form.credit_history.data
-        income_source = form.income_source.data
-        employment_type = form.employment_type.data
 
         start_time = time.time()
         try:
@@ -233,18 +234,82 @@ def get_report(application_id):
 @api_bp.route("/api/v1/health", methods=["GET"])
 @rate_limit(limit_count=60, period_seconds=60)
 def health():
-    """Standard health check REST API endpoint."""
+    """Standard health check REST API endpoint with model, database, and uptime information."""
+    from src.models.predict import _predictor
+
+    # Model status
+    model_status = "loaded" if (_predictor.model is not None and _predictor.pipeline is not None) else "not_loaded"
+
+    # Database connectivity status
+    database_status = "connected" if db_manager.check_connection() else "disconnected"
+
+    # Uptime duration formatting
+    uptime_seconds = time.time() - START_TIME
+    if uptime_seconds < 60:
+        uptime_str = f"{uptime_seconds:.1f}s"
+    elif uptime_seconds < 3600:
+        uptime_str = f"{int(uptime_seconds // 60)}m {int(uptime_seconds % 60)}s"
+    else:
+        uptime_str = f"{int(uptime_seconds // 3600)}h {int((uptime_seconds % 3600) // 60)}m {int(uptime_seconds % 60)}s"
+
     return (
         jsonify(
             {
                 "status": "healthy",
+                "model": model_status,
+                "model_loaded": "logistic_regression",  # compat
+                "database": database_status,
+                "uptime": uptime_str,
                 "version": "1.0.0",
-                "model_loaded": "logistic_regression",
                 "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             }
         ),
         200,
     )
+
+
+@api_bp.route("/version", methods=["GET"])
+def version_endpoint():
+    """Returns application and model version metadata."""
+    return (
+        jsonify(
+            {
+                "app_name": "Credit Card Approval Prediction",
+                "version": "1.0.0",
+                "flask_version": "3.0.x",
+                "python_version": "3.13",
+                "model_version": "1.0.0",
+                "model_type": "logistic_regression",
+            }
+        ),
+        200,
+    )
+
+
+@api_bp.route("/startup", methods=["GET"])
+def startup_diagnostics():
+    """Returns startup diagnostics about system dependencies and file structures."""
+    import sys
+
+    from src.models.predict import _predictor
+
+    diagnostics = {
+        "status": "completed",
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "python_path": sys.path,
+        "environment": os.getenv("FLASK_ENV", "development"),
+        "database": {
+            "path": db_manager.db_path,
+            "exists": os.path.exists(db_manager.db_path),
+            "healthy": db_manager.check_connection(),
+        },
+        "model_files": {
+            "best_model_exists": os.path.exists(_predictor.model_path),
+            "pipeline_exists": os.path.exists(_predictor.pipeline_path),
+            "loaded": _predictor.model is not None and _predictor.pipeline is not None,
+        },
+    }
+    return jsonify(diagnostics), 200
 
 
 @api_bp.route("/api/v1/admin/stats", methods=["GET"])

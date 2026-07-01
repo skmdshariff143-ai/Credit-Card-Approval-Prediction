@@ -56,7 +56,21 @@ class DatabaseManager:
                     probability REAL NOT NULL
                 )
             """)
+            # Create performance indexes for search and sorting
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_app_id ON prediction_history(application_id);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_timestamp ON prediction_history(timestamp);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_income ON prediction_history(income);")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_risk ON prediction_history(risk_level);")
             conn.commit()
+
+    def check_connection(self) -> bool:
+        """Verifies database connectivity."""
+        try:
+            with self._get_connection() as conn:
+                conn.execute("SELECT 1")
+            return True
+        except Exception:
+            return False
 
     def add_prediction(
         self,
@@ -121,7 +135,9 @@ class DatabaseManager:
             cursor.execute(
                 """
                 INSERT OR REPLACE INTO prediction_history (
-                    application_id, timestamp, gender, income, employment, experience, children, debt, prediction, probability, risk_level, model, recommendation, raw_input
+                    application_id, timestamp, gender, income, employment,
+                    experience, children, debt, prediction, probability,
+                    risk_level, model, recommendation, raw_input
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (

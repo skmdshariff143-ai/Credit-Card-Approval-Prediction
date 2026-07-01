@@ -7,7 +7,6 @@ import seaborn as sns
 from sklearn.metrics import auc, confusion_matrix, precision_recall_curve, roc_curve
 
 from configs.config import config
-from src.utils.exceptions import ModelEvaluationError
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)

@@ -382,4 +382,58 @@ document.addEventListener('DOMContentLoaded', function () {
             window.print();
         });
     }
+
+    // ----------------------------------------------------------------------
+    // 7. Form Submission Loading Screen Orchestration
+    // ----------------------------------------------------------------------
+    const riskForm = document.getElementById('wizard-risk-form');
+    if (riskForm) {
+        riskForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            
+            // 1. Create and inject the loading overlay HTML dynamically if not exists
+            let overlay = document.getElementById('loading-overlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'loading-overlay';
+                overlay.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center';
+                overlay.style.cssText = 'background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); z-index: 9999; color: #fff; transition: opacity 0.3s ease;';
+                overlay.innerHTML = `
+                    <div class="spinner-border text-primary mb-4" role="status" style="width: 4rem; height: 4rem;">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h3 id="loading-status-text" class="text-uppercase tracking-wider fw-bold mb-2">Connecting...</h3>
+                    <p id="loading-status-subtext" class="text-muted text-center px-4" style="max-width: 450px;">Initializing credit evaluation pipelines...</p>
+                `;
+                document.body.appendChild(overlay);
+            }
+            
+            overlay.style.opacity = '1';
+            overlay.classList.remove('d-none');
+            
+            // 2. Cycle messages
+            const statusText = document.getElementById('loading-status-text');
+            const statusSubtext = document.getElementById('loading-status-subtext');
+            
+            const steps = [
+                { text: "Connecting...", sub: "Establishing secure link to CreditGuard decision engine..." },
+                { text: "Loading model...", sub: "Fetching Logistic Regression weights and validation templates..." },
+                { text: "Preparing prediction...", sub: "Transforming socio-demographic features and scaling financials..." },
+                { text: "Application Ready", sub: "Finalizing risk evaluation scores..." }
+            ];
+            
+            let currentStep = 0;
+            const interval = setInterval(() => {
+                currentStep++;
+                if (currentStep < steps.length) {
+                    statusText.textContent = steps[currentStep].text;
+                    statusSubtext.textContent = steps[currentStep].sub;
+                } else {
+                    clearInterval(interval);
+                    // Submit the form actually
+                    riskForm.submit();
+                }
+            }, 600); // 600ms per stage, total ~2.4s of beautiful premium loading animation
+        });
+    }
 });

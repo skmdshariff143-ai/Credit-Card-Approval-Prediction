@@ -1,5 +1,5 @@
 import json
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -390,3 +390,22 @@ def test_500_error_page_request(client):
         response = client.get("/admin")
         assert response.status_code == 500
         assert b"500" in response.data or b"Error" in response.data
+
+
+def test_version_endpoint(client):
+    """Test version metadata endpoint."""
+    response = client.get("/version")
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data["app_name"] == "Credit Card Approval Prediction"
+    assert "version" in data
+
+
+def test_startup_diagnostics(client):
+    """Test startup diagnostics endpoint."""
+    response = client.get("/startup")
+    assert response.status_code == 200
+    data = json.loads(response.data)
+    assert data["status"] == "completed"
+    assert "database" in data
+    assert "model_files" in data

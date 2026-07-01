@@ -1,4 +1,3 @@
-import json
 import os
 
 import pandas as pd
@@ -105,21 +104,33 @@ class ModelComparator:
 
         report_content = [
             "# Model Comparison & Ranking Report\n",
-            "This report compares and ranks candidate risk models based on F1-Score, ROC-AUC, and processing time profiles.\n",
+            (
+                "This report compares and ranks candidate risk models based on F1-Score, ROC-AUC, "
+                "and processing time profiles.\n"
+            ),
             "## 1. Metrics Performance Table\n",
             md_table_str,
             "\n## 2. Algorithm Strengths & Weaknesses Assessment\n",
             "### Logistic Regression",
-            "- **Strengths**: High business interpretability, linear decision boundary mapping, and sub-millisecond inference speed.",
+            (
+                "- **Strengths**: High business interpretability, linear decision boundary mapping, "
+                "and sub-millisecond inference speed."
+            ),
             "- **Weaknesses**: Underfits complex feature interactions; lower Recall/F1 values.",
             "\n### Decision Tree Classifier",
             "- **Strengths**: Simple visual tree rules, natively handles mixed data types.",
             "- **Weaknesses**: Prone to overfitting on small data partitions; higher variance.",
             "\n### Random Forest Classifier",
-            "- **Strengths**: Exceptional bagging stability, lower variance, reduces overfitting, and ranks features accurately.",
+            (
+                "- **Strengths**: Exceptional bagging stability, lower variance, reduces overfitting, "
+                "and ranks features accurately."
+            ),
             "- **Weaknesses**: Larger file sizes; slower training on multiple trees.",
             "\n### XGBoost Classifier",
-            "- **Strengths**: State-of-the-art boosting formulation, optimizes F1 target objectives, robust missing values handling.",
+            (
+                "- **Strengths**: State-of-the-art boosting formulation, optimizes F1 target objectives, "
+                "robust missing values handling."
+            ),
             "- **Weaknesses**: Hyperparameter space requires extensive tuning; complex to interpret visually.",
             "\n## 3. Final Recommendation Summary",
             f"The best model selected by F1-Score objective is **{df.loc[0, 'Model']}** (Rank 1).",

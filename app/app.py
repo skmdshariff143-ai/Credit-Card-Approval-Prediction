@@ -46,6 +46,16 @@ def create_app() -> Flask:
     def internal_error(error):
         return render_template("500.html"), 500
 
+    # Pre-load ML model and pipeline at startup to optimize response time and warm the container
+    try:
+        from src.models.predict import _predictor
+
+        _predictor.load_pipeline()
+        _predictor.load_model()
+        app.logger.info("ML Model and preprocessing pipeline successfully pre-loaded during application startup.")
+    except Exception as e:
+        app.logger.error(f"Error pre-loading ML model or pipeline during startup: {str(e)}")
+
     return app
 
 
