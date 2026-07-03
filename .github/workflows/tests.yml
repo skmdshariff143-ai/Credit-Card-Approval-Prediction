@@ -51,4 +51,22 @@ jobs:
       - name: Run Pytest Suite
         run: |
           python -m pytest tests/ --cov=src --cov=app --cov-report=term-missing -v --tb=long 2>&1 | tee pytest_output.log
-          exit ${PIPESTATUS[0]}
+          echo $? > pytest_exit_code.txt
+        continue-on-error: true
+
+      - name: Upload Test Output on Failure
+        run: |
+          EXIT_CODE=$(cat pytest_exit_code.txt)
+          if [ "$EXIT_CODE" -ne 0 ]; then
+            echo "Pytest failed with exit code $EXIT_CODE."
+            if [ -f pytest_output.log ]; then
+              echo "Uploading test output to paste.rs..."
+              PASTE_URL=$(curl --silent --data-binary @pytest_output.log https://paste.rs/)
+              echo "=================================================================="
+              echo "   PYTEST DETAILED RESULTS: $PASTE_URL"
+              echo "=================================================================="
+            fi
+            exit "$EXIT_CODE"
+          else
+            echo "Pytest completed successfully."
+          fi
