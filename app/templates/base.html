@@ -1,150 +1,148 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}CreditGuard AI — Premium Credit Risk Platform{% endblock %}</title>
-
-  <!-- Typography & Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
-  <!-- Custom Design System Stylesheet -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  
-  <!-- Chart.js and CDNs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  {% block extra_head %}{% endblock %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CreditGuard AI | Premium Risk Dashboard{% endblock %}</title>
+    <!-- Google Fonts: Inter for Body, Outfit for Headings, JetBrains Mono for Data -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {% block extra_head %}{% endblock %}
 </head>
-<body>
+<body class="dashboard-body">
 
-  <!-- Page Loader -->
-  <div class="page-loader" id="pageLoader">
-    <div class="loader-spinner"></div>
-  </div>
-
-  <!-- Mobile Top Header Bar -->
-  <header class="mobile-header no-print">
-    <button class="menu-toggle" id="menuToggle" aria-label="Toggle Navigation Menu">
-      <i class="fas fa-bars"></i>
-    </button>
-    <div class="landing-nav-brand">
-      <div class="sidebar-logo" style="width:32px;height:32px;font-size:16px;border-radius:8px;">
-        <i class="fas fa-shield-halved"></i>
-      </div>
-      <span style="font-family:var(--font-heading);font-weight:700;font-size:16px;">CreditGuard AI</span>
+    <!-- Page Transition Loader -->
+    <div class="loader-backdrop" id="pageLoader">
+        <div class="loader-ring">
+            <div class="loader-segment"></div>
+            <div class="loader-logo"><i class="fas fa-shield-halved"></i></div>
+        </div>
     </div>
-  </header>
 
-  <!-- Sidebar Overlay for Mobile -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
-  <div class="app-layout">
-    
-    <!-- Sidebar Navigation -->
-    <aside class="sidebar no-print" id="sidebar">
-      <div class="sidebar-header">
-        <div class="sidebar-logo">
-          <i class="fas fa-shield-halved"></i>
+    <!-- Mobile Nav Bar -->
+    <header class="mobile-navbar no-print">
+        <button class="sidebar-toggle-btn" id="sidebarToggle" aria-label="Toggle Sidebar Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="mobile-brand">
+            <div class="logo-box"><i class="fas fa-shield-halved"></i></div>
+            <span>CreditGuard AI</span>
         </div>
-        <div class="sidebar-brand">
-          CreditGuard
-          <small>AI Assessment</small>
+        <div class="mobile-user-initials">
+            {% if current_user.is_authenticated %}{{ current_user.username[:2].upper() }}{% else %}<i class="fas fa-user"></i>{% endif %}
         </div>
-      </div>
+    </header>
 
-      <nav class="sidebar-nav">
-        <div class="nav-section-label">Main</div>
-        
-        <a href="{{ url_for('api.index') }}" class="nav-link {% if request.endpoint == 'api.index' %}active{% endif %}" aria-label="Home Landing Page">
-          <i class="fas fa-house"></i>
-          <span>Portal Home</span>
-        </a>
-
-        {% if current_user.is_authenticated %}
-        <a href="{{ url_for('api.admin') }}" class="nav-link {% if request.endpoint == 'api.admin' %}active{% endif %}" aria-label="Dashboard Analytics">
-          <i class="fas fa-chart-pie"></i>
-          <span>Dashboard</span>
-        </a>
-
-        <a href="{{ url_for('api.predict_get') }}" class="nav-link {% if request.endpoint == 'api.predict_get' or request.endpoint == 'api.predict_post' %}active{% endif %}" aria-label="New Credit Application Wizard">
-          <i class="fas fa-file-circle-plus"></i>
-          <span>New Application</span>
-        </a>
-
-        <a href="{{ url_for('api.history') }}" class="nav-link {% if request.endpoint == 'api.history' %}active{% endif %}" aria-label="Prediction History Log">
-          <i class="fas fa-clock-rotate-left"></i>
-          <span>Prediction History</span>
-        </a>
-        {% endif %}
-
-        <div class="nav-section-label">Platform</div>
-        
-        <a href="{{ url_for('api.about') }}" class="nav-link {% if request.endpoint == 'api.about' %}active{% endif %}" aria-label="About Pipeline & Metrics">
-          <i class="fas fa-circle-info"></i>
-          <span>System Metrics</span>
-        </a>
-
-        {% if current_user.is_authenticated %}
-        <div class="nav-section-label">Account</div>
-
-        <a href="{{ url_for('auth.profile') }}" class="nav-link {% if request.endpoint == 'auth.profile' %}active{% endif %}" aria-label="User Profile Details">
-          <i class="fas fa-user-circle"></i>
-          <span>My Profile</span>
-        </a>
-        {% endif %}
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="theme-toggle-row" id="themeToggleRow">
-          <span>Dark Mode</span>
-          <label class="theme-switch" for="themeToggle">
-            <input type="checkbox" id="themeToggle" checked>
-            <span class="theme-slider"></span>
-          </label>
-        </div>
-
-        {% if current_user.is_authenticated %}
-        <a href="{{ url_for('auth.logout') }}" class="nav-link mt-16" style="color: var(--danger);" aria-label="Sign Out Session">
-          <i class="fas fa-right-from-bracket"></i>
-          <span>Log Out</span>
-        </a>
-        {% else %}
-        <div class="flex gap-8 mt-8">
-          <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-sm w-full">Sign In</a>
-          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm w-full">Sign Up</a>
-        </div>
-        {% endif %}
-      </div>
-    </aside>
-
-    <!-- Main Content Area -->
-    <main class="main-content" id="mainContent">
-      
-      <!-- Flash Alert Block -->
-      {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <div class="alert-container no-print">
-          {% for category, message in messages %}
-            <div class="alert alert-{{ category if category != 'error' else 'danger' }} animate-slide-down">
-              <i class="fas {% if category == 'success' %}fa-check-circle{% elif category == 'danger' or category == 'error' %}fa-times-circle{% else %}fa-exclamation-triangle{% endif %}"></i>
-              <span>{{ message }}</span>
-              <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation Drawer -->
+        <aside class="sidebar-drawer no-print" id="sidebarDrawer">
+            <div class="sidebar-brand-wrapper">
+                <div class="logo-box"><i class="fas fa-shield-halved"></i></div>
+                <div class="brand-text">
+                    <h2>CreditGuard</h2>
+                    <small>Enterprise Risk Suite</small>
+                </div>
             </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-      {% endwith %}
 
-      <!-- Core Content Block -->
-      {% block content %}{% endblock %}
-    </main>
-  </div>
+            <nav class="sidebar-menu-nav">
+                <span class="menu-header">Overview</span>
+                
+                <a href="{{ url_for('api.admin') }}" class="menu-item {% if request.endpoint == 'api.admin' %}active{% endif %}">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
 
-  <!-- Main JavaScript File -->
-  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-  
-  {% block scripts %}{% endblock %}
+                <a href="{{ url_for('api.predict_get') }}" class="menu-item {% if request.endpoint == 'api.predict_get' or request.endpoint == 'api.predict_post' %}active{% endif %}">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                    <span>New Application</span>
+                </a>
 
+                <a href="{{ url_for('api.history') }}" class="menu-item {% if request.endpoint == 'api.history' %}active{% endif %}">
+                    <i class="fas fa-clock-rotate-left"></i>
+                    <span>Prediction History</span>
+                </a>
+
+                <span class="menu-header">Analytics</span>
+
+                <a href="{{ url_for('api.admin') }}" class="menu-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Analytics</span>
+                </a>
+
+                <a href="{{ url_for('api.history') }}" class="menu-item">
+                    <i class="fas fa-file-pdf"></i>
+                    <span>Reports</span>
+                </a>
+
+                <span class="menu-header">Account</span>
+
+                <a href="{{ url_for('auth.profile') }}" class="menu-item {% if request.endpoint == 'auth.profile' %}active{% endif %}">
+                    <i class="fas fa-user-gear"></i>
+                    <span>Profile</span>
+                </a>
+
+                <a href="{{ url_for('auth.profile') }}" class="menu-item">
+                    <i class="fas fa-sliders"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer-controls">
+                <div class="theme-toggle-container" id="themeTogglerBtn">
+                    <span class="theme-label-text">Dark Mode</span>
+                    <button class="theme-switch-slider" id="themeSwitchControl" aria-label="Toggle Theme">
+                        <span class="theme-switch-circle"></span>
+                    </button>
+                </div>
+
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('auth.logout') }}" class="menu-item logout-item">
+                    <i class="fas fa-right-from-bracket"></i>
+                    <span>Sign Out</span>
+                </a>
+                {% else %}
+                <div class="auth-btn-row">
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-sm">Log In</a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Sign Up</a>
+                </div>
+                {% endif %}
+            </div>
+        </aside>
+
+        <!-- Sidebar Overlay (mobile) -->
+        <div class="sidebar-backdrop-overlay" id="sidebarBackdrop"></div>
+
+        <!-- Main Workspace Area -->
+        <main class="dashboard-workspace" id="dashboardWorkspace">
+            <!-- Flash Message Container -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages-stack no-print">
+                {% for category, message in messages %}
+                <div class="toast-alert alert-{{ category if category != 'error' else 'danger' }}">
+                    <i class="fas {% if category == 'success' %}fa-circle-check{% elif category == 'danger' or category == 'error' %}fa-circle-xmark{% else %}fa-circle-exclamation{% endif %}"></i>
+                    <div class="toast-content">{{ message }}</div>
+                    <button class="toast-close-btn" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <!-- Page Template Content -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Main JS Application Controller -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

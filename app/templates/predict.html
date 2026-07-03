@@ -1,347 +1,351 @@
 {% extends 'base.html' %}
-{% block title %}CreditGuard AI — New Credit Application{% endblock %}
+{% block title %}CreditGuard AI | New Credit Application{% endblock %}
 
 {% block content %}
-<div class="page-header animate-slide-up">
-  <div class="breadcrumbs">
-    <a href="{{ url_for('api.admin') }}">Dashboard</a>
-    <span class="separator"><i class="fas fa-chevron-right"></i></span>
-    <span class="text-primary">New Application</span>
-  </div>
-  <h1>New Credit Evaluation</h1>
-  <p>Complete the application form to get an instant AI-powered credit scoring assessment.</p>
+<div class="workspace-page-header animate-slide-up">
+    <div class="header-breadcrumbs">
+        <a href="{{ url_for('api.admin') }}">Dashboard</a>
+        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+        <span class="active-crumb">New Credit Evaluation</span>
+    </div>
+    <h1>New Credit Evaluation</h1>
+    <p>Complete the secure application questionnaire to generate an instant machine learning risk rating.</p>
 </div>
 
-<div class="wizard-container mt-32">
-  
-  <!-- Wizard Step Indicator Progress Bar -->
-  <div class="wizard-progress no-print animate-slide-up stagger-1">
-    <div class="wizard-progress-fill" id="wizardProgressFill" style="width: 25%;"></div>
-    
-    <div class="wizard-step-indicator active" data-step="1">
-      <div class="wizard-step-circle">1</div>
-      <div class="wizard-step-label">Personal Info</div>
-    </div>
-    <div class="wizard-step-indicator" data-step="2">
-      <div class="wizard-step-circle">2</div>
-      <div class="wizard-step-label">Financials</div>
-    </div>
-    <div class="wizard-step-indicator" data-step="3">
-      <div class="wizard-step-circle">3</div>
-      <div class="wizard-step-label">Verification</div>
-    </div>
-    <div class="wizard-step-indicator" data-step="4">
-      <div class="wizard-step-circle">4</div>
-      <div class="wizard-step-label">Analysis</div>
-    </div>
-  </div>
-
-  <form method="POST" action="{{ url_for('api.predict_post') }}" class="animate-slide-up stagger-2" id="wizardForm">
-    {{ form.hidden_tag() }}
-
-    <!-- ========================================================
-         STEP 1: Personal Information
-         ======================================================== -->
-    <div class="wizard-panel active" data-step="1">
-      <div class="card card-glass">
-        <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-user-circle text-primary mr-8"></i> Personal Details</h2>
-          <span class="badge badge-primary">Step 1 of 4</span>
-        </div>
+<div class="form-wizard-container mt-32">
+    <!-- Wizard Progress Timeline (5 Steps) -->
+    <div class="wizard-timeline-bar no-print animate-slide-up stagger-1">
+        <div class="wizard-timeline-fill" id="wizardProgressFill" style="width: 20%;"></div>
         
-        <div class="grid grid-2 gap-16">
-          <div class="form-group">
-            <label class="form-label" for="code_gender">Gender</label>
-            <div class="form-control-icon">
-              <i class="fas fa-venus-mars"></i>
-              {{ form.code_gender(class="form-control", id="code_gender") }}
-            </div>
-            {% if form.code_gender.errors %}
-              <div class="form-error">{{ form.code_gender.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="age_years">Age (Years)</label>
-            <div class="form-control-icon">
-              <i class="fas fa-calendar-days"></i>
-              {{ form.age_years(class="form-control", id="age_years", placeholder="e.g. 35") }}
-            </div>
-            <small class="form-text">Minimum age: 18 years</small>
-            {% if form.age_years.errors %}
-              <div class="form-error">{{ form.age_years.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="name_family_status">Marital Status</label>
-            <div class="form-control-icon">
-              <i class="fas fa-heart"></i>
-              {{ form.name_family_status(class="form-control", id="name_family_status") }}
-            </div>
-            {% if form.name_family_status.errors %}
-              <div class="form-error">{{ form.name_family_status.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="cnt_children">Number of Children</label>
-            <div class="form-control-icon">
-              <i class="fas fa-child"></i>
-              {{ form.cnt_children(class="form-control", id="cnt_children") }}
-            </div>
-            {% if form.cnt_children.errors %}
-              <div class="form-error">{{ form.cnt_children.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="cnt_fam_members">Family Members</label>
-            <div class="form-control-icon">
-              <i class="fas fa-people-group"></i>
-              {{ form.cnt_fam_members(class="form-control", id="cnt_fam_members") }}
-            </div>
-            {% if form.cnt_fam_members.errors %}
-              <div class="form-error">{{ form.cnt_fam_members.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="name_education_type">Education Level</label>
-            <div class="form-control-icon">
-              <i class="fas fa-graduation-cap"></i>
-              {{ form.name_education_type(class="form-control", id="name_education_type") }}
-            </div>
-            {% if form.name_education_type.errors %}
-              <div class="form-error">{{ form.name_education_type.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="name_housing_type">Housing Type</label>
-            <div class="form-control-icon">
-              <i class="fas fa-house"></i>
-              {{ form.name_housing_type(class="form-control", id="name_housing_type") }}
-            </div>
-            {% if form.name_housing_type.errors %}
-              <div class="form-error">{{ form.name_housing_type.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="occupation_type">Occupation Type</label>
-            <div class="form-control-icon">
-              <i class="fas fa-briefcase"></i>
-              {{ form.occupation_type(class="form-control", id="occupation_type") }}
-            </div>
-            {% if form.occupation_type.errors %}
-              <div class="form-error">{{ form.occupation_type.errors[0] }}</div>
-            {% endif %}
-          </div>
+        <div class="timeline-step active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Personal</div>
         </div>
-      </div>
+        <div class="timeline-step" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Employment</div>
+        </div>
+        <div class="timeline-step" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Financials</div>
+        </div>
+        <div class="timeline-step" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Review</div>
+        </div>
+        <div class="timeline-step" data-step="5">
+            <div class="step-circle">5</div>
+            <div class="step-label">Prediction</div>
+        </div>
     </div>
 
-    <!-- ========================================================
-         STEP 2: Financial Information
-         ======================================================== -->
-    <div class="wizard-panel" data-step="2">
-      <div class="card card-glass">
-        <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-wallet text-accent mr-8"></i> Financial Information</h2>
-          <span class="badge badge-accent">Step 2 of 4</span>
-        </div>
-        
-        <div class="grid grid-2 gap-16">
-          <div class="form-group">
-            <label class="form-label" for="name_income_type">Income Source</label>
-            <div class="form-control-icon">
-              <i class="fas fa-money-bill-wave"></i>
-              {{ form.name_income_type(class="form-control", id="name_income_type") }}
-            </div>
-            {% if form.name_income_type.errors %}
-              <div class="form-error">{{ form.name_income_type.errors[0] }}</div>
-            {% endif %}
-          </div>
+    <!-- Application Form Multi-Step Panels -->
+    <form method="POST" action="{{ url_for('api.predict_post') }}" class="animate-slide-up stagger-2" id="wizardForm">
+        {{ form.hidden_tag() }}
 
-          <div class="form-group">
-            <label class="form-label" for="amt_income_total">Total Annual Income ($)</label>
-            <div class="form-control-icon">
-              <i class="fas fa-sack-dollar"></i>
-              {{ form.amt_income_total(class="form-control", id="amt_income_total", placeholder="e.g. 65000") }}
-            </div>
-            {% if form.amt_income_total.errors %}
-              <div class="form-error">{{ form.amt_income_total.errors[0] }}</div>
-            {% endif %}
-          </div>
+        <!-- ========================================================
+             STEP 1: Personal Information
+             ======================================================== -->
+        <div class="wizard-step-panel active" data-step="1">
+            <div class="card card-glass">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-user-circle text-primary"></i> Step 1: Personal Information</h3>
+                    <span class="panel-badge-step">Step 1 of 5</span>
+                </div>
+                
+                <div class="grid grid-2 gap-24">
+                    <div class="form-group">
+                        <label class="form-label" for="code_gender">Gender</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-venus-mars"></i>
+                            {{ form.code_gender(class="form-control", id="code_gender") }}
+                        </div>
+                        {% if form.code_gender.errors %}
+                            <div class="form-error">{{ form.code_gender.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-          <div class="form-group">
-            <label class="form-label" for="years_employed">Employment Duration (Years)</label>
-            <div class="form-control-icon">
-              <i class="fas fa-business-time"></i>
-              {{ form.years_employed(class="form-control", id="years_employed", placeholder="e.g. 5.5") }}
-            </div>
-            {% if form.years_employed.errors %}
-              <div class="form-error">{{ form.years_employed.errors[0] }}</div>
-            {% endif %}
-          </div>
+                    <div class="form-group">
+                        <label class="form-label" for="age_years">Applicant Age (Years)</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-calendar-days"></i>
+                            {{ form.age_years(class="form-control", id="age_years", placeholder="e.g. 35") }}
+                        </div>
+                        {% if form.age_years.errors %}
+                            <div class="form-error">{{ form.age_years.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-          <div class="form-group">
-            <label class="form-label" for="flag_unemployed">Employment Status</label>
-            <div class="form-control-icon">
-              <i class="fas fa-user-tie"></i>
-              {{ form.flag_unemployed(class="form-control", id="flag_unemployed") }}
-            </div>
-            {% if form.flag_unemployed.errors %}
-              <div class="form-error">{{ form.flag_unemployed.errors[0] }}</div>
-            {% endif %}
-          </div>
+                    <div class="form-group">
+                        <label class="form-label" for="name_family_status">Marital Status</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-heart"></i>
+                            {{ form.name_family_status(class="form-control", id="name_family_status") }}
+                        </div>
+                        {% if form.name_family_status.errors %}
+                            <div class="form-error">{{ form.name_family_status.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-          <div class="form-group">
-            <label class="form-label" for="flag_own_car">Vehicle Ownership</label>
-            <div class="form-control-icon">
-              <i class="fas fa-car"></i>
-              {{ form.flag_own_car(class="form-control", id="flag_own_car") }}
-            </div>
-            {% if form.flag_own_car.errors %}
-              <div class="form-error">{{ form.flag_own_car.errors[0] }}</div>
-            {% endif %}
-          </div>
+                    <div class="form-group">
+                        <label class="form-label" for="cnt_children">Number of Children</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-child"></i>
+                            {{ form.cnt_children(class="form-control", id="cnt_children") }}
+                        </div>
+                        {% if form.cnt_children.errors %}
+                            <div class="form-error">{{ form.cnt_children.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-          <div class="form-group">
-            <label class="form-label" for="flag_own_realty">Property Ownership</label>
-            <div class="form-control-icon">
-              <i class="fas fa-building"></i>
-              {{ form.flag_own_realty(class="form-control", id="flag_own_realty") }}
-            </div>
-            {% if form.flag_own_realty.errors %}
-              <div class="form-error">{{ form.flag_own_realty.errors[0] }}</div>
-            {% endif %}
-          </div>
+                    <div class="form-group">
+                        <label class="form-label" for="cnt_fam_members">Total Family Members</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-people-group"></i>
+                            {{ form.cnt_fam_members(class="form-control", id="cnt_fam_members") }}
+                        </div>
+                        {% if form.cnt_fam_members.errors %}
+                            <div class="form-error">{{ form.cnt_fam_members.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-          <div class="form-group">
-            <label class="form-label" for="existing_debt">Existing Monthly Debt Payments ($)</label>
-            <div class="form-control-icon">
-              <i class="fas fa-credit-card"></i>
-              {{ form.existing_debt(class="form-control", id="existing_debt", placeholder="e.g. 350") }}
-            </div>
-            {% if form.existing_debt.errors %}
-              <div class="form-error">{{ form.existing_debt.errors[0] }}</div>
-            {% endif %}
-          </div>
+                    <div class="form-group">
+                        <label class="form-label" for="name_education_type">Education Level</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-graduation-cap"></i>
+                            {{ form.name_education_type(class="form-control", id="name_education_type") }}
+                        </div>
+                        {% if form.name_education_type.errors %}
+                            <div class="form-error">{{ form.name_education_type.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-          <div class="form-group">
-            <label class="form-label" for="loan_amount">Requested Loan/Limit Amount ($)</label>
-            <div class="form-control-icon">
-              <i class="fas fa-hand-holding-dollar"></i>
-              {{ form.loan_amount(class="form-control", id="loan_amount", placeholder="e.g. 5000") }}
+                    <div class="form-group">
+                        <label class="form-label" for="name_housing_type">Housing Arrangement</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-house"></i>
+                            {{ form.name_housing_type(class="form-control", id="name_housing_type") }}
+                        </div>
+                        {% if form.name_housing_type.errors %}
+                            <div class="form-error">{{ form.name_housing_type.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            {% if form.loan_amount.errors %}
-              <div class="form-error">{{ form.loan_amount.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="credit_history">Credit Bureau Rating</label>
-            <div class="form-control-icon">
-              <i class="fas fa-star-half-stroke"></i>
-              {{ form.credit_history(class="form-control", id="credit_history") }}
-            </div>
-            {% if form.credit_history.errors %}
-              <div class="form-error">{{ form.credit_history.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="flag_phone">Mobile Number Verification</label>
-            <div class="form-control-icon">
-              <i class="fas fa-mobile-screen"></i>
-              {{ form.flag_phone(class="form-control", id="flag_phone") }}
-            </div>
-            {% if form.flag_phone.errors %}
-              <div class="form-error">{{ form.flag_phone.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="flag_work_phone">Work Telephone</label>
-            <div class="form-control-icon">
-              <i class="fas fa-phone-office"></i>
-              {{ form.flag_work_phone(class="form-control", id="flag_work_phone") }}
-            </div>
-            {% if form.flag_work_phone.errors %}
-              <div class="form-error">{{ form.flag_work_phone.errors[0] }}</div>
-            {% endif %}
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="flag_email">Email Notification Consent</label>
-            <div class="form-control-icon">
-              <i class="fas fa-envelope"></i>
-              {{ form.flag_email(class="form-control", id="flag_email") }}
-            </div>
-            {% if form.flag_email.errors %}
-              <div class="form-error">{{ form.flag_email.errors[0] }}</div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ========================================================
-         STEP 3: Summary Review
-         ======================================================== -->
-    <div class="wizard-panel" data-step="3">
-      <div class="card card-glass">
-        <div class="card-header">
-          <h2 class="card-title"><i class="fas fa-list-check text-warning mr-8"></i> Review Application</h2>
-          <span class="badge badge-warning">Step 3 of 4</span>
-        </div>
-        
-        <div class="alert alert-info">
-          <i class="fas fa-circle-info"></i>
-          <span>Please double check and verify all applicant details before triggering model scoring.</span>
         </div>
 
-        <div id="reviewSummary" class="grid grid-2 gap-16 p-16" style="background:rgba(255,255,255,0.02);border-radius:var(--radius-md);">
-          <!-- Populated dynamically via JavaScript -->
-        </div>
-      </div>
-    </div>
+        <!-- ========================================================
+             STEP 2: Employment Information
+             ======================================================== -->
+        <div class="wizard-step-panel" data-step="2">
+            <div class="card card-glass">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-briefcase text-accent"></i> Step 2: Employment Information</h3>
+                    <span class="panel-badge-step">Step 2 of 5</span>
+                </div>
+                
+                <div class="grid grid-2 gap-24">
+                    <div class="form-group">
+                        <label class="form-label" for="name_income_type">Income Source Category</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-wallet"></i>
+                            {{ form.name_income_type(class="form-control", id="name_income_type") }}
+                        </div>
+                        {% if form.name_income_type.errors %}
+                            <div class="form-error">{{ form.name_income_type.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-    <!-- ========================================================
-         STEP 4: Run Machine Learning Prediction
-         ======================================================== -->
-    <div class="wizard-panel" data-step="4">
-      <div class="card card-glass text-center p-32">
-        <div class="sidebar-logo" style="width:72px;height:72px;font-size:32px;margin:0 auto 24px;border-radius:18px;background:linear-gradient(135deg, var(--primary), var(--accent));">
-          <i class="fas fa-cpu animate-float"></i>
-        </div>
-        <h2 class="mb-8">Ready to Analyze Application</h2>
-        <p class="text-secondary mb-24">
-          Click submit below to pass these parameters to the pre-loaded scikit-learn models and overlay DTI safety criteria.
-        </p>
-        
-        <div class="flex justify-center">
-          <div class="badge badge-success">
-            <i class="fas fa-circle-nodes"></i> Active Model Pipeline: XGBoost Classifier
-          </div>
-        </div>
-      </div>
-    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="occupation_type">Occupation Sector</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-user-tie"></i>
+                            {{ form.occupation_type(class="form-control", id="occupation_type") }}
+                        </div>
+                        {% if form.occupation_type.errors %}
+                            <div class="form-error">{{ form.occupation_type.errors[0] }}</div>
+                        {% endif %}
+                    </div>
 
-    <!-- Wizard Navigation Buttons -->
-    <div class="wizard-nav no-print">
-      <button type="button" class="btn btn-ghost" id="wizardBack" style="visibility: hidden;">
-        <i class="fas fa-chevron-left"></i> Previous Step
-      </button>
-      <button type="button" class="btn btn-primary" id="wizardNext">
-        Next Step <i class="fas fa-chevron-right"></i>
-      </button>
-      <button type="submit" class="btn btn-success" id="wizardSubmit" style="display: none;">
-        <i class="fas fa-circle-check"></i> Submit Application
-      </button>
-    </div>
-  </form>
+                    <div class="form-group">
+                        <label class="form-label" for="years_employed">Years Employed</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-business-time"></i>
+                            {{ form.years_employed(class="form-control", id="years_employed", placeholder="e.g. 4.5") }}
+                        </div>
+                        {% if form.years_employed.errors %}
+                            <div class="form-error">{{ form.years_employed.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="flag_unemployed">Employment Status</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-user-slash"></i>
+                            {{ form.flag_unemployed(class="form-control", id="flag_unemployed") }}
+                        </div>
+                        {% if form.flag_unemployed.errors %}
+                            <div class="form-error">{{ form.flag_unemployed.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="flag_own_car">Owns Vehicle</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-car"></i>
+                            {{ form.flag_own_car(class="form-control", id="flag_own_car") }}
+                        </div>
+                        {% if form.flag_own_car.errors %}
+                            <div class="form-error">{{ form.flag_own_car.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="flag_own_realty">Owns Real Estate Property</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-building"></i>
+                            {{ form.flag_own_realty(class="form-control", id="flag_own_realty") }}
+                        </div>
+                        {% if form.flag_own_realty.errors %}
+                            <div class="form-error">{{ form.flag_own_realty.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             STEP 3: Financial Information
+             ======================================================== -->
+        <div class="wizard-step-panel" data-step="3">
+            <div class="card card-glass">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-sack-dollar text-success"></i> Step 3: Financial Information</h3>
+                    <span class="panel-badge-step">Step 3 of 5</span>
+                </div>
+                
+                <div class="grid grid-2 gap-24">
+                    <div class="form-group">
+                        <label class="form-label" for="amt_income_total">Total Gross Annual Income ($)</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-money-bill-wave"></i>
+                            {{ form.amt_income_total(class="form-control", id="amt_income_total", placeholder="e.g. 75000") }}
+                        </div>
+                        {% if form.amt_income_total.errors %}
+                            <div class="form-error">{{ form.amt_income_total.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="existing_debt">Existing Monthly Debt Payments ($)</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-credit-card"></i>
+                            {{ form.existing_debt(class="form-control", id="existing_debt", placeholder="e.g. 450") }}
+                        </div>
+                        {% if form.existing_debt.errors %}
+                            <div class="form-error">{{ form.existing_debt.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="loan_amount">Requested Credit Limit ($)</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-hand-holding-dollar"></i>
+                            {{ form.loan_amount(class="form-control", id="loan_amount", placeholder="e.g. 5000") }}
+                        </div>
+                        {% if form.loan_amount.errors %}
+                            <div class="form-error">{{ form.loan_amount.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="credit_history">Bureau Credit History</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-star-half-stroke"></i>
+                            {{ form.credit_history(class="form-control", id="credit_history") }}
+                        </div>
+                        {% if form.credit_history.errors %}
+                            <div class="form-error">{{ form.credit_history.errors[0] }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="flag_phone">Registered Mobile Number</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-mobile-screen"></i>
+                            {{ form.flag_phone(class="form-control", id="flag_phone") }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="flag_work_phone">Work Telephone Number</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-phone-office"></i>
+                            {{ form.flag_work_phone(class="form-control", id="flag_work_phone") }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="flag_email">Email Consent Notification</label>
+                        <div class="form-control-icon-wrapper">
+                            <i class="fas fa-envelope"></i>
+                            {{ form.flag_email(class="form-control", id="flag_email") }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             STEP 4: Review
+             ======================================================== -->
+        <div class="wizard-step-panel" data-step="4">
+            <div class="card card-glass">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-clipboard-check text-warning"></i> Step 4: Verification Review</h3>
+                    <span class="panel-badge-step">Step 4 of 5</span>
+                </div>
+                
+                <div class="toast-alert alert-info mb-16">
+                    <i class="fas fa-circle-info"></i>
+                    <div class="toast-content">Verify the parameters before submitting. Modifying values requires backing up.</div>
+                </div>
+
+                <div id="reviewSummary" class="wizard-summary-grid">
+                    <!-- Populated dynamically via main.js wizard engine -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================================
+             STEP 5: Prediction
+             ======================================================== -->
+        <div class="wizard-step-panel" data-step="5">
+            <div class="card card-glass text-center p-32">
+                <div class="wizard-final-icon-spinner">
+                    <i class="fas fa-microchip animate-float text-primary"></i>
+                </div>
+                <h2 class="mb-8">Scoring Pipeline Ready</h2>
+                <p class="text-secondary mb-24">Click 'Run AI Assessment' below to evaluate risk weights on preloaded pipelines.</p>
+                
+                <div class="flex justify-center">
+                    <span class="badge badge-success"><i class="fas fa-circle-nodes"></i> Model Classifier: XGBoost Pipeline</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="wizard-nav-row no-print mt-24">
+            <button type="button" class="btn btn-ghost" id="wizardBack" style="visibility: hidden;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button type="button" class="btn btn-primary" id="wizardNext">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+            <button type="submit" class="btn btn-success" id="wizardSubmit" style="display: none;">
+                <i class="fas fa-paper-plane"></i> Run AI Assessment
+            </button>
+        </div>
+    </form>
 </div>
 {% endblock %}

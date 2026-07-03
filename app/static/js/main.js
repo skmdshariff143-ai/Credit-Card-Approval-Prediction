@@ -1,55 +1,79 @@
-/* ============================================================
-   CreditGuard AI — Premium Frontend Controller
-   Client Interactions, Form Wizard, Theme Toggles & Page Loaders
-   ============================================================ */
+/* ==========================================================================
+   CreditGuard AI | Premium Core Frontend Controller
+   Toggles, Drawer Navigation, Ripples, and 5-Step Form Wizard Engine
+   ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
   
-  // 1. PAGE LOADER INITIALIZATION
+  // 1. PAGE TRANSITION LOADER LIFECYCLE
   const loader = document.getElementById('pageLoader');
   if (loader) {
-    // Hide loader immediately after DOM rendering finishes
     setTimeout(() => {
       loader.classList.add('hidden');
-    }, 200);
+    }, 180);
   }
 
-  // 2. THEME CONTROLLER (Dark / Light Preference)
-  const themeToggle = document.getElementById('themeToggle');
-  const savedTheme = localStorage.getItem('theme') || 'dark';
+  // 2. MODERN LIGHT/DARK THEME TOGGLE
+  const themeSwitchControl = document.getElementById('themeSwitchControl');
+  const themeTogglerBtn = document.getElementById('themeTogglerBtn');
+  const activeTheme = localStorage.getItem('theme') || 'dark';
+
+  document.documentElement.setAttribute('data-theme', activeTheme);
   
-  // Set initial preference
-  document.documentElement.setAttribute('data-theme', savedTheme);
-  if (themeToggle) {
-    themeToggle.checked = (savedTheme === 'dark');
-    
-    themeToggle.addEventListener('change', () => {
-      const activeTheme = themeToggle.checked ? 'dark' : 'light';
-      document.documentElement.setAttribute('data-theme', activeTheme);
-      localStorage.setItem('theme', activeTheme);
+  // Align toggle label if exist
+  if (themeTogglerBtn) {
+    const label = themeTogglerBtn.querySelector('.theme-label-text');
+    if (label) {
+      label.textContent = (activeTheme === 'dark') ? 'Dark Mode' : 'Light Mode';
+    }
+  }
+
+  if (themeSwitchControl) {
+    themeSwitchControl.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const target = (current === 'dark') ? 'light' : 'dark';
+      
+      document.documentElement.setAttribute('data-theme', target);
+      localStorage.setItem('theme', target);
+
+      if (themeTogglerBtn) {
+        const label = themeTogglerBtn.querySelector('.theme-label-text');
+        if (label) {
+          label.textContent = (target === 'dark') ? 'Dark Mode' : 'Light Mode';
+        }
+      }
     });
   }
 
-  // 3. RESPONSIVE MOBILE SIDEBAR TOGGLES
-  const menuToggle = document.getElementById('menuToggle');
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebarOverlay');
+  // 3. MOBILE SIDEBAR DRAWER INTERACTIONS
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const sidebarDrawer = document.getElementById('sidebarDrawer');
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
-  if (menuToggle && sidebar && overlay) {
-    const toggleMenu = () => {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
+  if (sidebarToggle && sidebarDrawer && sidebarBackdrop) {
+    const toggleSidebar = () => {
+      sidebarDrawer.classList.toggle('open');
+      sidebarBackdrop.classList.toggle('active');
     };
 
-    menuToggle.addEventListener('click', toggleMenu);
-    overlay.addEventListener('click', toggleMenu);
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // Close on navigation
+    const navLinks = sidebarDrawer.querySelectorAll('.menu-item');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        sidebarDrawer.classList.remove('open');
+        sidebarBackdrop.classList.remove('active');
+      });
+    });
   }
 
-  // 4. MULTI-STEP WIZARD ENGINE
+  // 4. MULTI-STEP WIZARD ENGINE (5 Steps)
   const wizardForm = document.getElementById('wizardForm');
   if (wizardForm) {
-    const panels = Array.from(document.querySelectorAll('.wizard-panel'));
-    const indicators = Array.from(document.querySelectorAll('.wizard-step-indicator'));
+    const panels = Array.from(wizardForm.querySelectorAll('.wizard-step-panel'));
+    const indicators = Array.from(document.querySelectorAll('.timeline-step'));
     const fill = document.getElementById('wizardProgressFill');
     
     const backBtn = document.getElementById('wizardBack');
@@ -57,129 +81,141 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('wizardSubmit');
     
     let currentStep = 1;
+    const totalSteps = 5;
 
-    // Validate fields inside current step
+    // Validate active step fields
     const validateStep = (step) => {
-      const activePanel = panels.find(p => p.dataset.step === String(step));
+      const activePanel = panels.find(p => parseInt(p.dataset.step) === step);
       if (!activePanel) return true;
 
-      // Find required form elements in the panel
-      const inputs = Array.from(activePanel.querySelectorAll('input, select, textarea'));
-      let valid = true;
+      const inputs = Array.from(activePanel.querySelectorAll('input, select'));
+      let isValid = true;
 
       inputs.forEach(input => {
-        // Clear old errors
-        const group = input.closest('.form-group');
-        if (group) {
-          const oldError = group.querySelector('.form-error');
-          if (oldError) oldError.remove();
+        // Clear any old validation messages
+        const parent = input.closest('.form-group');
+        if (parent) {
+          const oldMsg = parent.querySelector('.form-error');
+          if (oldMsg) oldMsg.remove();
         }
 
-        // Validate basic parameters
+        // Run verification checks
         if (input.hasAttribute('required') && !input.value.trim()) {
-          valid = false;
-          showInputError(input, 'This field is required.');
+          isValid = false;
+          showErrorMsg(input, 'This entry is required.');
         } else if (input.id === 'age_years' && input.value) {
-          const val = parseFloat(input.value);
-          if (isNaN(val) || val < 18 || val > 100) {
-            valid = false;
-            showInputError(input, 'Age must be between 18 and 100.');
+          const age = parseFloat(input.value);
+          if (isNaN(age) || age < 18 || age > 99) {
+            isValid = false;
+            showErrorMsg(input, 'Applicant age must be between 18 and 99 years.');
           }
         } else if (input.id === 'amt_income_total' && input.value) {
-          const val = parseFloat(input.value);
-          if (isNaN(val) || val <= 0) {
-            valid = false;
-            showInputError(input, 'Income must be a positive value.');
+          const income = parseFloat(input.value);
+          if (isNaN(income) || income <= 0) {
+            isValid = false;
+            showErrorMsg(input, 'Annual gross income must be a positive value.');
+          }
+        } else if (input.id === 'existing_debt' && input.value) {
+          const debt = parseFloat(input.value);
+          if (isNaN(debt) || debt < 0) {
+            isValid = false;
+            showErrorMsg(input, 'Debt payments cannot be negative.');
+          }
+        } else if (input.id === 'loan_amount' && input.value) {
+          const limit = parseFloat(input.value);
+          if (isNaN(limit) || limit <= 0) {
+            isValid = false;
+            showErrorMsg(input, 'Credit limit must be a positive value.');
           }
         }
       });
 
-      return valid;
+      return isValid;
     };
 
-    const showInputError = (input, msg) => {
-      const group = input.closest('.form-group');
-      if (group) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'form-error animate-slide-down';
-        errorDiv.textContent = msg;
-        group.appendChild(errorDiv);
+    const showErrorMsg = (input, msg) => {
+      const parent = input.closest('.form-group');
+      if (parent) {
+        const err = document.createElement('div');
+        err.className = 'form-error animate-slide-up';
+        err.textContent = msg;
+        parent.appendChild(err);
       }
     };
 
-    // Update review summary panel (Step 3)
+    // Extract entries to populate Step 4 (Review) summary grid
     const populateReviewSummary = () => {
-      const reviewDiv = document.getElementById('reviewSummary');
-      if (!reviewDiv) return;
+      const summaryGrid = document.getElementById('reviewSummary');
+      if (!summaryGrid) return;
       
-      reviewDiv.innerHTML = '';
+      summaryGrid.innerHTML = '';
       
-      const fieldMappings = [
+      const elementsMap = [
         { label: 'Gender', id: 'code_gender' },
         { label: 'Age', id: 'age_years', suffix: ' Years' },
         { label: 'Marital Status', id: 'name_family_status' },
         { label: 'Children', id: 'cnt_children' },
+        { label: 'Family Members', id: 'cnt_fam_members' },
         { label: 'Education', id: 'name_education_type' },
         { label: 'Housing Type', id: 'name_housing_type' },
-        { label: 'Occupation', id: 'occupation_type' },
-        { label: 'Income Source', id: 'name_income_type' },
-        { label: 'Annual Income', id: 'amt_income_total', prefix: '$' },
-        { label: 'Employment Years', id: 'years_employed', suffix: ' Yrs' },
-        { label: 'Existing Monthly Debt', id: 'existing_debt', prefix: '$' },
+        { label: 'Income Category', id: 'name_income_type' },
+        { label: 'Occupation Sector', id: 'occupation_type' },
+        { label: 'Employment Duration', id: 'years_employed', suffix: ' Yrs' },
+        { label: 'Gross Annual Income', id: 'amt_income_total', prefix: '$' },
+        { label: 'Monthly Debt Outflow', id: 'existing_debt', prefix: '$' },
         { label: 'Requested Limit', id: 'loan_amount', prefix: '$' },
         { label: 'Credit Rating', id: 'credit_history' }
       ];
 
-      fieldMappings.forEach(item => {
-        const el = document.getElementById(item.id);
-        if (el) {
-          let val = '';
-          if (el.tagName === 'SELECT') {
-            val = el.options[el.selectedIndex].text;
+      elementsMap.forEach(field => {
+        const input = document.getElementById(field.id);
+        if (input) {
+          let text = '';
+          if (input.tagName === 'SELECT') {
+            text = input.options[input.selectedIndex].text;
           } else {
-            val = el.value || 'N/A';
+            text = input.value || 'N/A';
           }
           
-          if (item.prefix && val !== 'N/A') val = item.prefix + val;
-          if (item.suffix && val !== 'N/A') val = val + item.suffix;
+          if (field.prefix && text !== 'N/A') text = field.prefix + text;
+          if (field.suffix && text !== 'N/A') text = text + field.suffix;
 
-          const detailBlock = document.createElement('div');
-          detailBlock.style.padding = '8px';
-          detailBlock.innerHTML = `
-            <span style="font-size:11px;color:var(--text-muted);display:block;text-transform:uppercase;">${item.label}</span>
-            <span style="font-size:14px;font-weight:600;color:var(--text-primary);">${val}</span>
+          const block = document.createElement('div');
+          block.className = 'wizard-summary-item';
+          block.innerHTML = `
+            <label>${field.label}</label>
+            <span>${text}</span>
           `;
-          reviewDiv.appendChild(detailBlock);
+          summaryGrid.appendChild(block);
         }
       });
     };
 
-    // Render step change layouts
-    const updateWizard = () => {
-      // Toggle panel visibility
-      panels.forEach(p => {
-        p.classList.toggle('active', p.dataset.step === String(currentStep));
+    // Change step view layout
+    const transitionStep = () => {
+      panels.forEach(panel => {
+        panel.classList.toggle('active', parseInt(panel.dataset.step) === currentStep);
       });
 
-      // Update progress bar
+      // Fill line length
       if (fill) {
-        const percentage = ((currentStep - 1) / (panels.length - 1)) * 100;
-        fill.style.width = `${percentage}%`;
+        const pct = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        fill.style.width = `${pct}%`;
       }
 
-      // Update step indicator circles
+      // Step indicators
       indicators.forEach(ind => {
         const stepNum = parseInt(ind.dataset.step);
         ind.classList.toggle('active', stepNum === currentStep);
         ind.classList.toggle('completed', stepNum < currentStep);
       });
 
-      // Navigation button visibility checks
+      // Controls buttons toggle
       if (backBtn) {
         backBtn.style.visibility = (currentStep === 1) ? 'hidden' : 'visible';
       }
 
-      if (currentStep === panels.length) {
+      if (currentStep === totalSteps) {
         if (nextBtn) nextBtn.style.display = 'none';
         if (submitBtn) submitBtn.style.display = 'inline-flex';
       } else {
@@ -187,19 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (submitBtn) submitBtn.style.display = 'none';
       }
 
-      // Populate review step when entering Step 3
-      if (currentStep === 3) {
+      if (currentStep === 4) {
         populateReviewSummary();
       }
     };
 
-    // Navigation trigger handlers
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
         if (validateStep(currentStep)) {
-          if (currentStep < panels.length) {
+          if (currentStep < totalSteps) {
             currentStep++;
-            updateWizard();
+            transitionStep();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
         }
@@ -210,31 +244,33 @@ document.addEventListener('DOMContentLoaded', () => {
       backBtn.addEventListener('click', () => {
         if (currentStep > 1) {
           currentStep--;
-          updateWizard();
+          transitionStep();
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       });
     }
 
-    // Initialize layout
-    updateWizard();
+    // Load initial layout
+    transitionStep();
   }
 
-  // 5. BUTTON RIPPLE CLICK ANIMATION
-  const rippleButtons = document.querySelectorAll('.btn');
-  rippleButtons.forEach(btn => {
+  // 5. BUTTON RIPPLE CLICK DECORATOR
+  const btnElements = document.querySelectorAll('.btn');
+  btnElements.forEach(btn => {
     btn.addEventListener('click', function(e) {
-      const rect = this.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const ripple = document.createElement('span');
-      ripple.className = 'ripple';
-      ripple.style.left = `${x}px`;
-      ripple.style.top = `${y}px`;
-      
-      this.appendChild(ripple);
-      setTimeout(() => ripple.remove(), 600);
+      const boundaries = this.getBoundingClientRect();
+      const clickX = e.clientX - boundaries.left;
+      const clickY = e.clientY - boundaries.top;
+
+      const rippleCircle = document.createElement('span');
+      rippleCircle.className = 'ripple';
+      rippleCircle.style.left = `${clickX}px`;
+      rippleCircle.style.top = `${clickY}px`;
+
+      this.appendChild(rippleCircle);
+      setTimeout(() => {
+        rippleCircle.remove();
+      }, 600);
     });
   });
 

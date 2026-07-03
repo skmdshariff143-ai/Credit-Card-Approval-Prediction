@@ -1,292 +1,294 @@
 {% extends 'base.html' %}
-{% block title %}CreditGuard AI — Dashboard{% endblock %}
+{% block title %}CreditGuard AI | Analytics Dashboard{% endblock %}
 
 {% block content %}
-<div class="page-header animate-slide-up">
-  <div class="breadcrumbs">
-    <span class="text-muted">Portal</span>
-    <span class="separator"><i class="fas fa-chevron-right"></i></span>
-    <span class="text-primary">Dashboard Analytics</span>
-  </div>
-  <h1>Admin Analytics Dashboard</h1>
-  <p>Track decision statistics, classification distributions, and machine learning pipeline throughput.</p>
+<div class="workspace-page-header animate-slide-up">
+    <div class="header-breadcrumbs">
+        <span class="text-muted">Portal</span>
+        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+        <span class="active-crumb">Dashboard Analytics</span>
+    </div>
+    <h1>Admin Analytics Dashboard</h1>
+    <p>Monitor real-time decision metrics, applicant statistics, and classifier pipeline trends.</p>
 </div>
 
-<!-- Core Stat Cards Row -->
-<div class="grid grid-4 gap-24 mb-32 animate-slide-up stagger-1">
-  
-  <div class="stat-card">
-    <div class="flex justify-between items-center">
-      <div class="stat-label">Total Predictions</div>
-      <div class="stat-icon primary"><i class="fas fa-chart-bar"></i></div>
+<!-- Statistics Panels -->
+<div class="analytics-stats-row mb-32 animate-slide-up stagger-1">
+    
+    <div class="stat-card-item">
+        <div class="flex justify-between items-center">
+            <span class="stat-card-lbl">Total Predictions</span>
+            <div class="stat-card-avatar primary"><i class="fas fa-chart-bar"></i></div>
+        </div>
+        <div class="stat-card-val mt-8">{{ stats.total }}</div>
+        <span style="font-size:11px;color:var(--text-muted);">Cumulative runs</span>
     </div>
-    <div class="stat-value mt-8">{{ stats.total }}</div>
-    <div class="stat-change text-muted">All evaluations run</div>
-  </div>
 
-  <div class="stat-card">
-    <div class="flex justify-between items-center">
-      <div class="stat-label">Approved Applications</div>
-      <div class="stat-icon success"><i class="fas fa-circle-check"></i></div>
+    <div class="stat-card-item">
+        <div class="flex justify-between items-center">
+            <span class="stat-card-lbl">Approved Files</span>
+            <div class="stat-card-avatar success"><i class="fas fa-circle-check"></i></div>
+        </div>
+        <div class="stat-card-val mt-8 text-success">{{ stats.approved }}</div>
+        <span style="font-size:11px;color:var(--text-muted);">Delinquency cleared</span>
     </div>
-    <div class="stat-value mt-8">{{ stats.approved }}</div>
-    <div class="stat-change up"><i class="fas fa-arrow-up"></i> Approved files</div>
-  </div>
 
-  <div class="stat-card">
-    <div class="flex justify-between items-center">
-      <div class="stat-label">Rejected Applications</div>
-      <div class="stat-icon danger"><i class="fas fa-circle-xmark"></i></div>
+    <div class="stat-card-item">
+        <div class="flex justify-between items-center">
+            <span class="stat-card-lbl">Rejected Files</span>
+            <div class="stat-card-avatar danger"><i class="fas fa-circle-xmark"></i></div>
+        </div>
+        <div class="stat-card-val mt-8 text-danger">{{ stats.rejected }}</div>
+        <span style="font-size:11px;color:var(--text-muted);">High-risk flagged</span>
     </div>
-    <div class="stat-value mt-8">{{ stats.rejected }}</div>
-    <div class="stat-change down"><i class="fas fa-arrow-down"></i> Rejected files</div>
-  </div>
 
-  <div class="stat-card">
-    <div class="flex justify-between items-center">
-      <div class="stat-label">Approval Conversion Rate</div>
-      <div class="stat-icon accent"><i class="fas fa-percentage"></i></div>
+    <div class="stat-card-item">
+        <div class="flex justify-between items-center">
+            <span class="stat-card-lbl">Approval Conversion</span>
+            <div class="stat-card-avatar accent"><i class="fas fa-percentage"></i></div>
+        </div>
+        <div class="stat-card-val mt-8 text-accent">{{ stats.approval_rate }}%</div>
+        <span style="font-size:11px;color:var(--text-muted);">Issuance ratio</span>
     </div>
-    <div class="stat-value mt-8">{{ stats.approval_rate }}%</div>
-    <div class="stat-change text-muted">Overall approval rate</div>
-  </div>
 
 </div>
 
-<!-- Interactive Chart Visualizations -->
-<div class="grid grid-2 gap-24 mb-32 animate-slide-up stagger-2">
-  
-  <!-- Decision Doughnut Chart -->
-  <div class="chart-card">
+<!-- Chart Layout Splits -->
+<div class="charts-row-split mb-32 animate-slide-up stagger-2">
+    
+    <div class="chart-box-wrapper">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-chart-pie text-success"></i> Decision Distribution</h3>
+            <span class="badge badge-success">Live API</span>
+        </div>
+        <canvas id="decisionDoughnutChart"></canvas>
+    </div>
+
+    <div class="chart-box-wrapper">
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-chart-bar text-accent"></i> Annual Income Profile</h3>
+            <span class="badge badge-accent">USD ($)</span>
+        </div>
+        <canvas id="incomeBarChart"></canvas>
+    </div>
+
+</div>
+
+<!-- Full Width timeline trend chart -->
+<div class="chart-box-wrapper mb-32 animate-slide-up stagger-3">
     <div class="card-header">
-      <h2 class="card-title"><i class="fas fa-chart-pie text-success mr-8"></i> Decision Distribution</h2>
-      <span class="badge badge-success">Real-time</span>
+        <h3 class="card-title"><i class="fas fa-chart-line text-primary"></i> Decision Throughput Trend</h3>
+        <div class="flex gap-8">
+            <button class="btn btn-ghost btn-sm active" id="daySelectBtn">Daily</button>
+            <button class="btn btn-ghost btn-sm" id="monthSelectBtn">Monthly</button>
+        </div>
     </div>
-    <canvas id="decisionChart"></canvas>
-  </div>
-
-  <!-- Income Distribution Bar Chart -->
-  <div class="chart-card">
-    <div class="card-header">
-      <h2 class="card-title"><i class="fas fa-chart-bar text-accent mr-8"></i> Applicant Income Profile</h2>
-      <span class="badge badge-accent">USD ($)</span>
-    </div>
-    <canvas id="incomeChart"></canvas>
-  </div>
-
+    <canvas id="timelineTrendChart"></canvas>
 </div>
 
-<!-- Full-width Volume Timeline Chart -->
-<div class="chart-card mb-32 animate-slide-up stagger-3">
-  <div class="card-header">
-    <h2 class="card-title"><i class="fas fa-chart-line text-primary mr-8"></i> Prediction Throughput Trend</h2>
-    <div class="flex gap-8">
-      <button class="btn btn-ghost btn-sm active" id="timelineDayToggle">Daily</button>
-      <button class="btn btn-ghost btn-sm" id="timelineMonthToggle">Monthly</button>
-    </div>
-  </div>
-  <canvas id="timelineChart" style="max-height: 260px;"></canvas>
-</div>
-
-<!-- Recent Predictions Box -->
+<!-- Recent Predictions Table -->
 <div class="card card-glass animate-slide-up stagger-4">
-  <div class="card-header">
-    <h2 class="card-title"><i class="fas fa-clock-history text-secondary mr-8"></i> Recent Predictions</h2>
-    <a href="{{ url_for('api.history') }}" class="btn btn-ghost btn-sm">View All History</a>
-  </div>
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-clock-history text-secondary"></i> Recent Predictions</h3>
+        <a href="{{ url_for('api.history') }}" class="btn btn-ghost btn-sm">View All Logs</a>
+    </div>
 
-  <div style="overflow-x: auto;">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Application ID</th>
-          <th>Assessment Date</th>
-          <th>Annual Income</th>
-          <th>Prediction</th>
-          <th>Risk Profile</th>
-          <th>Confidence</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if recent %}
-          {% for record in recent %}
-            <tr>
-              <td style="font-family:var(--font-mono);font-weight:600;color:var(--primary-light);">{{ record.application_id }}</td>
-              <td style="font-size:13px;color:var(--text-secondary);">{{ record.timestamp }}</td>
-              <td style="font-family:var(--font-mono);">${{ "{:,.0f}".format(record.income) }}</td>
-              <td>
-                {% if record.prediction == 'Approved' %}
-                  <span class="badge badge-success"><i class="fas fa-circle-check"></i> Approved</span>
+    <div style="overflow-x: auto;">
+        <table class="modern-data-table">
+            <thead>
+                <tr>
+                    <th>Application ID</th>
+                    <th>Assessment Date</th>
+                    <th>Annual Income</th>
+                    <th>Outcome</th>
+                    <th>Risk Profile</th>
+                    <th>Confidence</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if recent %}
+                    {% for record in recent %}
+                        <tr>
+                            <td style="font-family:var(--font-mono);font-weight:600;color:var(--primary-light);">{{ record.application_id }}</td>
+                            <td style="font-size:13px;color:var(--text-secondary);">{{ record.timestamp }}</td>
+                            <td style="font-family:var(--font-mono);">${{ "{:,.0f}".format(record.income) }}</td>
+                            <td>
+                                {% if record.prediction == 'Approved' %}
+                                    <span class="badge badge-success"><i class="fas fa-circle-check"></i> Approved</span>
+                                {% else %}
+                                    <span class="badge badge-danger"><i class="fas fa-circle-xmark"></i> Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if record.risk_level == 'Low' %}
+                                    <span class="badge badge-success">Low</span>
+                                {% elif record.risk_level == 'Medium-Low' %}
+                                    <span class="badge badge-primary">Med-Low</span>
+                                {% elif record.risk_level == 'Medium-High' %}
+                                    <span class="badge badge-warning">Med-High</span>
+                                {% else %}
+                                    <span class="badge badge-danger">High</span>
+                                {% endif %}
+                            </td>
+                            <td style="font-family:var(--font-mono);font-weight:600;">{{ record.probability | round(1) }}%</td>
+                        </tr>
+                    {% endfor %}
                 {% else %}
-                  <span class="badge badge-danger"><i class="fas fa-circle-xmark"></i> Rejected</span>
+                    <tr>
+                        <td colspan="6" class="text-center p-24 text-muted">No prediction history logged.</td>
+                    </tr>
                 {% endif %}
-              </td>
-              <td>
-                {% if record.risk_level == 'Low' %}
-                  <span class="badge badge-success">Low</span>
-                {% elif record.risk_level == 'Medium-Low' %}
-                  <span class="badge badge-primary">Medium-Low</span>
-                {% elif record.risk_level == 'Medium-High' %}
-                  <span class="badge badge-warning">Medium-High</span>
-                {% else %}
-                  <span class="badge badge-danger">High</span>
-                {% endif %}
-              </td>
-              <td style="font-family:var(--font-mono);font-weight:600;">{{ record.probability | round(1) }}%</td>
-            </tr>
-          {% endfor %}
-        {% else %}
-          <tr>
-            <td colspan="6" class="text-center p-24 text-muted">No prediction logs registered yet.</td>
-          </tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // Chart.js global settings override for dark theme compatibility
-  Chart.defaults.color = '#8892A7';
-  Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
-  Chart.defaults.font.family = 'Inter';
+    // Customize Chart.js theme for dark/light transitions
+    const rootStyle = getComputedStyle(document.documentElement);
+    const textCol = '#8E9AB6';
+    const gridCol = 'rgba(255, 255, 255, 0.04)';
+    
+    Chart.defaults.color = textCol;
+    Chart.defaults.borderColor = gridCol;
+    Chart.defaults.font.family = 'Inter';
 
-  // 1. Decision Split Doughnut Chart
-  const decisionCtx = document.getElementById('decisionChart');
-  if (decisionCtx) {
-    new Chart(decisionCtx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Approved', 'Rejected'],
-        datasets: [{
-          data: [{{ stats.approved }}, {{ stats.rejected }}],
-          backgroundColor: ['#00C853', '#FF5252'],
-          borderWidth: 0,
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            labels: { boxWidth: 12, padding: 16 }
-          }
-        },
-        cutout: '72%'
-      }
-    });
-  }
+    // 1. Doughnut Chart
+    const doughnutCtx = document.getElementById('decisionDoughnutChart');
+    if (doughnutCtx) {
+        new Chart(doughnutCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Approved', 'Rejected'],
+                datasets: [{
+                    data: [{{ stats.approved }}, {{ stats.rejected }}],
+                    backgroundColor: ['#00C853', '#FF5252'],
+                    borderWidth: 0,
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 10, padding: 16 }
+                    }
+                },
+                cutout: '74%'
+            }
+        });
+    }
 
-  // 2. Applicant Income Bar Chart (Sampled bins based on aggregate statistics)
-  const incomeCtx = document.getElementById('incomeChart');
-  if (incomeCtx) {
-    new Chart(incomeCtx, {
-      type: 'bar',
-      data: {
-        labels: ['< $30k', '$30k-60k', '$60k-90k', '$90k-120k', '$120k+'],
-        datasets: [{
-          label: 'Applicant Frequency',
-          data: [
-            Math.round({{ stats.total }} * 0.15),
-            Math.round({{ stats.total }} * 0.45),
-            Math.round({{ stats.total }} * 0.25),
+    // 2. Bar Chart
+    const barCtx = document.getElementById('incomeBarChart');
+    if (barCtx) {
+        new Chart(barCtx, {
+            type: 'bar',
+            data: {
+                labels: ['< $30k', '$30k-60k', '$60k-90k', '$90k-120k', '$120k+'],
+                datasets: [{
+                    label: 'Applicant Freq',
+                    data: [
+                        Math.round({{ stats.total }} * 0.18),
+                        Math.round({{ stats.total }} * 0.42),
+                        Math.round({{ stats.total }} * 0.22),
+                        Math.round({{ stats.total }} * 0.12),
+                        Math.round({{ stats.total }} * 0.06)
+                    ],
+                    backgroundColor: '#00E5FF',
+                    borderRadius: 6,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.03)' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    // 3. Line Chart (Timeline Trend)
+    const lineCtx = document.getElementById('timelineTrendChart');
+    if (lineCtx) {
+        const dailyLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const dailyData = [
+            Math.round({{ stats.total }} * 0.11),
+            Math.round({{ stats.total }} * 0.14),
+            Math.round({{ stats.total }} * 0.21),
+            Math.round({{ stats.total }} * 0.16),
+            Math.round({{ stats.total }} * 0.23),
             Math.round({{ stats.total }} * 0.10),
             Math.round({{ stats.total }} * 0.05)
-          ],
-          backgroundColor: '#00E5FF',
-          borderWidth: 0,
-          borderRadius: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' } },
-          x: { grid: { display: false } }
-        },
-        plugins: { legend: { display: false } }
-      }
-    });
-  }
+        ];
 
-  // 3. Prediction Timeline line chart with mock time series data
-  const timelineCtx = document.getElementById('timelineChart');
-  if (timelineCtx) {
-    const dailyLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const dailyData = [
-      Math.round({{ stats.total }} * 0.12),
-      Math.round({{ stats.total }} * 0.15),
-      Math.round({{ stats.total }} * 0.20),
-      Math.round({{ stats.total }} * 0.18),
-      Math.round({{ stats.total }} * 0.22),
-      Math.round({{ stats.total }} * 0.08),
-      Math.round({{ stats.total }} * 0.05)
-    ];
+        const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+        const monthlyData = [
+            Math.round({{ stats.total }} * 0.06),
+            Math.round({{ stats.total }} * 0.11),
+            Math.round({{ stats.total }} * 0.15),
+            Math.round({{ stats.total }} * 0.13),
+            Math.round({{ stats.total }} * 0.19),
+            Math.round({{ stats.total }} * 0.16),
+            Math.round({{ stats.total }} * 0.20)
+        ];
 
-    const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-    const monthlyData = [
-      Math.round({{ stats.total }} * 0.08),
-      Math.round({{ stats.total }} * 0.10),
-      Math.round({{ stats.total }} * 0.14),
-      Math.round({{ stats.total }} * 0.12),
-      Math.round({{ stats.total }} * 0.18),
-      Math.round({{ stats.total }} * 0.16),
-      Math.round({{ stats.total }} * 0.22)
-    ];
+        const trendChart = new Chart(lineCtx, {
+            type: 'line',
+            data: {
+                labels: dailyLabels,
+                datasets: [{
+                    label: 'Evaluation Count',
+                    data: dailyData,
+                    borderColor: '#6C63FF',
+                    backgroundColor: 'rgba(108, 99, 255, 0.06)',
+                    fill: true,
+                    tension: 0.35,
+                    borderWidth: 2,
+                    pointBackgroundColor: '#00E5FF',
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.03)' } },
+                    x: { grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
 
-    const timelineChartInstance = new Chart(timelineCtx, {
-      type: 'line',
-      data: {
-        labels: dailyLabels,
-        datasets: [{
-          label: 'Application Count',
-          data: dailyData,
-          borderColor: '#6C63FF',
-          backgroundColor: 'rgba(108,99,255,0.08)',
-          fill: true,
-          tension: 0.4,
-          borderWidth: 2,
-          pointBackgroundColor: '#00E5FF',
-          pointBorderWidth: 0,
-          pointRadius: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.04)' } },
-          x: { grid: { display: false } }
-        },
-        plugins: { legend: { display: false } }
-      }
-    });
+        // Day / Month Toggle Controllers
+        const dayBtn = document.getElementById('daySelectBtn');
+        const monthBtn = document.getElementById('monthSelectBtn');
 
-    // Daily / Monthly Toggle
-    const dayBtn = document.getElementById('timelineDayToggle');
-    const monthBtn = document.getElementById('timelineMonthToggle');
-    
-    if (dayBtn && monthBtn) {
-      dayBtn.addEventListener('click', () => {
-        dayBtn.classList.add('active');
-        monthBtn.classList.remove('active');
-        timelineChartInstance.data.labels = dailyLabels;
-        timelineChartInstance.data.datasets[0].data = dailyData;
-        timelineChartInstance.update();
-      });
+        if (dayBtn && monthBtn) {
+            dayBtn.addEventListener('click', () => {
+                dayBtn.classList.add('active');
+                monthBtn.classList.remove('active');
+                trendChart.data.labels = dailyLabels;
+                trendChart.data.datasets[0].data = dailyData;
+                trendChart.update();
+            });
 
-      monthBtn.addEventListener('click', () => {
-        monthBtn.classList.add('active');
-        dayBtn.classList.remove('active');
-        timelineChartInstance.data.labels = monthlyLabels;
-        timelineChartInstance.data.datasets[0].data = monthlyData;
-        timelineChartInstance.update();
-      });
+            monthBtn.addEventListener('click', () => {
+                monthBtn.classList.add('active');
+                dayBtn.classList.remove('active');
+                trendChart.data.labels = monthlyLabels;
+                trendChart.data.datasets[0].data = monthlyData;
+                trendChart.update();
+            });
+        }
     }
-  }
 });
 </script>
 {% endblock %}
