@@ -240,8 +240,12 @@
         {% endif %}
       </div>
 
-      <h2 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px;">
-        {% if result == 'Approved' %}Approved{% else %}Rejected{% endif %}
+      <h2 style="font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 12px; line-height: 1.4; padding: 0 10px;">
+        {% if result == 'Approved' %}
+          Your application has a {{ '%.1f'|format(probability) }}% approval probability.
+        {% else %}
+          Your application has a {{ '%.1f'|format(100 - probability) }}% risk of delinquency.
+        {% endif %}
       </h2>
       <p class="cg-app-id cg-mb-md">{{ application_id }}</p>
 
