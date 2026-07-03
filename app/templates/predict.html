@@ -3,6 +3,168 @@
 {% block title %}Credit Assessment | CreditGuard AI{% endblock %}
 {% block page_id %}page-predict{% endblock %}
 
+{% block head %}
+<style>
+  /* ── Prediction Wizard Premium Styles ── */
+  .cg-wizard-wrapper {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* Interactive Select Cards */
+  .cg-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 12px;
+  }
+  .cg-card-select-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--t-base) var(--ease);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .cg-card-select-item::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--gradient-card);
+    pointer-events: none;
+  }
+  .cg-card-select-item:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--shadow-md);
+  }
+  .cg-card-select-item.active {
+    border-color: var(--primary);
+    background: var(--primary-muted) !important;
+    box-shadow: var(--shadow-glow);
+  }
+  .cg-card-select-item.active i {
+    color: var(--primary);
+    transform: scale(1.1);
+  }
+  .cg-card-select-item i {
+    font-size: 24px;
+    color: var(--text-muted);
+    transition: all var(--t-base) var(--ease);
+  }
+  .cg-card-select-title {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .cg-card-select-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Individual question cards (Step 1) */
+  .cg-question-card {
+    display: none;
+    animation: cg-fadeSlide 0.4s var(--ease);
+  }
+  .cg-question-card.active {
+    display: block;
+  }
+
+  /* Floating Labels */
+  .cg-floating-group {
+    position: relative;
+    margin-bottom: 24px;
+  }
+  .cg-floating-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    font-size: 14px;
+    outline: none;
+    transition: all var(--t-fast) var(--ease);
+  }
+  .cg-floating-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-muted);
+    background: var(--bg-card);
+  }
+  .cg-floating-label {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 14px;
+    pointer-events: none;
+    transition: all var(--t-fast) var(--ease);
+    background: transparent;
+  }
+  .cg-floating-input:focus ~ .cg-floating-label,
+  .cg-floating-input:not(:placeholder-shown) ~ .cg-floating-label {
+    top: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--primary);
+    background: var(--bg-card);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  /* AI Prediction Scanning State */
+  .cg-scan-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+  }
+  .cg-scan-ring {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px dashed var(--primary-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    animation: cg-scan-spin 10s linear infinite;
+  }
+  .cg-scan-core {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--gradient-primary);
+    box-shadow: var(--shadow-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 20px;
+    animation: cg-pulse 2s ease-in-out infinite;
+  }
+  @keyframes cg-scan-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes cg-pulse {
+    0%, 100% { transform: scale(1); box-shadow: var(--shadow-glow); }
+    50% { transform: scale(1.1); box-shadow: 0 0 32px rgba(99,102,241,0.4); }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="cg-page-header">
   <div class="cg-breadcrumb">
@@ -11,255 +173,516 @@
     <span class="current">New Assessment</span>
   </div>
   <h1 class="cg-page-title">Credit Assessment</h1>
-  <p class="cg-page-desc">Complete the form to evaluate the credit card application.</p>
+  <p class="cg-page-desc">Complete the interactive wizard to get an instant credit approval decision.</p>
 </div>
 
-<!-- Wizard stepper -->
-<div class="cg-wizard-track" data-reveal="0s">
-  <div class="cg-step-item">
-    <div class="cg-step-node active" id="stepNode1">
-      <div class="cg-step-circle">1</div>
-      <span class="cg-step-label">Personal</span>
-    </div>
-    <div class="cg-step-line" id="stepLine1"></div>
-  </div>
-  <div class="cg-step-item">
-    <div class="cg-step-node" id="stepNode2">
-      <div class="cg-step-circle">2</div>
-      <span class="cg-step-label">Employment</span>
-    </div>
-    <div class="cg-step-line" id="stepLine2"></div>
-  </div>
-  <div class="cg-step-item">
-    <div class="cg-step-node" id="stepNode3">
-      <div class="cg-step-circle">3</div>
-      <span class="cg-step-label">Financial</span>
-    </div>
-    <div class="cg-step-line" id="stepLine3"></div>
-  </div>
-  <div class="cg-step-item">
-    <div class="cg-step-node" id="stepNode4">
-      <div class="cg-step-circle">4</div>
-      <span class="cg-step-label">Review</span>
-    </div>
-  </div>
-</div>
-
-<form method="POST" action="{{ url_for('api.predict_post') }}" class="cg-max-w-lg" style="margin:0 auto;" id="wizardForm">
-  {{ form.hidden_tag() }}
-
-  <!-- Step 1: Personal -->
-  <div class="cg-wizard-panel active" id="panel1">
-    <div class="cg-card">
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
-        <i class="fa-solid fa-user" style="color:var(--primary);margin-right:8px;"></i> Personal Details
-      </h3>
-      <div class="cg-grid cg-grid-2">
-        <div class="cg-input-group">
-          {{ form.code_gender.label }}
-          {{ form.code_gender(class='cg-select', id='code_gender', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.age_years.label }}
-          {{ form.age_years(class='cg-input', id='age_years', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.name_family_status.label }}
-          {{ form.name_family_status(class='cg-select', id='name_family_status', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.cnt_children.label }}
-          {{ form.cnt_children(class='cg-input', id='cnt_children', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.cnt_fam_members.label }}
-          {{ form.cnt_fam_members(class='cg-input', id='cnt_fam_members', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.name_education_type.label }}
-          {{ form.name_education_type(class='cg-select', id='name_education_type', required=True) }}
-        </div>
-        <div class="cg-input-group" style="grid-column: span 2;">
-          {{ form.name_housing_type.label }}
-          {{ form.name_housing_type(class='cg-select', id='name_housing_type', required=True) }}
-        </div>
+<!-- Wizard Container -->
+<div class="cg-wizard-wrapper">
+  <!-- Stepper Track -->
+  <div class="cg-wizard-track cg-mb-xl" data-reveal="0s">
+    <div class="cg-step-item">
+      <div class="cg-step-node active" id="stepNode1">
+        <div class="cg-step-circle">1</div>
+        <span class="cg-step-label">Personal</span>
       </div>
-
-      <div class="cg-flex-between cg-mt-lg">
-        <div></div>
-        <button type="button" class="cg-btn cg-btn-primary" data-wizard-next id="btnNext1">
-          Next Step <i class="fa-solid fa-arrow-right"></i>
-        </button>
+      <div class="cg-step-line" id="stepLine1"></div>
+    </div>
+    <div class="cg-step-item">
+      <div class="cg-step-node" id="stepNode2">
+        <div class="cg-step-circle">2</div>
+        <span class="cg-step-label">Employment</span>
+      </div>
+      <div class="cg-step-line" id="stepLine2"></div>
+    </div>
+    <div class="cg-step-item">
+      <div class="cg-step-node" id="stepNode3">
+        <div class="cg-step-circle">3</div>
+        <span class="cg-step-label">Financial</span>
+      </div>
+      <div class="cg-step-line" id="stepLine3"></div>
+    </div>
+    <div class="cg-step-item">
+      <div class="cg-step-node" id="stepNode4">
+        <div class="cg-step-circle">4</div>
+        <span class="cg-step-label">Review</span>
+      </div>
+      <div class="cg-step-line" id="stepLine4"></div>
+    </div>
+    <div class="cg-step-item">
+      <div class="cg-step-node" id="stepNode5">
+        <div class="cg-step-circle">5</div>
+        <span class="cg-step-label">AI Decision</span>
       </div>
     </div>
   </div>
 
-  <!-- Step 2: Employment -->
-  <div class="cg-wizard-panel" id="panel2">
-    <div class="cg-card">
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
-        <i class="fa-solid fa-briefcase" style="color:var(--primary);margin-right:8px;"></i> Employment Profile
-      </h3>
-      <div class="cg-grid cg-grid-2">
-        <div class="cg-input-group">
-          {{ form.name_income_type.label }}
-          {{ form.name_income_type(class='cg-select', id='name_income_type', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.occupation_type.label }}
-          {{ form.occupation_type(class='cg-select', id='occupation_type') }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.employment_type.label }}
-          {{ form.employment_type(class='cg-select', id='employment_type', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.years_employed.label }}
-          {{ form.years_employed(class='cg-input', id='years_employed', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.income_source.label }}
-          {{ form.income_source(class='cg-select', id='income_source', required=True) }}
-        </div>
-        <div class="cg-input-group" style="display:flex;align-items:flex-end;">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:14px;user-select:none;">
-            {{ form.flag_unemployed(id='flag_unemployed') }}
-            <span>Is Unemployed / Retired</span>
-          </label>
-        </div>
-      </div>
+  <!-- Form Wizard -->
+  <form method="POST" action="{{ url_for('api.predict_post') }}" id="predictForm">
+    {{ form.hidden_tag() }}
 
-      <div class="cg-flex-between cg-mt-lg">
-        <button type="button" class="cg-btn cg-btn-secondary" data-wizard-prev id="btnPrev2">
-          <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-        <button type="button" class="cg-btn cg-btn-primary" data-wizard-next id="btnNext2">
-          Next Step <i class="fa-solid fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-  </div>
+    <!-- Hidden Fields with standard defaults to satisfy WTForms DataRequired validation -->
+    <input type="hidden" name="name_housing_type" value="House / apartment">
+    <input type="hidden" name="name_income_type" value="Working">
+    <input type="hidden" name="flag_own_car" value="N">
+    <input type="hidden" name="flag_own_realty" value="N">
+    <input type="hidden" name="cnt_children" value="0">
+    <input type="hidden" name="cnt_fam_members" value="1">
+    <input type="hidden" name="flag_work_phone" value="False">
+    <input type="hidden" name="flag_phone" value="False">
+    <input type="hidden" name="flag_email" value="False">
 
-  <!-- Step 3: Financial -->
-  <div class="cg-wizard-panel" id="panel3">
-    <div class="cg-card">
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
-        <i class="fa-solid fa-wallet" style="color:var(--primary);margin-right:8px;"></i> Financial Indicators
-      </h3>
-      <div class="cg-grid cg-grid-2">
-        <div class="cg-input-group">
-          {{ form.amt_income_total.label }}
-          {{ form.amt_income_total(class='cg-input', id='amt_income_total', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.existing_debt.label }}
-          {{ form.existing_debt(class='cg-input', id='existing_debt', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.loan_amount.label }}
-          {{ form.loan_amount(class='cg-input', id='loan_amount', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.credit_history.label }}
-          {{ form.credit_history(class='cg-select', id='credit_history', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.flag_own_car.label }}
-          {{ form.flag_own_car(class='cg-select', id='flag_own_car', required=True) }}
-        </div>
-        <div class="cg-input-group">
-          {{ form.flag_own_realty.label }}
-          {{ form.flag_own_realty(class='cg-select', id='flag_own_realty', required=True) }}
-        </div>
+    <!-- STEP 1: Personal Information (Individual interactive cards) -->
+    <div class="cg-wizard-panel active" id="panel1">
+      <!-- Question 1: Gender -->
+      <div class="cg-question-card active" id="qGender">
+        <div class="cg-card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">Select Gender</h3>
+          <p class="cg-text-xs cg-text-muted">Select applicant's primary legal gender registry.</p>
+          <div class="cg-card-grid">
+            <div class="cg-card-select-item" onclick="selectCardOption('code_gender', 'M', this)">
+              <i class="fa-solid fa-mars"></i>
+              <span class="cg-card-select-title">Male</span>
+            </div>
+            <div class="cg-card-select-item" onclick="selectCardOption('code_gender', 'F', this)">
+              <i class="fa-solid fa-venus"></i>
+              <span class="cg-card-select-title">Female</span>
+            </div>
+          </div>
+          {{ form.code_gender(style='display:none;', id='code_gender') }}
 
-        <div class="cg-input-group" style="grid-column: span 2;margin-bottom:0;">
-          <label style="font-size:12.5px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;display:block;">Verification Checks</label>
-          <div class="cg-flex" style="gap:24px;flex-wrap:wrap;">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
-              {{ form.flag_work_phone(id='flag_work_phone') }}
-              <span class="cg-text-sm">Work Phone</span>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
-              {{ form.flag_phone(id='flag_phone') }}
-              <span class="cg-text-sm">Landline Phone</span>
-            </label>
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
-              {{ form.flag_email(id='flag_email') }}
-              <span class="cg-text-sm">Email Address</span>
-            </label>
+          <div class="cg-flex-between cg-mt-lg">
+            <div></div>
+            <button type="button" class="cg-btn cg-btn-primary" onclick="showNextQuestion('qGender', 'qAge')">
+              Next <i class="fa-solid fa-arrow-right"></i>
+            </button>
           </div>
         </div>
       </div>
 
-      <div class="cg-flex-between cg-mt-lg">
-        <button type="button" class="cg-btn cg-btn-secondary" data-wizard-prev id="btnPrev3">
-          <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-        <button type="button" class="cg-btn cg-btn-primary" data-wizard-next id="btnNext3">
-          Next Step <i class="fa-solid fa-arrow-right"></i>
-        </button>
+      <!-- Question 2: Age -->
+      <div class="cg-question-card" id="qAge">
+        <div class="cg-card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Applicant Age</h3>
+          <div class="cg-floating-group cg-mt-md">
+            {{ form.age_years(class='cg-floating-input', id='age_years', placeholder=' ') }}
+            <label class="cg-floating-label" for="age_years">Age in Years (18-100)</label>
+          </div>
+
+          <div class="cg-flex-between cg-mt-lg">
+            <button type="button" class="cg-btn cg-btn-secondary" onclick="showNextQuestion('qAge', 'qGender')">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <button type="button" class="cg-btn cg-btn-primary" onclick="showNextQuestion('qAge', 'qFamily')">
+              Next <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question 3: Marital Status -->
+      <div class="cg-question-card" id="qFamily">
+        <div class="cg-card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">Marital Status</h3>
+          <p class="cg-text-xs cg-text-muted">Select applicant's official marital standing.</p>
+          <div class="cg-card-grid">
+            <div class="cg-card-select-item" onclick="selectCardOption('name_family_status', 'Married', this)">
+              <i class="fa-solid fa-ring"></i>
+              <span class="cg-card-select-title">Married</span>
+            </div>
+            <div class="cg-card-select-item" onclick="selectCardOption('name_family_status', 'Single / not married', this)">
+              <i class="fa-solid fa-user"></i>
+              <span class="cg-card-select-title">Single</span>
+            </div>
+            <div class="cg-card-select-item" onclick="selectCardOption('name_family_status', 'Civil marriage', this)">
+              <i class="fa-solid fa-user-group"></i>
+              <span class="cg-card-select-title">Partnership</span>
+            </div>
+            <div class="cg-card-select-item" onclick="selectCardOption('name_family_status', 'Separated', this)">
+              <i class="fa-solid fa-heart-crack"></i>
+              <span class="cg-card-select-title">Separated</span>
+            </div>
+          </div>
+          {{ form.name_family_status(style='display:none;', id='name_family_status') }}
+
+          <div class="cg-flex-between cg-mt-lg">
+            <button type="button" class="cg-btn cg-btn-secondary" onclick="showNextQuestion('qFamily', 'qAge')">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <button type="button" class="cg-btn cg-btn-primary" onclick="showNextQuestion('qFamily', 'qEdu')">
+              Next <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Question 4: Education -->
+      <div class="cg-question-card" id="qEdu">
+        <div class="cg-card">
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">Education Level</h3>
+          <p class="cg-text-xs cg-text-muted">Select the highest completed level of education.</p>
+          <div class="cg-card-grid">
+            <div class="cg-card-select-item" onclick="selectCardOption('name_education_type', 'Secondary / secondary special', this)">
+              <i class="fa-solid fa-school"></i>
+              <span class="cg-card-select-title">Secondary</span>
+            </div>
+            <div class="cg-card-select-item" onclick="selectCardOption('name_education_type', 'Higher education', this)">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <span class="cg-card-select-title">Higher Edu</span>
+            </div>
+            <div class="cg-card-select-item" onclick="selectCardOption('name_education_type', 'Incomplete higher', this)">
+              <i class="fa-solid fa-book-open"></i>
+              <span class="cg-card-select-title">Incomplete</span>
+            </div>
+            <div class="cg-card-select-item" onclick="selectCardOption('name_education_type', 'Academic degree', this)">
+              <i class="fa-solid fa-award"></i>
+              <span class="cg-card-select-title">Degree</span>
+            </div>
+          </div>
+          {{ form.name_education_type(style='display:none;', id='name_education_type') }}
+
+          <div class="cg-flex-between cg-mt-lg">
+            <button type="button" class="cg-btn cg-btn-secondary" onclick="showNextQuestion('qEdu', 'qFamily')">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <button type="button" class="cg-btn cg-btn-primary" onclick="goToStep(1)">
+              Next Step <i class="fa-solid fa-arrow-right-long"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Step 4: Review -->
-  <div class="cg-wizard-panel" id="panel4">
-    <div class="cg-card">
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:14px;">
-        <i class="fa-solid fa-clipboard-check" style="color:var(--primary);margin-right:8px;"></i> Review & Submit
-      </h3>
-      <p class="cg-text-sm cg-text-muted" style="margin-bottom:20px;">
-        Review your details below. Once verified, submit for ML credit scoring.
-      </p>
+    <!-- STEP 2: Employment -->
+    <div class="cg-wizard-panel" id="panel2">
+      <div class="cg-card">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
+          <i class="fa-solid fa-briefcase" style="color:var(--primary);margin-right:8px;"></i> Employment Profile
+        </h3>
 
-      <div id="reviewSummary" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;margin-bottom:24px;">
-        <!-- Filled dynamically by script -->
-      </div>
+        <div class="cg-input-group cg-mb-md">
+          <label>Occupation Type</label>
+          {{ form.occupation_type(class='cg-select', id='occupation_type') }}
+        </div>
 
-      <div class="cg-flex-between">
-        <button type="button" class="cg-btn cg-btn-secondary" data-wizard-prev id="btnPrev4">
-          <i class="fa-solid fa-arrow-left"></i> Back
-        </button>
-        {{ form.submit(class='cg-btn cg-btn-primary cg-btn-lg', id='btnSubmitForm') }}
+        <div class="cg-input-group cg-mb-md">
+          <label>Employment Sector Type</label>
+          {{ form.employment_type(class='cg-select', id='employment_type') }}
+        </div>
+
+        <div class="cg-floating-group cg-mt-md">
+          {{ form.years_employed(class='cg-floating-input', id='years_employed', placeholder=' ') }}
+          <label class="cg-floating-label" for="years_employed">Years of Employment</label>
+        </div>
+
+        <div class="cg-input-group cg-mb-md">
+          <label>Primary Income Source</label>
+          {{ form.income_source(class='cg-select', id='income_source') }}
+        </div>
+
+        <div class="cg-flex-between cg-mt-lg">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="goToStep(0)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="goToStep(2)">
+            Next Step <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-</form>
+
+    <!-- STEP 3: Financial Details -->
+    <div class="cg-wizard-panel" id="panel3">
+      <div class="cg-card">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
+          <i class="fa-solid fa-wallet" style="color:var(--primary);margin-right:8px;"></i> Financial Details
+        </h3>
+
+        <div class="cg-floating-group">
+          {{ form.amt_income_total(class='cg-floating-input', id='amt_income_total', placeholder=' ') }}
+          <label class="cg-floating-label" for="amt_income_total">Annual Gross Income ($)</label>
+        </div>
+
+        <div class="cg-floating-group">
+          {{ form.existing_debt(class='cg-floating-input', id='existing_debt', placeholder=' ') }}
+          <label class="cg-floating-label" for="existing_debt">Outstanding Debt Liabilities ($)</label>
+        </div>
+
+        <div class="cg-input-group cg-mb-md">
+          <label>Credit Bureau History</label>
+          {{ form.credit_history(class='cg-select', id='credit_history') }}
+        </div>
+
+        <div class="cg-floating-group">
+          {{ form.loan_amount(class='cg-floating-input', id='loan_amount', placeholder=' ') }}
+          <label class="cg-floating-label" for="loan_amount">Requested Facility Limit ($)</label>
+        </div>
+
+        <div class="cg-flex-between cg-mt-lg">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="goToStep(1)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="goToStep(3)">
+            Next Step <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Review (Summary card with edit options) -->
+    <div class="cg-wizard-panel" id="panel4">
+      <div class="cg-card">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">
+          <i class="fa-solid fa-clipboard-check" style="color:var(--primary);margin-right:8px;"></i> Application Review
+        </h3>
+        <p class="cg-text-xs cg-text-muted cg-mb-md">Review applicant features before submitting to the decisioning models.</p>
+
+        <div id="reviewContent" class="cg-grid cg-gap-md" style="margin-bottom:24px;">
+          <!-- Summarized dynamically by JS -->
+        </div>
+
+        <div class="cg-flex-between">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="goToStep(2)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary cg-btn-lg" onclick="triggerDecisionScanning()">
+            Submit Assessment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5: AI Prediction (Loading Animation) -->
+    <div class="cg-wizard-panel" id="panel5">
+      <div class="cg-card">
+        <div class="cg-scan-wrapper">
+          <div class="cg-scan-ring">
+            <div class="cg-scan-core">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+          </div>
+          <h3 id="scanTitle" style="font-size:18px;font-weight:800;margin-bottom:8px;">Analyzing Applicant Profile</h3>
+          <p id="scanDesc" style="color:var(--text-secondary);font-size:13.5px;max-width:320px;line-height:1.6;">
+            Running neural network classification on risk layers...
+          </p>
+          <div class="cg-mt-lg cg-w-full" style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;max-width:240px;margin:24px auto 0;">
+            <div id="scanProgressBar" style="width:0%;height:100%;background:var(--primary);transition:width 0.2s ease;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  // Simple summary populator
-  document.getElementById('btnNext3')?.addEventListener('click', () => {
-    const sumEl = document.getElementById('reviewSummary');
-    if (!sumEl) return;
+  // Active states tracking
+  let currentStepIndex = 0;
+  const panels = Array.from(document.querySelectorAll('.cg-wizard-panel'));
+  const nodes = Array.from(document.querySelectorAll('.cg-step-node'));
+  const lines = Array.from(document.querySelectorAll('.cg-step-line'));
 
-    const fields = [
-      { id: 'code_gender', label: 'Gender' },
-      { id: 'age_years', label: 'Age (Years)' },
-      { id: 'name_family_status', label: 'Marital Status' },
-      { id: 'amt_income_total', label: 'Annual Income', format: true },
-      { id: 'years_employed', label: 'Work Experience (Years)' },
-      { id: 'existing_debt', label: 'Outstanding Debt', format: true },
-      { id: 'loan_amount', label: 'Requested Limit', format: true },
-      { id: 'credit_history', label: 'Credit Rating' }
+  function selectCardOption(fieldId, value, element) {
+    // Set WTForms select value
+    const select = document.getElementById(fieldId);
+    if (select) {
+      select.value = value;
+      // Trigger change event to ensure sync
+      select.dispatchEvent(new Event('change'));
+    }
+
+    // Toggle active state classes on sibling cards
+    const grid = element.parentElement;
+    grid.querySelectorAll('.cg-card-select-item').forEach(c => c.classList.remove('active'));
+    element.classList.add('active');
+  }
+
+  function showNextQuestion(currentQId, nextQId) {
+    // Basic field validation before proceeding within step 1
+    if (currentQId === 'qGender') {
+      if (!document.getElementById('code_gender').value) {
+        CG.Toast.show('Please select a gender option.', 'warning');
+        return;
+      }
+    } else if (currentQId === 'qAge') {
+      const val = parseFloat(document.getElementById('age_years').value);
+      if (isNaN(val) || val < 18 || val > 100) {
+        CG.Toast.show('Please enter a valid age between 18 and 100.', 'warning');
+        return;
+      }
+    } else if (currentQId === 'qFamily') {
+      if (!document.getElementById('name_family_status').value) {
+        CG.Toast.show('Please select a family status option.', 'warning');
+        return;
+      }
+    }
+
+    document.getElementById(currentQId).classList.remove('active');
+    document.getElementById(nextQId).classList.add('active');
+  }
+
+  function goToStep(stepIndex) {
+    // Field validations on step transition
+    if (stepIndex === 1 && currentStepIndex === 0) {
+      if (!document.getElementById('name_education_type').value) {
+        CG.Toast.show('Please select an education level.', 'warning');
+        return;
+      }
+    } else if (stepIndex === 2 && currentStepIndex === 1) {
+      const val = parseFloat(document.getElementById('years_employed').value);
+      if (isNaN(val) || val < 0 || val > 60) {
+        CG.Toast.show('Please enter valid employment years (0-60).', 'warning');
+        return;
+      }
+    } else if (stepIndex === 3 && currentStepIndex === 2) {
+      const inc = parseFloat(document.getElementById('amt_income_total').value);
+      const debt = parseFloat(document.getElementById('existing_debt').value);
+      const limit = parseFloat(document.getElementById('loan_amount').value);
+      if (isNaN(inc) || inc <= 1000) {
+        CG.Toast.show('Please enter annual income (> $1,000).', 'warning');
+        return;
+      }
+      if (isNaN(debt) || debt < 0) {
+        CG.Toast.show('Please enter outstanding debt liabilities.', 'warning');
+        return;
+      }
+      if (isNaN(limit) || limit < 0) {
+        CG.Toast.show('Please enter requested credit facility limit.', 'warning');
+        return;
+      }
+    }
+
+    currentStepIndex = stepIndex;
+
+    // Show panel
+    panels.forEach((p, idx) => p.classList.toggle('active', idx === stepIndex));
+
+    // Update stepper nodes
+    nodes.forEach((n, idx) => {
+      n.classList.remove('active', 'done');
+      if (idx < stepIndex) n.classList.add('done');
+      else if (idx === stepIndex) n.classList.add('active');
+    });
+
+    // Update stepper lines
+    lines.forEach((l, idx) => {
+      l.classList.toggle('done', idx < stepIndex);
+    });
+
+    if (stepIndex === 3) {
+      populateReviewSummary();
+    }
+  }
+
+  function populateReviewSummary() {
+    const summaryEl = document.getElementById('reviewContent');
+    if (!summaryEl) return;
+
+    const sections = [
+      {
+        title: 'Personal Info',
+        step: 0,
+        fields: [
+          { id: 'code_gender', label: 'Gender', map: (v) => v === 'M' ? 'Male' : 'Female' },
+          { id: 'age_years', label: 'Age', suffix: ' Years' },
+          { id: 'name_family_status', label: 'Marital Status' },
+          { id: 'name_education_type', label: 'Education Level' }
+        ]
+      },
+      {
+        title: 'Employment Info',
+        step: 1,
+        fields: [
+          { id: 'occupation_type', label: 'Occupation' },
+          { id: 'employment_type', label: 'Employment Sector' },
+          { id: 'years_employed', label: 'Experience', suffix: ' Years' },
+          { id: 'income_source', label: 'Income Source' }
+        ]
+      },
+      {
+        title: 'Financial Info',
+        step: 2,
+        fields: [
+          { id: 'amt_income_total', label: 'Annual Income', prefix: '$', format: true },
+          { id: 'existing_debt', label: 'Outstanding Debt', prefix: '$', format: true },
+          { id: 'credit_history', label: 'Credit Bureau Rating' },
+          { id: 'loan_amount', label: 'Requested Facility Limit', prefix: '$', format: true }
+        ]
+      }
     ];
 
-    let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;font-size:13px;">';
-    fields.forEach(f => {
-      const el = document.getElementById(f.id);
-      if (el) {
-        let val = el.value;
-        if (f.id === 'code_gender') val = val === 'M' ? 'Male' : 'Female';
+    let html = '';
+    sections.forEach(sec => {
+      html += `
+        <div class="cg-card" style="padding:16px;">
+          <div class="cg-flex-between" style="margin-bottom:12px;">
+            <h4 style="font-size:13px;font-weight:700;">${sec.title}</h4>
+            <button type="button" class="cg-btn cg-btn-ghost cg-btn-sm" style="padding:4px 8px;" onclick="goToStep(${sec.step})">
+              <i class="fa-solid fa-pen-to-square"></i> Edit
+            </button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr;gap:8px;font-size:12.5px;">
+      `;
+
+      sec.fields.forEach(f => {
+        const el = document.getElementById(f.id);
+        let val = el ? el.value : '—';
+        if (f.map) val = f.map(val);
         if (f.format) {
           const num = parseFloat(val) || 0;
-          val = '$' + num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+          val = num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
         }
-        html += `<div><span style="color:var(--text-muted);">${f.label}:</span> <strong style="color:var(--text-primary);margin-left:4px;">${val}</strong></div>`;
-      }
+        if (f.prefix) val = f.prefix + val;
+        if (f.suffix) val = val + f.suffix;
+
+        html += `
+          <div class="cg-flex-between">
+            <span class="cg-text-muted">${f.label}</span>
+            <span class="cg-text-primary cg-font-semibold">${val}</span>
+          </div>
+        `;
+      });
+
+      html += `</div></div>`;
     });
-    html += '</div>';
-    sumEl.innerHTML = html;
-  });
+
+    summaryEl.innerHTML = html;
+  }
+
+  function triggerDecisionScanning() {
+    goToStep(4);
+
+    const titleEl = document.getElementById('scanTitle');
+    const descEl = document.getElementById('scanDesc');
+    const progressEl = document.getElementById('scanProgressBar');
+
+    const steps = [
+      { pct: 20, title: 'Parsing Demographics', desc: 'Validating applicant legal gender registry and age limits...' },
+      { pct: 45, title: 'Calculating DTI Index', desc: 'Calculating outstanding debt vs gross income spread ratios...' },
+      { pct: 70, title: 'Evaluating Credit Bureau History', desc: 'Checking prior defaults and repayment logs...' },
+      { pct: 90, title: 'Running Classifiers', desc: 'Evaluating profile layers across Random Forest and XGBoost classifiers...' },
+      { pct: 100, title: 'Finalizing Decision Report', desc: 'Logging predictions report parameters and database files...' }
+    ];
+
+    let currentScanIdx = 0;
+    const runScanStep = () => {
+      if (currentScanIdx >= steps.length) {
+        // Complete, submit form
+        document.getElementById('predictForm').submit();
+        return;
+      }
+
+      const s = steps[currentScanIdx];
+      titleEl.textContent = s.title;
+      descEl.textContent = s.desc;
+      progressEl.style.width = s.pct + '%';
+
+      currentScanIdx++;
+      setTimeout(runScanStep, 800);
+    };
+
+    // Run first step
+    setTimeout(runScanStep, 200);
+  }
 </script>
 {% endblock %}
