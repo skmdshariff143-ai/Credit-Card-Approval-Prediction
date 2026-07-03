@@ -209,6 +209,36 @@ const CG = (() => {
     }
   };
 
+  /* ── Ripple Click Effects ── */
+  const Ripple = {
+    create(e) {
+      const btn = e.currentTarget;
+      const rect = btn.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const x = e.clientX - rect.left - size/2;
+      const y = e.clientY - rect.top - size/2;
+      
+      const circle = document.createElement('span');
+      circle.style.width = circle.style.height = `${size}px`;
+      circle.style.left = `${x}px`;
+      circle.style.top = `${y}px`;
+      circle.classList.add('cg-ripple-span');
+      
+      const prevRipple = btn.querySelector('.cg-ripple-span');
+      if (prevRipple) prevRipple.remove();
+      
+      btn.appendChild(circle);
+      setTimeout(() => circle.remove(), 600);
+    },
+    init() {
+      document.querySelectorAll('.cg-btn, .cg-tile-select, .cg-drawer-chip').forEach(btn => {
+        btn.style.position = 'relative';
+        btn.style.overflow = 'hidden';
+        btn.addEventListener('mousedown', this.create);
+      });
+    }
+  };
+
   /* ── Flash Message Handler ── */
   const Flash = {
     init() {
@@ -230,6 +260,7 @@ const CG = (() => {
     Reveal.init();
     Wizard.init();
     Gauge.init();
+    Ripple.init();
 
     // Bind theme toggle
     document.getElementById('themeToggle')?.addEventListener('click', () => Theme.toggle());
