@@ -1,152 +1,362 @@
 {% extends "base.html" %}
 
-{% block title %}Assessment Result | CreditGuard AI{% endblock %}
+{% block title %}Decision Dashboard | CreditGuard AI{% endblock %}
 {% block page_id %}page-result{% endblock %}
+
+{% block head %}
+<style>
+  /* ── AI Decision Dashboard Premium Styles ── */
+  .cg-result-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 1024px) {
+    .cg-result-grid {
+      grid-template-columns: 320px 1fr;
+    }
+  }
+
+  /* Success/Warning Animated Backdrops */
+  .cg-result-status-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .cg-result-status-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--gradient-card);
+    pointer-events: none;
+  }
+
+  /* Animated status illustrations */
+  .cg-outcome-glow {
+    position: absolute;
+    top: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .cg-outcome-glow.approved { background: var(--success); }
+  .cg-outcome-glow.rejected { background: var(--danger); }
+
+  .cg-status-icon-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .cg-status-icon-wrap.approved {
+    background: var(--success-muted);
+    color: var(--success);
+    border: 1px solid rgba(34,197,94,0.3);
+    animation: cg-pulse-success 2s infinite;
+  }
+  .cg-status-icon-wrap.rejected {
+    background: var(--danger-muted);
+    color: var(--danger);
+    border: 1px solid rgba(239,68,68,0.3);
+    animation: cg-pulse-danger 2s infinite;
+  }
+  @keyframes cg-pulse-success {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+    70% { box-shadow: 0 0 0 16px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  }
+  @keyframes cg-pulse-danger {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    70% { box-shadow: 0 0 0 16px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  }
+
+  /* Radar-style Gauge */
+  .cg-radar-gauge {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin-bottom: 20px;
+  }
+  .cg-radar-svg {
+    transform: rotate(-90deg);
+  }
+  .cg-radar-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 6;
+  }
+  .cg-radar-fill {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s var(--ease);
+  }
+  .cg-radar-fill.approved { stroke: var(--success); }
+  .cg-radar-fill.rejected { stroke: var(--danger); }
+  
+  .cg-radar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .cg-radar-value {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+  }
+  .cg-radar-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Metric cards */
+  .cg-metric-pill {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 8px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  /* Custom Factor Card list */
+  .cg-factor-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--r-md);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    font-size: 13px;
+    margin-bottom: 10px;
+    transition: all var(--t-fast) var(--ease);
+  }
+  .cg-factor-item:hover {
+    border-color: rgba(255,255,255,0.12);
+    transform: translateX(4px);
+  }
+  .cg-factor-badge {
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    font-size: 10px;
+    font-weight: 700;
+    font-family: var(--font-sans);
+  }
+  .cg-factor-badge.positive { background: var(--success-muted); color: var(--success); }
+  .cg-factor-badge.negative { background: var(--danger-muted); color: var(--danger); }
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="cg-page-header">
   <div class="cg-breadcrumb">
     <a href="{{ url_for('api.index') }}">Home</a>
     <span class="sep">›</span>
-    <a href="{{ url_for('api.predict_get') }}">New Assessment</a>
+    <a href="{{ url_for('api.predict_get') }}">Assessment Panel</a>
     <span class="sep">›</span>
-    <span class="current">Result</span>
+    <span class="current">Decision Dashboard</span>
   </div>
-  <h1 class="cg-page-title">Assessment Result</h1>
-  <p class="cg-page-desc">AI-powered decision score and risk breakdown.</p>
+  <h1 class="cg-page-title">AI Decision Dashboard</h1>
+  <p class="cg-page-desc">Automated prediction results and explainable AI risk assessments.</p>
 </div>
 
-<!-- Main score banner card -->
-<div class="cg-card cg-text-center cg-mb-lg" data-reveal="0s" style="padding:40px 24px;">
-  <p class="cg-app-id" style="margin-bottom:12px;">Application: {{ application_id }}</p>
+<div class="cg-result-grid cg-fade-in" data-reveal="0s">
+  <!-- Left Side: Result Card, Gauge, Meta -->
+  <div>
+    <div class="cg-result-status-card">
+      <div class="cg-outcome-glow {% if result == 'Approved' %}approved{% else %}rejected{% endif %}"></div>
 
-  <!-- Big Decision text -->
-  <div style="margin-bottom:28px;">
-    {% if result == 'Approved' %}
-      <div style="display:inline-flex;align-items:center;gap:12px;color:var(--success);">
-        <i class="fa-solid fa-circle-check" style="font-size:48px;"></i>
-        <span style="font-size:40px;font-weight:900;letter-spacing:-1px;">APPROVED</span>
-        <!-- Approved -->
+      <!-- Icon -->
+      <div class="cg-status-icon-wrap {% if result == 'Approved' %}approved{% else %}rejected{% endif %}">
+        {% if result == 'Approved' %}
+          <i class="fa-solid fa-circle-check"></i>
+          <!-- Approved -->
+        {% else %}
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <!-- Rejected -->
+        {% endif %}
       </div>
-    {% else %}
-      <div style="display:inline-flex;align-items:center;gap:12px;color:var(--danger);">
-        <i class="fa-solid fa-circle-xmark" style="font-size:48px;"></i>
-        <span style="font-size:40px;font-weight:900;letter-spacing:-1px;">REJECTED</span>
-        <!-- Rejected -->
+
+      <h2 style="font-size: 20px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px;">
+        {% if result == 'Approved' %}Approved{% else %}Rejected{% endif %}
+      </h2>
+      <p class="cg-app-id cg-mb-md">{{ application_id }}</p>
+
+      <!-- Gauge Meter -->
+      <div class="cg-radar-gauge">
+        <svg class="cg-radar-svg" width="160" height="160">
+          <circle class="cg-radar-bg" cx="80" cy="80" r="70"/>
+          <circle class="cg-radar-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" cx="80" cy="80" r="70" data-pct="{{ probability }}"/>
+        </svg>
+        <div class="cg-radar-label">
+          <span class="cg-radar-value">{{ '%.1f'|format(probability) }}%</span>
+          <span class="cg-radar-sub">Confidence</span>
+        </div>
+      </div>
+
+      <!-- Metric Pills -->
+      <div class="cg-metric-pill">
+        <span class="cg-text-xs cg-text-muted">Risk Category</span>
+        <span class="cg-badge {% if risk_level == 'Low' %}success{% elif risk_level == 'High' %}danger{% else %}warning{% endif %}" style="font-size:10.5px;padding:2px 8px;">
+          {{ risk_level }}
+        </span>
+      </div>
+
+      <div class="cg-metric-pill">
+        <span class="cg-text-xs cg-text-muted">Model Classifier</span>
+        <span class="cg-text-xs cg-text-primary cg-font-semibold">{{ model_used }}</span>
+      </div>
+
+      <div class="cg-metric-pill">
+        <span class="cg-text-xs cg-text-muted">Time Index</span>
+        <span class="cg-text-xs cg-text-primary cg-mono">{{ date }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Explanations, Factors, Recommendations -->
+  <div class="cg-grid cg-gap-md">
+    <!-- AI Explanation Card -->
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
+        <i class="fa-solid fa-brain" style="color:var(--primary);margin-right:6px;"></i> Decision Interpretation
+      </h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
+        {% if result == 'Approved' %}
+          The model predicts a <strong>high likelihood of good credit repayment</strong> capacity. The socio-economic attributes and low debt ratios indicate excellent risk coverage.
+        {% else %}
+          The model flags potential <strong>credit delinquency risk factors</strong>. Key elements in the profile indicate cash flow instability or prior payment defaults.
+        {% endif %}
+      </p>
+
+      <!-- Business reasons loop -->
+      <h4 style="font-size:12px;font-weight:700;margin-bottom:10px;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;">Scoring Rules Triggered</h4>
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+        {% for reason in reasons %}
+          <div class="cg-flex" style="gap:10px;align-items:flex-start;font-size:13px;">
+            {% if result == 'Approved' %}
+              <i class="fa-solid fa-circle-check" style="color:var(--success);margin-top:3px;flex-shrink:0;"></i>
+            {% else %}
+              <i class="fa-solid fa-circle-xmark" style="color:var(--danger);margin-top:3px;flex-shrink:0;"></i>
+            {% endif %}
+            <span style="color:var(--text-secondary);">{{ reason }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Feature Contributions (Positive/Negative LIME factors) -->
+    {% if support_factors or risk_factors %}
+      <div class="cg-grid cg-grid-2 cg-gap-sm">
+        <!-- Supporting -->
+        <div class="cg-card" style="padding:18px;">
+          <h3 style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--success);">
+            <i class="fa-solid fa-plus-circle" style="margin-right:6px;"></i> Support Indicators
+          </h3>
+          {% for f in support_factors %}
+            <div class="cg-factor-item">
+              <div class="cg-flex-between cg-w-full">
+                <span class="cg-text-secondary">{{ f.feature }}</span>
+                <span class="cg-factor-badge positive">+{{ '%.1f'|format(f.contribution * 100) }}%</span>
+              </div>
+            </div>
+          {% else %}
+            <span class="cg-text-xs cg-text-muted">No positive indicators computed.</span>
+          {% endfor %}
+        </div>
+
+        <!-- Risk factors -->
+        <div class="cg-card" style="padding:18px;">
+          <h3 style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--danger);">
+            <i class="fa-solid fa-minus-circle" style="margin-right:6px;"></i> Risk Indicators
+          </h3>
+          {% for f in risk_factors %}
+            <div class="cg-factor-item">
+              <div class="cg-flex-between cg-w-full">
+                <span class="cg-text-secondary">{{ f.feature }}</span>
+                <span class="cg-factor-badge negative">-{{ '%.1f'|format(f.contribution * 100) }}%</span>
+              </div>
+            </div>
+          {% else %}
+            <span class="cg-text-xs cg-text-muted">No risk factors computed.</span>
+          {% endfor %}
+        </div>
       </div>
     {% endif %}
-  </div>
 
-  <!-- Radial gauge -->
-  <div class="cg-gauge-wrap" style="margin-bottom:28px;">
-    <svg class="cg-gauge-svg" width="200" height="200">
-      <circle class="cg-gauge-bg" cx="100" cy="100" r="85"/>
-      <circle class="cg-gauge-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" cx="100" cy="100" r="85" data-pct="{{ probability }}"/>
-    </svg>
-    <div class="cg-gauge-label">
-      <span class="cg-gauge-pct">{{ '%.1f'|format(probability) }}%</span>
-      <span class="cg-gauge-sub">Approval Index</span>
+    <!-- Recommendations -->
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
+        <i class="fa-solid fa-lightbulb" style="color:var(--warning);margin-right:6px;"></i> Actionable Recommendations
+      </h3>
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+        {% for rec in recommendations %}
+          <div class="cg-flex" style="gap:10px;align-items:flex-start;font-size:13px;">
+            <i class="fa-solid fa-arrow-right-long" style="color:var(--primary);margin-top:4px;flex-shrink:0;"></i>
+            <span style="color:var(--text-secondary);">{{ rec }}</span>
+          </div>
+        {% endfor %}
+      </div>
     </div>
-  </div>
 
-  <!-- Details row -->
-  <div class="cg-flex cg-flex-center cg-gap-lg" style="flex-wrap:wrap;border-top:1px solid var(--border);padding-top:24px;">
-    <div>
-      <span class="cg-text-xs cg-text-muted" style="display:block;">Risk Category</span>
-      <span class="cg-badge {% if risk_level == 'Low' %}success{% elif risk_level == 'High' %}danger{% else %}warning{% endif %}" style="margin-top:4px;">
-        {{ risk_level }}
-      </span>
-    </div>
-    <div style="width:1px;height:24px;background:var(--border);"></div>
-    <div>
-      <span class="cg-text-xs cg-text-muted" style="display:block;">Evaluation Model</span>
-      <span class="cg-text-sm cg-text-primary cg-font-semibold" style="display:block;margin-top:4px;">{{ model_used }}</span>
-    </div>
-    <div style="width:1px;height:24px;background:var(--border);"></div>
-    <div>
-      <span class="cg-text-xs cg-text-muted" style="display:block;">Inference Latency</span>
-      <span class="cg-text-sm cg-text-primary cg-font-semibold" style="display:block;margin-top:4px;">{{ prediction_time }} ms</span>
+    <!-- Actions Row -->
+    <div class="cg-flex cg-gap-md cg-mt-md">
+      <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="cg-btn cg-btn-primary">
+        <i class="fa-solid fa-file-pdf"></i> Download PDF Report
+      </a>
+      <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-secondary">
+        <i class="fa-solid fa-circle-plus"></i> New Prediction
+      </a>
+      <a href="{{ url_for('api.history') }}" class="cg-btn cg-btn-ghost">
+        View Prediction History
+      </a>
     </div>
   </div>
 </div>
+{% endblock %}
 
-<!-- Explainability section -->
-<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.1s">
-  <!-- Key factors -->
-  <div class="cg-card">
-    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
-      <i class="fa-solid fa-list-check" style="color:var(--primary);margin-right:8px;"></i> Key Factors
-    </h3>
-    <ul style="list-style:none;padding:0;margin:0;">
-      {% for reason in reasons %}
-        <li class="cg-flex" style="gap:10px;font-size:13.5px;margin-bottom:12px;align-items:flex-start;">
-          {% if result == 'Approved' %}
-            <i class="fa-solid fa-circle-check cg-text-success" style="margin-top:3px;flex-shrink:0;"></i>
-          {% else %}
-            <i class="fa-solid fa-triangle-exclamation cg-text-danger" style="margin-top:3px;flex-shrink:0;"></i>
-          {% endif %}
-          <span style="color:var(--text-secondary);">{{ reason }}</span>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-
-  <!-- Recommendations -->
-  <div class="cg-card">
-    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
-      <i class="fa-solid fa-lightbulb" style="color:var(--warning);margin-right:8px;"></i> Recommendations
-    </h3>
-    <ul style="list-style:none;padding:0;margin:0;">
-      {% for rec in recommendations %}
-        <li class="cg-flex" style="gap:10px;font-size:13.5px;margin-bottom:12px;align-items:flex-start;">
-          <i class="fa-solid fa-arrow-right-long" style="color:var(--primary);margin-top:4px;flex-shrink:0;font-size:12px;"></i>
-          <span style="color:var(--text-secondary);">{{ rec }}</span>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-</div>
-
-<!-- LIME explanation cards -->
-{% if support_factors or risk_factors %}
-<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.2s">
-  <div class="cg-card">
-    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--success);">
-      <i class="fa-solid fa-plus-circle" style="margin-right:6px;"></i> Supporting Features
-    </h3>
-    <div class="cg-flex" style="flex-wrap:wrap;gap:8px;">
-      {% for f in support_factors %}
-        <span class="cg-badge success cg-mono" style="font-size:12px;padding:6px 12px;">
-          {{ f.feature }}: +{{ '%.1f'|format(f.contribution * 100) }}%
-        </span>
-      {% endfor %}
-    </div>
-  </div>
-  <div class="cg-card">
-    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--danger);">
-      <i class="fa-solid fa-minus-circle" style="margin-right:6px;"></i> Counter-indicative Features
-    </h3>
-    <div class="cg-flex" style="flex-wrap:wrap;gap:8px;">
-      {% for f in risk_factors %}
-        <span class="cg-badge danger cg-mono" style="font-size:12px;padding:6px 12px;">
-          {{ f.feature }}: -{{ '%.1f'|format(f.contribution * 100) }}%
-        </span>
-      {% endfor %}
-    </div>
-  </div>
-</div>
-{% endif %}
-
-<!-- Action buttons -->
-<div class="cg-flex cg-gap-md" data-reveal="0.3s">
-  <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary">
-    <i class="fa-solid fa-rotate-right"></i> Run Another Assessment
-  </a>
-  <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="cg-btn cg-btn-secondary">
-    <i class="fa-solid fa-file-invoice"></i> View Report
-  </a>
-  <a href="{{ url_for('api.history') }}" class="cg-btn cg-btn-ghost">
-    Prediction History
-  </a>
-</div>
+{% block scripts %}
+<script>
+  // Trigger gauge animations
+  document.addEventListener('DOMContentLoaded', () => {
+    const fill = document.querySelector('.cg-radar-fill');
+    if (fill) {
+      const pct = parseFloat(fill.dataset.pct || 0);
+      const circumference = 2 * Math.PI * 70;
+      fill.style.strokeDasharray = circumference;
+      fill.style.strokeDashoffset = circumference;
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          fill.style.strokeDashoffset = circumference - (circumference * pct / 100);
+        }, 300);
+      });
+    }
+  });
+</script>
 {% endblock %}
