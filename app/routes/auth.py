@@ -190,7 +190,7 @@ def reset_password(token):
             flash("Account not found. Please register.", "danger")
             return redirect(url_for("auth.register"))
 
-    return render_template("auth/reset_password.html", form=form)
+    return render_template("auth/reset_password.html", form=form, token=token)
 
 
 # ==================================================================
@@ -209,7 +209,31 @@ def profile():
 @auth_bp.route("/profile/edit", methods=["POST"])
 @login_required
 def profile_edit():
-    """Update user profile details."""
+    """Update user profile details or password."""
+    form_type = request.form.get("form_type", "profile")
+
+    if form_type == "password":
+        current_password = request.form.get("current_password", "")
+        new_password = request.form.get("new_password", "")
+
+        if not current_password or not new_password:
+            flash("Current and new passwords are required.", "danger")
+            return redirect(url_for("auth.profile"))
+
+        if len(new_password) < 8:
+            flash("New password must be at least 8 characters.", "danger")
+            return redirect(url_for("auth.profile"))
+
+        row = db_manager.get_user_by_id(current_user.id)
+        if not row or not check_password_hash(row["password_hash"], current_password):
+            flash("Current password is incorrect.", "danger")
+            return redirect(url_for("auth.profile"))
+
+        new_hash = generate_password_hash(new_password, method="scrypt")
+        db_manager.update_user_password(current_user.id, new_hash)
+        flash("Password updated successfully.", "success")
+        return redirect(url_for("auth.profile"))
+
     full_name = request.form.get("full_name", "").strip()
     email = request.form.get("email", "").strip().lower()
 
@@ -217,7 +241,6 @@ def profile_edit():
         flash("Name and email are required.", "danger")
         return redirect(url_for("auth.profile"))
 
-    # Check email isn't taken by another user
     existing = db_manager.get_user_by_email(email)
     if existing and existing["id"] != current_user.id:
         flash("That email is already in use by another account.", "danger")

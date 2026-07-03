@@ -217,7 +217,7 @@ class DatabaseManager:
             query += " AND risk_level = ?"
             params.append(risk_level)
 
-        allowed_sorts = {"id", "timestamp", "income", "prediction", "probability", "risk_level"}
+        allowed_sorts = {"id", "timestamp", "income", "prediction", "probability", "risk_level", "application_id"}
         if sort_by not in allowed_sorts:
             sort_by = "id"
         if order not in {"ASC", "DESC"}:
@@ -427,7 +427,7 @@ class DatabaseManager:
             query += " WHERE " + " AND ".join(where_clauses)
 
         # Allowed sort fields to prevent SQL injection
-        allowed_sorts = {"id", "timestamp", "income", "prediction", "probability", "risk_level"}
+        allowed_sorts = {"id", "timestamp", "income", "prediction", "probability", "risk_level", "application_id"}
         if sort_by not in allowed_sorts:
             sort_by = "id"
         if order not in {"ASC", "DESC"}:

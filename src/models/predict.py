@@ -119,6 +119,21 @@ class RiskPredictor:
         return list(probs)
 
 
+    def get_model_name(self) -> str:
+        """Returns the human-friendly name of the loaded classifier."""
+        model = self.load_model()
+        if model is None:
+            return "Unknown"
+        class_name = model.__class__.__name__
+        mapping = {
+            "LogisticRegression": "Logistic Regression",
+            "RandomForestClassifier": "Random Forest",
+            "DecisionTreeClassifier": "Decision Tree",
+            "XGBClassifier": "XGBoost",
+        }
+        return mapping.get(class_name, class_name)
+
+
 # Functional API wrapper endpoints for external services
 _predictor = RiskPredictor()
 

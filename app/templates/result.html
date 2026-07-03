@@ -115,7 +115,7 @@
                             {% for factor in support_factors %}
                                 <div class="contribution-row-bar positive">
                                     <span class="fs-7 fw-semibold text-secondary-emphasis">{{ factor.feature }}</span>
-                                    <span class="fs-7 fw-bold font-mono text-success">+{{ factor.weight | round(3) }}</span>
+                                    <span class="fs-7 fw-bold font-mono text-success">+{{ factor.impact | round(3) }}</span>
                                 </div>
                             {% endfor %}
                         {% else %}
@@ -134,7 +134,7 @@
                             {% for factor in risk_factors %}
                                 <div class="contribution-row-bar negative">
                                     <span class="fs-7 fw-semibold text-secondary-emphasis">{{ factor.feature }}</span>
-                                    <span class="fs-7 fw-bold font-mono text-danger">{{ factor.weight | round(3) }}</span>
+                                    <span class="fs-7 fw-bold font-mono text-danger">{{ factor.impact | round(3) }}</span>
                                 </div>
                             {% endfor %}
                         {% else %}

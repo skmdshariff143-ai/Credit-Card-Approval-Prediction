@@ -236,24 +236,29 @@ pytest tests/ -v
 
 ## 🖼️ User Interface & Dashboard Screenshots
 
-### 1. Operations Analytics Dashboard (Desktop & Mobile-ready)
+### 1. Premium Landing Page (Dark Futuristic Theme)
 <p align="center">
-  <img src="docs/images/home_page.png" alt="Analytics Dashboard View" width="700">
+  <img src="docs/images/landing_page_v2.png" alt="CreditGuard AI Landing Page v2.0" width="700">
 </p>
 
-### 2. Model Explainability Interface (LIME Breakdown)
+### 2. Operations Analytics Dashboard (Chart.js)
 <p align="center">
-  <img src="docs/images/approved_result.png" alt="Model Explanation Approved" width="700">
+  <img src="docs/images/dashboard_v2.png" alt="Analytics Dashboard View" width="700">
 </p>
 
-### 3. SQLite Database Query Filters & History Exports
+### 3. Multi-Step Credit Application Wizard
 <p align="center">
-  <img src="docs/images/prediction_history.png" alt="Database Query Filters" width="700">
+  <img src="docs/images/prediction_form_v2.png" alt="5-Step Prediction Form Wizard" width="700">
 </p>
 
-### 4. Correlation Analysis & Outlier Visualizations
+### 4. AI Prediction Result (Confidence Gauge)
 <p align="center">
-  <img src="docs/images/correlation_heatmap.png" alt="Correlation Matrix Heatmap" width="500">
+  <img src="docs/images/result_v2.png" alt="Prediction Result with SVG Gauge" width="700">
+</p>
+
+### 5. Prediction History Ledger
+<p align="center">
+  <img src="docs/images/history_v2.png" alt="Prediction History Data Table" width="700">
 </p>
 
 ---

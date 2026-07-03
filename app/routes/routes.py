@@ -334,7 +334,7 @@ def get_report(application_id):
 @rate_limit(limit_count=60, period_seconds=60)
 def health():
     """Standard health check REST API endpoint with model, database, and uptime information."""
-    from src.models.predict import _predictor
+    from app.services.predict import _predictor
 
     # Model status
     model_status = "loaded" if (_predictor.model is not None and _predictor.pipeline is not None) else "not_loaded"

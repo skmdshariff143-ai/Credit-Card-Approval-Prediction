@@ -120,7 +120,13 @@ class ModelEvaluator:
             indices = np.argsort(importances)[::-1][:15]  # Top 15 features
 
             plt.figure(figsize=(10, 6))
-            sns.barplot(x=importances[indices], y=np.array(feature_names)[indices], palette="viridis")
+            sns.barplot(
+                x=importances[indices],
+                y=np.array(feature_names)[indices],
+                hue=np.array(feature_names)[indices],
+                palette="viridis",
+                legend=False,
+            )
             plt.title(f"Top 15 Feature Importances - {name}", fontsize=12, fontweight="bold")
             plt.xlabel("Relative Importance")
             plt.ylabel("Features")

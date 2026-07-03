@@ -39,7 +39,7 @@
                 <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
                     <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-user-pen text-primary me-2"></i> Update Profile Information</h3>
                 </div>
-                <form method="POST" action="{{ url_for('auth.profile') }}">
+                <form method="POST" action="{{ url_for('auth.profile_edit') }}">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <input type="hidden" name="form_type" value="profile">
 
@@ -73,7 +73,7 @@
         <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
             <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-key text-warning me-2"></i> Modify Account Password</h3>
         </div>
-        <form method="POST" action="{{ url_for('auth.profile') }}">
+        <form method="POST" action="{{ url_for('auth.profile_edit') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="form_type" value="password">
 
@@ -93,7 +93,7 @@
                         <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="new_password">New Password</label>
                         <div class="form-floating-premium">
                             <i class="fa-solid fa-shield-halved form-icon-left"></i>
-                            <input type="password" name="new_password" id="new_password" class="form-control-premium" required minlength="6" placeholder="Enter new password">
+                            <input type="password" name="new_password" id="new_password" class="form-control-premium" required minlength="8" placeholder="Enter new password">
                         </div>
                     </div>
                 </div>
