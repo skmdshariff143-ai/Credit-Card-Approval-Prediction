@@ -1,183 +1,104 @@
 {% extends "base.html" %}
 
-{% block title %}AI Credit Assessment | CreditGuard AI{% endblock %}
+{% block title %}3D AI Assessment | CreditGuard AI{% endblock %}
 {% block page_id %}page-predict{% endblock %}
 
 {% block head %}
 <style>
-  /* ── Ultra-Premium Glassmorphic Input Components ── */
-  .cg-wizard-wrapper {
-    max-width: 720px;
-    margin: 0 auto;
+  /* ── 3D AI Conversational Wizard Styles ── */
+  .cg-assessment-container {
+    max-width: 600px;
+    margin: 40px auto;
+    perspective: 1000px;
   }
 
-  /* Question Cards Layout */
-  .cg-question-section {
-    margin-bottom: 36px;
-    padding-bottom: 24px;
-    border-bottom: 1px solid var(--border);
-  }
-  .cg-question-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-  .cg-question-header {
+  /* Conversational Tracker Header */
+  .cg-assessment-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
+    margin-bottom: 24px;
   }
-  .cg-question-title {
-    font-size: 14.5px;
+  .cg-assessment-counter {
+    font-size: 12.5px;
     font-weight: 700;
-    color: var(--text-primary);
-  }
-  .cg-tooltip-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    font-size: 13px;
-    cursor: pointer;
-    transition: color var(--t-fast) var(--ease);
-    padding: 0;
-  }
-  .cg-tooltip-btn:hover {
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
     color: var(--primary);
   }
-
-  /* Interactive Select Cards (3D elevation) */
-  .cg-interactive-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 12px;
+  .cg-assessment-progress-track {
+    width: 120px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
   }
-  .cg-tile-select {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    padding: 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--t-base) var(--ease);
+  .cg-assessment-progress-bar {
+    height: 100%;
+    background: var(--gradient-primary);
+    width: 0%;
+    transition: width 0.4s var(--ease);
+  }
+
+  /* Question slide animation */
+  .cg-question-slide {
+    display: none;
+    transform-style: preserve-3d;
+    transform: rotateX(5deg);
+    opacity: 0;
+    transition: all 0.4s var(--ease);
+  }
+  .cg-question-slide.active {
+    display: block;
+    opacity: 1;
+    transform: rotateX(0deg);
+    animation: cg-slide-in-card 0.45s var(--ease-spring) forwards;
+  }
+  @keyframes cg-slide-in-card {
+    from { opacity: 0; transform: translateY(30px) rotateX(10deg); }
+    to { opacity: 1; transform: translateY(0) rotateX(0deg); }
+  }
+
+  /* Question visual accents */
+  .cg-question-icon {
+    font-size: 32px;
+    color: var(--primary);
+    margin-bottom: 16px;
+    text-shadow: var(--shadow-glow);
+    display: inline-block;
+  }
+  .cg-question-text {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+  .cg-question-sub {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+
+  /* Keyboard shortcut badges */
+  .cg-shortcut-hint {
+    margin-top: 32px;
     display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
-    gap: 8px;
-    user-select: none;
-    position: relative;
-    box-shadow: var(--shadow-xs);
-  }
-  .cg-tile-select::before {
-    content: ''; position: absolute; inset: 0;
-    background: var(--gradient-card);
-    pointer-events: none;
-  }
-  .cg-tile-select:hover {
-    border-color: rgba(255,255,255,0.15);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-  }
-  .cg-tile-select.active {
-    border-color: var(--primary);
-    background: var(--primary-muted) !important;
-    box-shadow: var(--shadow-glow);
-  }
-  .cg-tile-select.active i {
-    color: var(--primary);
-    transform: scale(1.1);
-  }
-  .cg-tile-select i {
-    font-size: 20px;
-    color: var(--text-muted);
-    transition: all var(--t-base) var(--ease);
-  }
-  .cg-tile-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-  .cg-tile-desc {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: -4px;
-  }
-
-  /* Dual Slider & Number Input Sync Component */
-  .cg-dual-input-container {
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: var(--r-sm);
-    padding: 14px 16px;
-    display: flex;
     align-items: center;
     gap: 16px;
-    transition: border-color var(--t-fast) var(--ease);
-  }
-  .cg-dual-input-container:focus-within {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-muted);
-  }
-  .cg-slider {
-    flex: 1;
-    height: 4px;
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-    accent-color: var(--primary);
-  }
-  .cg-slider-number {
-    width: 100px;
-    background: transparent;
-    border: none;
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 14px;
-    font-weight: 600;
-    text-align: right;
-    outline: none;
-  }
-
-  /* Helper Tooltips */
-  .cg-field-helper {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--text-muted);
-    margin-top: 6px;
-    display: block;
   }
-
-  /* Scrollable Badge List (Occupation selection drawer) */
-  .cg-scroll-drawer {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    max-height: 180px;
-    overflow-y: auto;
-    padding: 8px;
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
+  .cg-key-badge {
     background: var(--bg-input);
-  }
-  .cg-drawer-chip {
-    padding: 6px 12px;
-    border-radius: var(--r-full);
     border: 1px solid var(--border);
-    background: var(--bg-card);
-    font-size: 12.5px;
-    cursor: pointer;
-    transition: all var(--t-fast) var(--ease);
-    color: var(--text-secondary);
-  }
-  .cg-drawer-chip:hover {
-    border-color: rgba(255,255,255,0.15);
-    color: var(--text-primary);
-  }
-  .cg-drawer-chip.active {
-    background: var(--primary-muted);
-    border-color: var(--primary);
-    color: var(--primary);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: var(--font-mono);
     font-weight: 600;
+    font-size: 10px;
+    box-shadow: var(--shadow-xs);
   }
 </style>
 {% endblock %}
@@ -187,53 +108,22 @@
   <div class="cg-breadcrumb">
     <a href="{{ url_for('api.index') }}">Home</a>
     <span class="sep">›</span>
-    <span class="current">AI Assessment</span>
+    <span class="current">Conversational Assessment</span>
   </div>
-  <h1 class="cg-page-title">AI Credit Assessment</h1>
-  <p class="cg-page-desc">Complete the glassmorphic assessment panel to generate credit authorization files.</p>
+  <h1 class="cg-page-title">AI Assessment Wizard</h1>
+  <p class="cg-page-desc">Answer the conversational telemetry checklist below to submit scoring records.</p>
 </div>
 
-<!-- Wizard Container -->
-<div class="cg-wizard-wrapper">
-  <!-- Stepper Track -->
-  <div class="cg-wizard-track cg-mb-xl" data-reveal="0s">
-    <div class="cg-step-item">
-      <div class="cg-step-node active" id="stepNode1">
-        <div class="cg-step-circle">1</div>
-        <span class="cg-step-label">Personal</span>
-      </div>
-      <div class="cg-step-line" id="stepLine1"></div>
-    </div>
-    <div class="cg-step-item">
-      <div class="cg-step-node" id="stepNode2">
-        <div class="cg-step-circle">2</div>
-        <span class="cg-step-label">Employment</span>
-      </div>
-      <div class="cg-step-line" id="stepLine2"></div>
-    </div>
-    <div class="cg-step-item">
-      <div class="cg-step-node" id="stepNode3">
-        <div class="cg-step-circle">3</div>
-        <span class="cg-step-label">Financial</span>
-      </div>
-      <div class="cg-step-line" id="stepLine3"></div>
-    </div>
-    <div class="cg-step-item">
-      <div class="cg-step-node" id="stepNode4">
-        <div class="cg-step-circle">4</div>
-        <span class="cg-step-label">Review</span>
-      </div>
-      <div class="cg-step-line" id="stepLine4"></div>
-    </div>
-    <div class="cg-step-item">
-      <div class="cg-step-node" id="stepNode5">
-        <div class="cg-step-circle">5</div>
-        <span class="cg-step-label">AI Decision</span>
-      </div>
+<!-- 3D Conversational Wizard Container -->
+<div class="cg-assessment-container">
+  <!-- Interactive Header -->
+  <div class="cg-assessment-header">
+    <span class="cg-assessment-counter" id="slideCounter">Assessment 1 of 12</span>
+    <div class="cg-assessment-progress-track">
+      <div class="cg-assessment-progress-bar" id="progressBar"></div>
     </div>
   </div>
 
-  <!-- Form Wizard -->
   <form method="POST" action="{{ url_for('api.predict_post') }}" id="predictForm">
     {{ form.hidden_tag() }}
 
@@ -248,279 +138,388 @@
     <input type="hidden" name="flag_phone" value="False">
     <input type="hidden" name="flag_email" value="False">
 
-    <!-- STEP 1: Personal Information -->
-    <div class="cg-wizard-panel active" id="panel1">
-      <div class="cg-card">
-        <!-- Question 1: Gender -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">1. Legal Registry Gender</span>
-            <span class="cg-tooltip-btn" title="Applicant registry gender format"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-interactive-grid">
-            <div class="cg-tile-select" onclick="selectCardOption('code_gender', 'M', this)">
-              <i class="fa-solid fa-mars"></i>
-              <span class="cg-tile-title">Male</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('code_gender', 'F', this)">
-              <i class="fa-solid fa-venus"></i>
-              <span class="cg-tile-title">Female</span>
-            </div>
-          </div>
-          {{ form.code_gender(style='display:none;', id='code_gender') }}
-        </div>
+    <!-- QUESTION 1: Gender -->
+    <div class="cg-question-slide active" id="slide1">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-venus-mars"></i></span>
+        <h2 class="cg-question-text">What is your gender?</h2>
+        <p class="cg-question-sub">Legal gender registry specification.</p>
 
-        <!-- Question 2: Age -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">2. Applicant Age</span>
-            <span class="cg-tooltip-btn" title="Applicant legal age index"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-dual-input-container">
-            <input type="range" class="cg-slider" min="18" max="100" value="30" id="age_slider" oninput="syncDualInput('age_slider', 'age_years')">
-            {{ form.age_years(class='cg-slider-number', id='age_years', placeholder='30', oninput="syncDualInput('age_years', 'age_slider')", required=True) }}
-          </div>
-          <small class="cg-field-helper">Drag slider or enter number directly (18-100)</small>
+        <div class="cg-interactive-grid">
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('code_gender', 'M', this, 1)">
+            <i class="fa-solid fa-mars"></i>
+            <span class="cg-tile-title">Male</span>
+            <span class="cg-key-badge" style="margin-top:8px;">Key 1</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('code_gender', 'F', this, 1)">
+            <i class="fa-solid fa-venus"></i>
+            <span class="cg-tile-title">Female</span>
+            <span class="cg-key-badge" style="margin-top:8px;">Key 2</span>
+          </button>
         </div>
+        {{ form.code_gender(style='display:none;', id='code_gender') }}
 
-        <!-- Question 3: Marital Status -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">3. Marital Standing</span>
-            <span class="cg-tooltip-btn" title="Marital registry declaration"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-interactive-grid">
-            <div class="cg-tile-select" onclick="selectCardOption('name_family_status', 'Married', this)">
-              <i class="fa-solid fa-ring"></i>
-              <span class="cg-tile-title">Married</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('name_family_status', 'Single / not married', this)">
-              <i class="fa-solid fa-user"></i>
-              <span class="cg-tile-title">Single</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('name_family_status', 'Civil marriage', this)">
-              <i class="fa-solid fa-user-group"></i>
-              <span class="cg-tile-title">Partnership</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('name_family_status', 'Separated', this)">
-              <i class="fa-solid fa-heart-crack"></i>
-              <span class="cg-tile-title">Separated</span>
-            </div>
-          </div>
-          {{ form.name_family_status(style='display:none;', id='name_family_status') }}
-        </div>
-
-        <!-- Question 4: Education -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">4. Educational Standing</span>
-            <span class="cg-tooltip-btn" title="Highest completed educational program"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-interactive-grid">
-            <div class="cg-tile-select" onclick="selectCardOption('name_education_type', 'Secondary / secondary special', this)">
-              <i class="fa-solid fa-school"></i>
-              <span class="cg-tile-title">Secondary</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('name_education_type', 'Higher education', this)">
-              <i class="fa-solid fa-graduation-cap"></i>
-              <span class="cg-tile-title">Higher Edu</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('name_education_type', 'Incomplete higher', this)">
-              <i class="fa-solid fa-book-open"></i>
-              <span class="cg-tile-title">Incomplete</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('name_education_type', 'Academic degree', this)">
-              <i class="fa-solid fa-award"></i>
-              <span class="cg-tile-title">Degree</span>
-            </div>
-          </div>
-          {{ form.name_education_type(style='display:none;', id='name_education_type') }}
-        </div>
-
-        <div class="cg-flex-between cg-mt-lg">
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
           <div></div>
-          <button type="button" class="cg-btn cg-btn-primary" onclick="goToStep(1)">
-            Next Step <i class="fa-solid fa-arrow-right"></i>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(1)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- STEP 2: Employment -->
-    <div class="cg-wizard-panel" id="panel2">
-      <div class="cg-card">
-        <!-- Occupation Drawer list -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">5. Occupation Classification</span>
-            <span class="cg-tooltip-btn" title="Primary occupation classification label"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-scroll-drawer">
-            {% for choice_val, choice_lbl in form.occupation_type.choices %}
-              <div class="cg-drawer-chip" onclick="selectChipOption('occupation_type', '{{ choice_val }}', this)">
-                {{ choice_lbl }}
-              </div>
-            {% endfor %}
-          </div>
-          {{ form.occupation_type(style='display:none;', id='occupation_type') }}
+    <!-- QUESTION 2: Age -->
+    <div class="cg-question-slide" id="slide2">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-calendar-days"></i></span>
+        <h2 class="cg-question-text">How old are you?</h2>
+        <p class="cg-question-sub">Enter age index (18-100 years).</p>
+
+        <div class="cg-dual-input-container">
+          <input type="range" class="cg-slider" min="18" max="100" value="30" id="age_slider" oninput="syncDualInput('age_slider', 'age_years')">
+          {{ form.age_years(class='cg-slider-number', id='age_years', placeholder='30', oninput="syncDualInput('age_years', 'age_slider')", required=True) }}
         </div>
 
-        <!-- Employment Type -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">6. Employment Sector Contract</span>
-            <span class="cg-tooltip-btn" title="Applicant employment structure status"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-interactive-grid">
-            <div class="cg-tile-select" onclick="selectCardOption('employment_type', 'Full-time', this)">
-              <i class="fa-solid fa-briefcase"></i>
-              <span class="cg-tile-title">Full-time</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('employment_type', 'Part-time', this)">
-              <i class="fa-solid fa-clock"></i>
-              <span class="cg-tile-title">Part-time</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('employment_type', 'Self-employed', this)">
-              <i class="fa-solid fa-user-gear"></i>
-              <span class="cg-tile-title">Freelancer</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('employment_type', 'Contract', this)">
-              <i class="fa-solid fa-file-signature"></i>
-              <span class="cg-tile-title">Contract</span>
-            </div>
-          </div>
-          {{ form.employment_type(style='display:none;', id='employment_type') }}
-        </div>
-
-        <!-- Experience Slider -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">7. Years of Employment</span>
-            <span class="cg-tooltip-btn" title="Total continuous experience duration"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-dual-input-container">
-            <input type="range" class="cg-slider" min="0" max="60" value="5" id="exp_slider" oninput="syncDualInput('exp_slider', 'years_employed')">
-            {{ form.years_employed(class='cg-slider-number', id='years_employed', placeholder='5', oninput="syncDualInput('years_employed', 'exp_slider')", required=True) }}
-          </div>
-          <small class="cg-field-helper">Employment duration experience (0-60)</small>
-        </div>
-
-        <!-- Income Source -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">8. Principal Income Flow Source</span>
-            <span class="cg-tooltip-btn" title="Primary cash flow source registry"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-interactive-grid">
-            <div class="cg-tile-select" onclick="selectCardOption('income_source', 'Salary', this)">
-              <i class="fa-solid fa-money-bill-wave"></i>
-              <span class="cg-tile-title">Wages / Salary</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('income_source', 'Business', this)">
-              <i class="fa-solid fa-store"></i>
-              <span class="cg-tile-title">Business Operations</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('income_source', 'Pension', this)">
-              <i class="fa-solid fa-receipt"></i>
-              <span class="cg-tile-title">Pension</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('income_source', 'Investments', this)">
-              <i class="fa-solid fa-chart-line"></i>
-              <span class="cg-tile-title">Investments</span>
-            </div>
-          </div>
-          {{ form.income_source(style='display:none;', id='income_source') }}
-        </div>
-
-        <div class="cg-flex-between cg-mt-lg">
-          <button type="button" class="cg-btn cg-btn-secondary" onclick="goToStep(0)">
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(2)">
             <i class="fa-solid fa-arrow-left"></i> Back
           </button>
-          <button type="button" class="cg-btn cg-btn-primary" onclick="goToStep(2)">
-            Next Step <i class="fa-solid fa-arrow-right"></i>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(2)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- STEP 3: Financial Details -->
-    <div class="cg-wizard-panel" id="panel3">
-      <div class="cg-card">
-        <!-- Annual Income -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">9. Annual Gross Income ($)</span>
-            <span class="cg-tooltip-btn" title="Total gross income received annually"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-dual-input-container">
-            <input type="range" class="cg-slider" min="1000" max="1000000" step="5000" value="150000" id="income_slider" oninput="syncDualInput('income_slider', 'amt_income_total')">
-            {{ form.amt_income_total(class='cg-slider-number', id='amt_income_total', placeholder='150000', oninput="syncDualInput('amt_income_total', 'income_slider')", required=True) }}
-          </div>
-        </div>
+    <!-- QUESTION 3: Marital Status -->
+    <div class="cg-question-slide" id="slide3">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-heart"></i></span>
+        <h2 class="cg-question-text">What is your marital standing?</h2>
+        <p class="cg-question-sub">Select family registry declaration.</p>
 
-        <!-- Debt -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">10. Existing Outstanding Debt ($)</span>
-            <span class="cg-tooltip-btn" title="Outstanding financial liabilities"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-dual-input-container">
-            <input type="range" class="cg-slider" min="0" max="500000" step="2500" value="0" id="debt_slider" oninput="syncDualInput('debt_slider', 'existing_debt')">
-            {{ form.existing_debt(class='cg-slider-number', id='existing_debt', placeholder='0', oninput="syncDualInput('existing_debt', 'debt_slider')", required=True) }}
-          </div>
+        <div class="cg-interactive-grid">
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_family_status', 'Married', this, 3)">
+            <i class="fa-solid fa-ring"></i>
+            <span class="cg-tile-title">Married</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 1</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_family_status', 'Single / not married', this, 3)">
+            <i class="fa-solid fa-user"></i>
+            <span class="cg-tile-title">Single</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 2</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_family_status', 'Civil marriage', this, 3)">
+            <i class="fa-solid fa-user-group"></i>
+            <span class="cg-tile-title">Partnership</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 3</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_family_status', 'Separated', this, 3)">
+            <i class="fa-solid fa-heart-crack"></i>
+            <span class="cg-tile-title">Separated</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 4</span>
+          </button>
         </div>
+        {{ form.name_family_status(style='display:none;', id='name_family_status') }}
 
-        <!-- Bureau rating -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">11. Bureau Credit History Rating</span>
-            <span class="cg-tooltip-btn" title="Official rating in bureau registry records"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-interactive-grid">
-            <div class="cg-tile-select" onclick="selectCardOption('credit_history', 'Good', this)">
-              <i class="fa-solid fa-circle-check" style="color:var(--success);"></i>
-              <span class="cg-tile-title">Excellent</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('credit_history', 'Average', this)">
-              <i class="fa-solid fa-circle-pause" style="color:var(--warning);"></i>
-              <span class="cg-tile-title">Fair</span>
-            </div>
-            <div class="cg-tile-select" onclick="selectCardOption('credit_history', 'Bad', this)">
-              <i class="fa-solid fa-circle-exclamation" style="color:var(--danger);"></i>
-              <span class="cg-tile-title">Bureau Default</span>
-            </div>
-          </div>
-          {{ form.credit_history(style='display:none;', id='credit_history') }}
-        </div>
-
-        <!-- Loan limit -->
-        <div class="cg-question-section">
-          <div class="cg-question-header">
-            <span class="cg-question-title">12. Requested Facility Limit ($)</span>
-            <span class="cg-tooltip-btn" title="Total credit line requested"><i class="fa-solid fa-circle-info"></i></span>
-          </div>
-          <div class="cg-dual-input-container">
-            <input type="range" class="cg-slider" min="500" max="250000" step="1000" value="10000" id="loan_slider" oninput="syncDualInput('loan_slider', 'loan_amount')">
-            {{ form.loan_amount(class='cg-slider-number', id='loan_amount', placeholder='10000', oninput="syncDualInput('loan_amount', 'loan_slider')", required=True) }}
-          </div>
-        </div>
-
-        <div class="cg-flex-between cg-mt-lg">
-          <button type="button" class="cg-btn cg-btn-secondary" onclick="goToStep(1)">
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(3)">
             <i class="fa-solid fa-arrow-left"></i> Back
           </button>
-          <button type="button" class="cg-btn cg-btn-primary" onclick="goToStep(3)">
-            Next Step <i class="fa-solid fa-arrow-right"></i>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(3)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- STEP 4: Review -->
-    <div class="cg-wizard-panel" id="panel4">
+    <!-- QUESTION 4: Education -->
+    <div class="cg-question-slide" id="slide4">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-graduation-cap"></i></span>
+        <h2 class="cg-question-text">Highest educational standing?</h2>
+        <p class="cg-question-sub">Select completed education level.</p>
+
+        <div class="cg-interactive-grid">
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_education_type', 'Secondary / secondary special', this, 4)">
+            <i class="fa-solid fa-school"></i>
+            <span class="cg-tile-title">Secondary</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 1</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_education_type', 'Higher education', this, 4)">
+            <i class="fa-solid fa-award"></i>
+            <span class="cg-tile-title">Higher Edu</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 2</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_education_type', 'Incomplete higher', this, 4)">
+            <i class="fa-solid fa-book-open"></i>
+            <span class="cg-tile-title">Incomplete</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 3</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('name_education_type', 'Academic degree', this, 4)">
+            <i class="fa-solid fa-trophy"></i>
+            <span class="cg-tile-title">Degree</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 4</span>
+          </button>
+        </div>
+        {{ form.name_education_type(style='display:none;', id='name_education_type') }}
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(4)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(4)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 5: Occupation -->
+    <div class="cg-question-slide" id="slide5">
+      <div class="cg-card" style="padding: 32px 24px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-briefcase"></i></span>
+        <h2 class="cg-question-text">What is your occupation?</h2>
+        <p class="cg-question-sub">Select primary occupation classification.</p>
+
+        <div class="cg-scroll-drawer">
+          {% for choice_val, choice_lbl in form.occupation_type.choices %}
+            <div class="cg-drawer-chip" onclick="selectChipValue('occupation_type', '{{ choice_val }}', this, 5)">
+              {{ choice_lbl }}
+            </div>
+          {% endfor %}
+        </div>
+        {{ form.occupation_type(style='display:none;', id='occupation_type') }}
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(5)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(5)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 6: Employment contract -->
+    <div class="cg-question-slide" id="slide6">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-file-contract"></i></span>
+        <h2 class="cg-question-text">Employment contract sector?</h2>
+        <p class="cg-question-sub">Employment classification status.</p>
+
+        <div class="cg-interactive-grid">
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('employment_type', 'Full-time', this, 6)">
+            <i class="fa-solid fa-user-tie"></i>
+            <span class="cg-tile-title">Full-time</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 1</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('employment_type', 'Part-time', this, 6)">
+            <i class="fa-solid fa-user-clock"></i>
+            <span class="cg-tile-title">Part-time</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 2</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('employment_type', 'Self-employed', this, 6)">
+            <i class="fa-solid fa-user-gear"></i>
+            <span class="cg-tile-title">Freelance</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 3</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('employment_type', 'Contract', this, 6)">
+            <i class="fa-solid fa-file-signature"></i>
+            <span class="cg-tile-title">Contract</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 4</span>
+          </button>
+        </div>
+        {{ form.employment_type(style='display:none;', id='employment_type') }}
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(6)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(6)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 7: Years Employed -->
+    <div class="cg-question-slide" id="slide7">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-timeline"></i></span>
+        <h2 class="cg-question-text">Years of continuous experience?</h2>
+        <p class="cg-question-sub">Drag slider or input directly (0-60 years).</p>
+
+        <div class="cg-dual-input-container">
+          <input type="range" class="cg-slider" min="0" max="60" value="5" id="exp_slider" oninput="syncDualInput('exp_slider', 'years_employed')">
+          {{ form.years_employed(class='cg-slider-number', id='years_employed', placeholder='5', oninput="syncDualInput('years_employed', 'exp_slider')", required=True) }}
+        </div>
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(7)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(7)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 8: Income Source -->
+    <div class="cg-question-slide" id="slide8">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-sack-dollar"></i></span>
+        <h2 class="cg-question-text">What is your income source?</h2>
+        <p class="cg-question-sub">Select primary cash flow registry source.</p>
+
+        <div class="cg-interactive-grid">
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('income_source', 'Salary', this, 8)">
+            <i class="fa-solid fa-money-bill-wave"></i>
+            <span class="cg-tile-title">Wages / Salary</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 1</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('income_source', 'Business', this, 8)">
+            <i class="fa-solid fa-store"></i>
+            <span class="cg-tile-title">Business</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 2</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('income_source', 'Pension', this, 8)">
+            <i class="fa-solid fa-receipt"></i>
+            <span class="cg-tile-title">Pension</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 3</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('income_source', 'Investments', this, 8)">
+            <i class="fa-solid fa-chart-line"></i>
+            <span class="cg-tile-title">Investments</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 4</span>
+          </button>
+        </div>
+        {{ form.income_source(style='display:none;', id='income_source') }}
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(8)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(8)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 9: Annual Income -->
+    <div class="cg-question-slide" id="slide9">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-wallet"></i></span>
+        <h2 class="cg-question-text">Annual gross income ($)?</h2>
+        <p class="cg-question-sub">Enter total annual incoming flow value.</p>
+
+        <div class="cg-dual-input-container">
+          <input type="range" class="cg-slider" min="1000" max="1000000" step="5000" value="150000" id="income_slider" oninput="syncDualInput('income_slider', 'amt_income_total')">
+          {{ form.amt_income_total(class='cg-slider-number', id='amt_income_total', placeholder='150000', oninput="syncDualInput('amt_income_total', 'income_slider')", required=True) }}
+        </div>
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(9)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(9)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 10: Debt -->
+    <div class="cg-question-slide" id="slide10">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-credit-card"></i></span>
+        <h2 class="cg-question-text">Existing outstanding debt ($)?</h2>
+        <p class="cg-question-sub">Enter active liabilities outstanding debt.</p>
+
+        <div class="cg-dual-input-container">
+          <input type="range" class="cg-slider" min="0" max="500000" step="2500" value="0" id="debt_slider" oninput="syncDualInput('debt_slider', 'existing_debt')">
+          {{ form.existing_debt(class='cg-slider-number', id='existing_debt', placeholder='0', oninput="syncDualInput('existing_debt', 'debt_slider')", required=True) }}
+        </div>
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(10)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(10)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 11: Credit Bureau Rating -->
+    <div class="cg-question-slide" id="slide11">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
+        <h2 class="cg-question-text">Bureau credit rating history?</h2>
+        <p class="cg-question-sub">Official bureau credit history registry status.</p>
+
+        <div class="cg-interactive-grid">
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('credit_history', 'Good', this, 11)">
+            <i class="fa-solid fa-circle-check" style="color:var(--success);"></i>
+            <span class="cg-tile-title">Excellent</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 1</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('credit_history', 'Average', this, 11)">
+            <i class="fa-solid fa-circle-pause" style="color:var(--warning);"></i>
+            <span class="cg-tile-title">Fair</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 2</span>
+          </button>
+          <button type="button" class="cg-tile-select" onclick="selectCardValue('credit_history', 'Bad', this, 11)">
+            <i class="fa-solid fa-circle-exclamation" style="color:var(--danger);"></i>
+            <span class="cg-tile-title">Bureau Default</span>
+            <span class="cg-key-badge" style="margin-top:6px;">Key 3</span>
+          </button>
+        </div>
+        {{ form.credit_history(style='display:none;', id='credit_history') }}
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(11)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(11)">
+            Next Question <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUESTION 12: Requested Limit -->
+    <div class="cg-question-slide" id="slide12">
+      <div class="cg-card" style="padding: 40px 32px;">
+        <span class="cg-question-icon"><i class="fa-solid fa-hand-holding-dollar"></i></span>
+        <h2 class="cg-question-text">Requested credit limit ($)?</h2>
+        <p class="cg-question-sub">Target card facility requested limit.</p>
+
+        <div class="cg-dual-input-container">
+          <input type="range" class="cg-slider" min="500" max="250000" step="1000" value="10000" id="loan_slider" oninput="syncDualInput('loan_slider', 'loan_amount')">
+          {{ form.loan_amount(class='cg-slider-number', id='loan_amount', placeholder='10000', oninput="syncDualInput('loan_amount', 'loan_slider')", required=True) }}
+        </div>
+
+        <div class="cg-flex-between cg-mt-xl" style="border-top:1px solid var(--border);padding-top:20px;">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(12)">
+            <i class="fa-solid fa-arrow-left"></i> Back
+          </button>
+          <button type="button" class="cg-btn cg-btn-primary" onclick="nextSlide(12)">
+            Review Specifications <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 13: Summary Review -->
+    <div class="cg-question-slide" id="slide13">
       <div class="cg-card">
         <h3 style="font-size:16px;font-weight:700;margin-bottom:6px;">
-          <i class="fa-solid fa-clipboard-check" style="color:var(--primary);margin-right:8px;"></i> Application Review
+          <i class="fa-solid fa-clipboard-check" style="color:var(--primary);margin-right:8px;"></i> Review Summary
         </h3>
         <p class="cg-text-xs cg-text-muted cg-mb-md">Confirm all telemetry specifications prior to prediction execution.</p>
 
@@ -529,7 +528,7 @@
         </div>
 
         <div class="cg-flex-between">
-          <button type="button" class="cg-btn cg-btn-secondary" onclick="goToStep(2)">
+          <button type="button" class="cg-btn cg-btn-secondary" onclick="prevSlide(13)">
             <i class="fa-solid fa-arrow-left"></i> Back
           </button>
           <button type="button" class="cg-btn cg-btn-primary cg-btn-lg" onclick="triggerDecisionScanning()">
@@ -539,8 +538,8 @@
       </div>
     </div>
 
-    <!-- STEP 5: AI Prediction (Loading) -->
-    <div class="cg-wizard-panel" id="panel5">
+    <!-- STEP 14: AI Scanning Progress loader -->
+    <div class="cg-question-slide" id="slide14">
       <div class="cg-card">
         <div class="cg-scan-wrapper">
           <div class="cg-scan-ring">
@@ -559,17 +558,27 @@
       </div>
     </div>
   </form>
+
+  <!-- Keyboard hints -->
+  <div class="cg-shortcut-hint" id="keyboardHint">
+    <span>Navigation:</span>
+    <span><span class="cg-key-badge">Enter</span> next</span>
+    <span><span class="cg-key-badge">Backspace</span> back</span>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-  let currentStepIndex = 0;
-  const panels = Array.from(document.querySelectorAll('.cg-wizard-panel'));
-  const nodes = Array.from(document.querySelectorAll('.cg-step-node'));
-  const lines = Array.from(document.querySelectorAll('.cg-step-line'));
+  let activeSlideIdx = 1;
+  const totalSlides = 14;
 
-  function selectCardOption(fieldId, value, element) {
+  document.addEventListener('DOMContentLoaded', () => {
+    updateSlideView();
+    bindKeyboardEvents();
+  });
+
+  function selectCardValue(fieldId, value, element, currentSlide) {
     const select = document.getElementById(fieldId);
     if (select) {
       select.value = value;
@@ -579,9 +588,14 @@
     const grid = element.parentElement;
     grid.querySelectorAll('.cg-tile-select').forEach(c => c.classList.remove('active'));
     element.classList.add('active');
+
+    // Smooth auto-transition delay (300ms) for select card inputs
+    setTimeout(() => {
+      nextSlide(currentSlide);
+    }, 300);
   }
 
-  function selectChipOption(fieldId, value, element) {
+  function selectChipValue(fieldId, value, element, currentSlide) {
     const select = document.getElementById(fieldId);
     if (select) {
       select.value = value;
@@ -591,6 +605,10 @@
     const container = element.parentElement;
     container.querySelectorAll('.cg-drawer-chip').forEach(c => c.classList.remove('active'));
     element.classList.add('active');
+
+    setTimeout(() => {
+      nextSlide(currentSlide);
+    }, 300);
   }
 
   function syncDualInput(sourceId, targetId) {
@@ -601,87 +619,124 @@
     }
   }
 
-  function goToStep(stepIndex) {
-    // Step 1 Validation
-    if (stepIndex === 1 && currentStepIndex === 0) {
+  function updateSlideView() {
+    // Show only active slide
+    for (let i = 1; i <= totalSlides; i++) {
+      const slide = document.getElementById('slide' + i);
+      if (slide) {
+        slide.classList.toggle('active', i === activeSlideIdx);
+      }
+    }
+
+    // Hide navigation hints on review and scanning screens
+    const hintEl = document.getElementById('keyboardHint');
+    if (hintEl) {
+      hintEl.style.display = activeSlideIdx >= 13 ? 'none' : 'flex';
+    }
+
+    // Update progress tracker
+    if (activeSlideIdx <= 12) {
+      document.getElementById('slideCounter').textContent = `Question ${activeSlideIdx} of 12`;
+      const pct = ((activeSlideIdx - 1) / 12) * 100;
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('slideCounter').style.display = 'inline-block';
+      document.getElementById('progressBar').parentElement.style.display = 'block';
+    } else {
+      document.getElementById('slideCounter').style.display = 'none';
+      document.getElementById('progressBar').parentElement.style.display = 'none';
+    }
+  }
+
+  function validateSlide(slideIdx) {
+    if (slideIdx === 1) {
       if (!document.getElementById('code_gender').value) {
         CG.Toast.show('Please select a gender option.', 'warning');
-        return;
+        return false;
       }
+    } else if (slideIdx === 2) {
       const age = parseFloat(document.getElementById('age_years').value);
       if (isNaN(age) || age < 18 || age > 100) {
         CG.Toast.show('Please enter a valid age between 18 and 100.', 'warning');
-        return;
+        return false;
       }
+    } else if (slideIdx === 3) {
       if (!document.getElementById('name_family_status').value) {
-        CG.Toast.show('Please select a marital standing.', 'warning');
-        return;
+        CG.Toast.show('Please select marital status.', 'warning');
+        return false;
       }
+    } else if (slideIdx === 4) {
       if (!document.getElementById('name_education_type').value) {
-        CG.Toast.show('Please select an education level.', 'warning');
-        return;
+        CG.Toast.show('Please select educational standing.', 'warning');
+        return false;
       }
-    }
-    // Step 2 Validation
-    else if (stepIndex === 2 && currentStepIndex === 1) {
+    } else if (slideIdx === 5) {
       if (!document.getElementById('occupation_type').value) {
-        CG.Toast.show('Please select an occupation.', 'warning');
-        return;
+        CG.Toast.show('Please select occupation classification.', 'warning');
+        return false;
       }
+    } else if (slideIdx === 6) {
       if (!document.getElementById('employment_type').value) {
-        CG.Toast.show('Please select employment contract.', 'warning');
-        return;
+        CG.Toast.show('Please select employment contract sector.', 'warning');
+        return false;
       }
+    } else if (slideIdx === 7) {
       const exp = parseFloat(document.getElementById('years_employed').value);
       if (isNaN(exp) || exp < 0 || exp > 60) {
         CG.Toast.show('Please enter valid experience years.', 'warning');
-        return;
+        return false;
       }
+    } else if (slideIdx === 8) {
       if (!document.getElementById('income_source').value) {
-        CG.Toast.show('Please select an income source.', 'warning');
-        return;
+        CG.Toast.show('Please select income flow source.', 'warning');
+        return false;
       }
-    }
-    // Step 3 Validation
-    else if (stepIndex === 3 && currentStepIndex === 2) {
+    } else if (slideIdx === 9) {
       const inc = parseFloat(document.getElementById('amt_income_total').value);
       if (isNaN(inc) || inc <= 1000) {
         CG.Toast.show('Please enter annual income (> $1,000).', 'warning');
-        return;
+        return false;
       }
+    } else if (slideIdx === 10) {
       const debt = parseFloat(document.getElementById('existing_debt').value);
       if (isNaN(debt) || debt < 0) {
         CG.Toast.show('Please enter outstanding debt liabilities.', 'warning');
-        return;
+        return false;
       }
+    } else if (slideIdx === 11) {
       if (!document.getElementById('credit_history').value) {
-        CG.Toast.show('Please select credit bureau rating.', 'warning');
-        return;
+        CG.Toast.show('Please select credit bureau rating history.', 'warning');
+        return false;
       }
+    } else if (slideIdx === 12) {
       const limit = parseFloat(document.getElementById('loan_amount').value);
       if (isNaN(limit) || limit < 0) {
-        CG.Toast.show('Please enter requested credit facility limit.', 'warning');
-        return;
+        CG.Toast.show('Please enter requested facility limit.', 'warning');
+        return false;
       }
     }
+    return true;
+  }
 
-    currentStepIndex = stepIndex;
-
-    panels.forEach((p, idx) => p.classList.toggle('active', idx === stepIndex));
-
-    nodes.forEach((n, idx) => {
-      n.classList.remove('active', 'done');
-      if (idx < stepIndex) n.classList.add('done');
-      else if (idx === stepIndex) n.classList.add('active');
-    });
-
-    lines.forEach((l, idx) => {
-      l.classList.toggle('done', idx < stepIndex);
-    });
-
-    if (stepIndex === 3) {
-      populateReviewSummary();
+  function nextSlide(currentSlide) {
+    if (validateSlide(currentSlide)) {
+      activeSlideIdx = currentSlide + 1;
+      if (activeSlideIdx === 13) {
+        populateReviewSummary();
+      }
+      updateSlideView();
     }
+  }
+
+  function prevSlide(currentSlide) {
+    if (currentSlide > 1) {
+      activeSlideIdx = currentSlide - 1;
+      updateSlideView();
+    }
+  }
+
+  function jumpToSlide(slideIdx) {
+    activeSlideIdx = slideIdx;
+    updateSlideView();
   }
 
   function populateReviewSummary() {
@@ -691,32 +746,29 @@
     const sections = [
       {
         title: 'Personal Specifications',
-        step: 0,
         fields: [
-          { id: 'code_gender', label: 'Legal Registry Gender', map: (v) => v === 'M' ? 'Male' : 'Female' },
-          { id: 'age_years', label: 'Age index', suffix: ' Years' },
-          { id: 'name_family_status', label: 'Marital Standing' },
-          { id: 'name_education_type', label: 'Educational Standing' }
+          { id: 'code_gender', label: 'Legal Registry Gender', map: (v) => v === 'M' ? 'Male' : 'Female', slide: 1 },
+          { id: 'age_years', label: 'Age index', suffix: ' Years', slide: 2 },
+          { id: 'name_family_status', label: 'Marital Standing', slide: 3 },
+          { id: 'name_education_type', label: 'Educational Standing', slide: 4 }
         ]
       },
       {
         title: 'Employment Specifications',
-        step: 1,
         fields: [
-          { id: 'occupation_type', label: 'Occupation Label' },
-          { id: 'employment_type', label: 'Sector contract' },
-          { id: 'years_employed', label: 'Experience duration', suffix: ' Years' },
-          { id: 'income_source', label: 'Income Source' }
+          { id: 'occupation_type', label: 'Occupation Label', slide: 5 },
+          { id: 'employment_type', label: 'Sector contract', slide: 6 },
+          { id: 'years_employed', label: 'Experience duration', suffix: ' Years', slide: 7 },
+          { id: 'income_source', label: 'Income Source', slide: 8 }
         ]
       },
       {
         title: 'Financial Specifications',
-        step: 2,
         fields: [
-          { id: 'amt_income_total', label: 'Annual Income', prefix: '$', format: true },
-          { id: 'existing_debt', label: 'Outstanding Debt', prefix: '$', format: true },
-          { id: 'credit_history', label: 'Credit Bureau Rating' },
-          { id: 'loan_amount', label: 'Requested Limit', prefix: '$', format: true }
+          { id: 'amt_income_total', label: 'Annual Income', prefix: '$', format: true, slide: 9 },
+          { id: 'existing_debt', label: 'Outstanding Debt', prefix: '$', format: true, slide: 10 },
+          { id: 'credit_history', label: 'Credit Bureau Rating', slide: 11 },
+          { id: 'loan_amount', label: 'Requested Limit', prefix: '$', format: true, slide: 12 }
         ]
       }
     ];
@@ -727,9 +779,6 @@
         <div class="cg-card" style="padding:16px;">
           <div class="cg-flex-between" style="margin-bottom:12px;">
             <h4 style="font-size:13px;font-weight:700;">${sec.title}</h4>
-            <button type="button" class="cg-btn cg-btn-ghost cg-btn-sm" style="padding:4px 8px;" onclick="goToStep(${sec.step})">
-              <i class="fa-solid fa-pen-to-square"></i> Edit
-            </button>
           </div>
           <div style="display:grid;grid-template-columns:1fr;gap:8px;font-size:12.5px;">
       `;
@@ -748,7 +797,12 @@
         html += `
           <div class="cg-flex-between">
             <span class="cg-text-muted">${f.label}</span>
-            <span class="cg-text-primary cg-font-semibold">${val}</span>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span class="cg-text-primary cg-font-semibold">${val}</span>
+              <button type="button" class="cg-btn cg-btn-ghost cg-btn-sm" style="padding:2px 4px;font-size:11px;" onclick="jumpToSlide(${f.slide})">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+            </div>
           </div>
         `;
       });
@@ -760,7 +814,8 @@
   }
 
   function triggerDecisionScanning() {
-    goToStep(4);
+    activeSlideIdx = 14;
+    updateSlideView();
 
     const titleEl = document.getElementById('scanTitle');
     const descEl = document.getElementById('scanDesc');
@@ -791,6 +846,42 @@
     };
 
     setTimeout(runScanStep, 200);
+  }
+
+  function bindKeyboardEvents() {
+    document.addEventListener('keydown', (e) => {
+      // Avoid interference if focused on text input fields
+      if (document.activeElement.tagName === 'INPUT' && document.activeElement.type === 'text') {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          nextSlide(activeSlideIdx);
+        }
+        return;
+      }
+
+      if (activeSlideIdx <= 12) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          nextSlide(activeSlideIdx);
+        } else if (e.key === 'Backspace') {
+          e.preventDefault();
+          prevSlide(activeSlideIdx);
+        }
+
+        // Numeric mappings for options
+        const activeSlideEl = document.getElementById('slide' + activeSlideIdx);
+        if (activeSlideEl) {
+          const options = Array.from(activeSlideEl.querySelectorAll('.cg-tile-select'));
+          if (options.length > 0) {
+            const keyNum = parseInt(e.key);
+            if (!isNaN(keyNum) && keyNum >= 1 && keyNum <= options.length) {
+              e.preventDefault();
+              options[keyNum - 1].click();
+            }
+          }
+        }
+      }
+    });
   }
 </script>
 {% endblock %}
