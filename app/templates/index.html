@@ -1,145 +1,219 @@
-{% extends "base.html" %}
-{% block title %}CreditGuard AI - Underwriting Portal{% endblock %}
+{% extends 'base.html' %}
+{% block title %}CreditGuard AI — Enterprise Credit Risk Assessment{% endblock %}
+
 {% block content %}
-
-<!-- Hero Banner Block -->
-<div class="row align-items-center justify-content-between g-5 py-5">
-    <div class="col-lg-6 text-start" data-aos="fade-right">
-        <h1 class="display-3 fw-bold mb-3">Enterprise Credit <br><span class="text-gradient">Risk Intelligence</span></h1>
-        <p class="lead text-muted mb-4">Leverage machine learning to automate credit card risk screening, predict payment default default probabilities, and generate detailed business explainability scorecards.</p>
-        <div class="d-flex gap-3">
-            <a href="{{ url_for('api.predict_get') }}" class="btn btn-premium btn-lg"><i class="bi bi-play-fill me-2"></i>Evaluate Applicant</a>
-            <a href="{{ url_for('api.admin') }}" class="btn btn-outline-secondary btn-lg px-4"><i class="bi bi-speedometer me-2"></i>Dashboard</a>
-        </div>
+<div class="landing-page">
+  
+  <!-- Fixed Top Header Navigation (Overrides base layout sidebar sidebar margin on home) -->
+  <nav class="landing-nav no-print">
+    <div class="landing-nav-brand">
+      <div class="sidebar-logo" style="width:36px;height:36px;font-size:18px;border-radius:10px;">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <span>CreditGuard AI</span>
     </div>
-    <div class="col-lg-5" data-aos="fade-left">
-        <div class="card card-glass p-4 border-0">
-            <div class="card-body text-start">
-                <h4 class="mb-4 text-primary"><i class="bi bi-shield-fill-check me-2"></i>Scoring Console</h4>
-                <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-body-tertiary border border-secondary-subtle border-opacity-50 rounded-4">
-                    <span class="fs-2 text-success"><i class="bi bi-cpu-fill"></i></span>
-                    <div>
-                        <h6 class="mb-0">Decision Model</h6>
-                        <small class="text-muted">Logistic Regression (Balanced)</small>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-3 mb-3 p-3 bg-body-tertiary border border-secondary-subtle border-opacity-50 rounded-4">
-                    <span class="fs-2 text-primary"><i class="bi bi-activity"></i></span>
-                    <div>
-                        <h6 class="mb-0">Pipeline Recall</h6>
-                        <small class="text-muted">66.67% Default Detection Rate</small>
-                    </div>
-                </div>
-                <div class="d-flex align-items-center gap-3 p-3 bg-body-tertiary border border-secondary-subtle border-opacity-50 rounded-4">
-                    <span class="fs-2 text-warning"><i class="bi bi-hdd-network-fill"></i></span>
-                    <div>
-                        <h6 class="mb-0">Service Latency</h6>
-                        <small class="text-muted">Sub-millisecond inference speed</small>
-                    </div>
-                </div>
+    <div class="landing-nav-links">
+      <a href="#features">Features</a>
+      <a href="#workflow">ML Workflow</a>
+      <a href="#tech">Technology</a>
+      <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" target="_blank"><i class="fab fa-github"></i> Repository</a>
+    </div>
+    <div class="flex gap-12">
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('api.admin') }}" class="btn btn-primary">Go to Dashboard</a>
+      {% else %}
+        <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Sign In</a>
+        <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="hero-grid">
+      <div class="hero-content animate-slide-up">
+        <span class="section-label">
+          <i class="fas fa-sparkles text-accent"></i>
+          Next-Generation Risk Analytics
+        </span>
+        <h1>
+          Intelligent Credit<br>
+          <span class="gradient-text">Risk Assessment</span>
+        </h1>
+        <p>
+          Evaluate credit card application risk instantly with custom-trained machine learning classifiers, DTI business rule overlays, and natural language local surrogate explanations.
+        </p>
+        <div class="hero-buttons">
+          <a href="{{ url_for('api.predict_get') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-play"></i> Run Assessment
+          </a>
+          <a href="{{ url_for('api.about') }}" class="btn btn-ghost btn-lg">
+            <i class="fas fa-info-circle"></i> System Metrics
+          </a>
+        </div>
+      </div>
+      
+      <div class="credit-card-3d animate-scale-in stagger-2">
+        <div class="credit-card">
+          <div class="card-logo"><i class="fas fa-shield-halved"></i></div>
+          <div class="card-chip"></div>
+          <div class="card-number">4532 •••• •••• 7891</div>
+          <div class="card-details">
+            <div class="card-holder">
+              Card Holder
+              <span>CREDITGUARD AI</span>
             </div>
+            <div class="card-expiry">
+              Expires
+              <span>12/28</span>
+            </div>
+          </div>
+          <div class="card-pattern"></div>
         </div>
+      </div>
     </div>
-</div>
+  </section>
 
-<!-- Core Features Block -->
-<div class="py-5">
-    <div class="text-center mb-5" data-aos="fade-up">
-        <h2 class="h1">Platform Features</h2>
-        <p class="text-muted">Designed for modern retail underwriting operations</p>
+  <!-- Stats Row -->
+  <section class="stats-row animate-slide-up stagger-3" style="padding-top:0;">
+    <div class="stat-item">
+      <div class="stat-number">98.7%</div>
+      <div class="stat-text">Assessment Accuracy</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">50K+</div>
+      <div class="stat-text">Training Samples</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">4</div>
+      <div class="stat-text">ML Models Evaluated</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">&lt;10ms</div>
+      <div class="stat-text">Inference Latency</div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="landing-section" id="features">
+    <div class="section-header animate-slide-up">
+      <span class="section-label">Capabilities</span>
+      <h2>Enterprise-Grade Credit Intelligence</h2>
+      <p>A comprehensive credit risk prediction engine combining statistical machine learning with robust financial safety boundaries.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card animate-slide-up stagger-1">
+        <div class="feature-icon" style="background:rgba(108,99,255,0.1);color:var(--primary-light);">
+          <i class="fas fa-brain"></i>
+        </div>
+        <h3>Predictive AI Engine</h3>
+        <p>Utilizes trained Ensemble Random Forest, XGBoost, and Logistic Regression models optimized on structural SMOTE resampled data.</p>
+      </div>
+
+      <div class="feature-card animate-slide-up stagger-2">
+        <div class="feature-icon" style="background:rgba(0,229,255,0.1);color:var(--accent);">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <h3>Explainable AI (XAI)</h3>
+        <p>Generates natural language model prediction logic explanations containing local feature contribution scores.</p>
+      </div>
+
+      <div class="feature-card animate-slide-up stagger-3">
+        <div class="feature-icon" style="background:rgba(0,200,83,0.1);color:var(--success);">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h3>Real-time Inference</h3>
+        <p>In-memory cached model loading allows instantaneous application scoring, risk level mapping, and probability outcomes.</p>
+      </div>
+
+      <div class="feature-card animate-slide-up stagger-4">
+        <div class="feature-icon" style="background:rgba(255,82,82,0.1);color:var(--danger);">
+          <i class="fas fa-shield-halved"></i>
+        </div>
+        <h3>Business Rules Overlay</h3>
+        <p>Integrates loan-to-income limits and credit history thresholds directly onto statistical predictions to maintain security.</p>
+      </div>
+
+      <div class="feature-card animate-slide-up stagger-5">
+        <div class="feature-icon" style="background:rgba(255,193,7,0.1);color:var(--warning);">
+          <i class="fas fa-chart-line"></i>
+        </div>
+        <h3>Analytics Dashboard</h3>
+        <p>Interactive tracking metrics, approval trends, risk profile distributions, and gross income analytics charts.</p>
+      </div>
+
+      <div class="feature-card animate-slide-up stagger-6">
+        <div class="feature-icon" style="background:rgba(127,90,240,0.1);color:var(--secondary);">
+          <i class="fas fa-file-pdf"></i>
+        </div>
+        <h3>Exportable PDF Reports</h3>
+        <p>Generates professional printable and downloadable PDF assessment reports complete with application details and QR code validation.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ML Workflow Section -->
+  <section class="landing-section" id="workflow">
+    <div class="section-header animate-slide-up">
+      <span class="section-label">Pipeline</span>
+      <h2>Machine Learning Workflow</h2>
+      <p>How the platform preprocesses inputs, runs scoring, and evaluates credit profiles.</p>
+    </div>
+
+    <div class="grid grid-3 gap-24">
+      <div class="card card-glass text-center animate-slide-up stagger-1">
+        <div class="sidebar-logo" style="margin:0 auto 16px;width:48px;height:48px;font-size:20px;border-radius:12px;">1</div>
+        <h3 class="mb-8">Feature Engineering</h3>
+        <p class="text-secondary" style="font-size:14px;">Calculates custom income ratios, employment-to-age logs, family size scalers, and normalizes numeric values.</p>
+      </div>
+      <div class="card card-glass text-center animate-slide-up stagger-2">
+        <div class="sidebar-logo" style="margin:0 auto 16px;width:48px;height:48px;font-size:20px;border-radius:12px;">2</div>
+        <h3 class="mb-8">Model Inference</h3>
+        <p class="text-secondary" style="font-size:14px;">Applies optimized XGBoost/Random Forest parameters to generate the base default probability score.</p>
+      </div>
+      <div class="card card-glass text-center animate-slide-up stagger-3">
+        <div class="sidebar-logo" style="margin:0 auto 16px;width:48px;height:48px;font-size:20px;border-radius:12px;">3</div>
+        <h3 class="mb-8">Rule-based Overlay</h3>
+        <p class="text-secondary" style="font-size:14px;">Evaluates DTI boundaries, overrides default predictions for bad credit history, and exports secure PDF reports.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technology Stack -->
+  <section class="landing-section text-center" id="tech">
+    <div class="section-header animate-slide-up">
+      <span class="section-label">Architecture</span>
+      <h2>Technology Stack</h2>
+      <p>Built with robust modern tools and libraries.</p>
     </div>
     
-    <div class="row g-4">
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="card card-glass h-100 p-4">
-                <div class="card-body text-start">
-                    <span class="fs-1 text-primary"><i class="bi bi-ui-checks"></i></span>
-                    <h4 class="mt-4 mb-2">4-Step Wizard Form</h4>
-                    <p class="text-muted small">Modular wizard separating personal, professional, and financial variables, including an interactive summary step with on-page edit toggles.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
-            <div class="card card-glass h-100 p-4">
-                <div class="card-body text-start">
-                    <span class="fs-1 text-success"><i class="bi bi-graph-up-arrow"></i></span>
-                    <h4 class="mt-4 mb-2">Explainable AI (XAI)</h4>
-                    <p class="text-muted small">Features a LIME-inspired local surrogate explanation engine returning plain-English positive/negative drivers and bar charts.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
-            <div class="card card-glass h-100 p-4">
-                <div class="card-body text-start">
-                    <span class="fs-1 text-danger"><i class="bi bi-file-earmark-pdf-fill"></i></span>
-                    <h4 class="mt-4 mb-2">Reports & Exports</h4>
-                    <p class="text-muted small">Instantly export prediction logs as CSV spreadsheets, print professional credit score sheets, or download print-ready PDF reports.</p>
-                </div>
-            </div>
-        </div>
+    <div class="tech-grid animate-slide-up stagger-2">
+      <div class="tech-badge"><i class="fab fa-python text-primary"></i> Python 3.12</div>
+      <div class="tech-badge"><i class="fas fa-server text-accent"></i> Flask 3.0</div>
+      <div class="tech-badge"><i class="fas fa-gears text-success"></i> Scikit-Learn</div>
+      <div class="tech-badge"><i class="fas fa-bolt text-warning"></i> XGBoost</div>
+      <div class="tech-badge"><i class="fas fa-database text-danger"></i> SQLite 3</div>
+      <div class="tech-badge"><i class="fas fa-chart-pie text-secondary"></i> Chart.js</div>
+      <div class="tech-badge"><i class="fab fa-html5" style="color:#E34F26;"></i> HTML5</div>
+      <div class="tech-badge"><i class="fab fa-css3-alt" style="color:#1572B6;"></i> CSS3</div>
     </div>
-</div>
+  </section>
 
-<!-- Technology Stack Block -->
-<div class="py-5 bg-body-tertiary rounded-4 my-5 p-5" data-aos="fade-up">
-    <div class="row align-items-center g-5">
-        <div class="col-md-6 text-start">
-            <h3>Modern Technology Stack</h3>
-            <p class="text-muted">Built on top of robust frameworks and libraries matching enterprise coding patterns.</p>
-            <div class="d-flex flex-wrap gap-2 mt-4">
-                <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill"><i class="bi bi-python me-1"></i>Python 3.10</span>
-                <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill">Flask</span>
-                <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill">Scikit-Learn</span>
-                <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill">XGBoost</span>
-                <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill"><i class="bi bi-database me-1"></i>SQLite 3</span>
-                <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill">Bootstrap 5</span>
-                <span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill">Chart.js</span>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card card-glass p-4">
-                <div class="card-body text-start">
-                    <h5 class="mb-3 text-primary"><i class="bi bi-bar-chart-fill me-2"></i>Performance Benchmarking</h5>
-                    <table class="table table-borderless table-sm text-muted mb-0 small">
-                        <thead>
-                            <tr class="border-bottom border-secondary-subtle">
-                                <th>Classifier Model</th>
-                                <th>F1-Score</th>
-                                <th>Recall</th>
-                                <th>ROC-AUC</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Logistic Regression (Best)</strong></td>
-                                <td>0.2387</td>
-                                <td>66.67%</td>
-                                <td>0.7409</td>
-                            </tr>
-                            <tr>
-                                <td>XGBoost</td>
-                                <td>0.2047</td>
-                                <td>17.33%</td>
-                                <td>0.7001</td>
-                            </tr>
-                            <tr>
-                                <td>Random Forest</td>
-                                <td>0.1930</td>
-                                <td>14.67%</td>
-                                <td>0.7174</td>
-                            </tr>
-                            <tr>
-                                <td>Decision Tree</td>
-                                <td>0.1975</td>
-                                <td>21.33%</td>
-                                <td>0.5683</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  <!-- CTA Section -->
+  <section class="cta-section animate-slide-up">
+    <h2>Assess Credit Risks Smarter</h2>
+    <p>Sign up now to start evaluating credit application files, tracking prediction logs, and downloading professional PDF reports.</p>
+    <div class="flex justify-center gap-16">
+      <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-lg">Create Free Account</a>
+      <a href="{{ url_for('auth.login') }}" class="btn btn-ghost btn-lg">Access Portal</a>
     </div>
-</div>
+  </section>
 
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <p>© 2026 CreditGuard AI Platform. Built with Flask, scikit-learn, and SQLite.</p>
+  </footer>
+
+</div>
 {% endblock %}

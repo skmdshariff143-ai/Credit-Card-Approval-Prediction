@@ -1,152 +1,181 @@
-{% extends "base.html" %}
-{% block title %}Prediction Result - CreditGuard AI{% endblock %}
+{% extends 'base.html' %}
+{% block title %}CreditGuard AI — Assessment Result{% endblock %}
+
 {% block content %}
-
-<div class="row justify-content-center">
-    <div class="col-lg-10" data-aos="zoom-in">
-        
-        <!-- Header status display -->
-        <div class="text-center mb-5">
-            <h2 class="h1">Evaluation Dashboard</h2>
-            <p class="text-muted">Application ID: <strong>{{ application_id }}</strong> | Processed: <strong>{{ date }}</strong></p>
-        </div>
-
-        <div class="row g-4">
-            <!-- 1. Left side: Result Scorecard -->
-            <div class="col-md-5">
-                <div class="card card-glass text-center p-5 h-100 border-0">
-                    <h5 class="text-uppercase text-muted small mb-4">Risk Evaluation Decision</h5>
-                    
-                    <!-- Circular Risk Gauge -->
-                    <div class="radial-score-container my-4">
-                        <svg class="radial-score-ring" width="200" height="200">
-                            <circle class="radial-score-bg" cx="100" cy="100" r="90" />
-                            <circle class="radial-score-bar" 
-                                    cx="100" cy="100" r="90" 
-                                    style="stroke-dashoffset: {{ 565.48 - (probability / 100 * 565.48) }}; stroke: {% if result == 'Approved' %}#10b981{% else %}#ef4444{% endif %};" />
-                        </svg>
-                        <div class="score-text-overlay">
-                            <h2 class="display-6 fw-bold mb-0 {% if result == 'Approved' %}text-success{% else %}text-danger{% endif %}">{{ "%.0f"|format(probability) }}%</h2>
-                            <small class="text-muted text-uppercase tracking-wider" style="font-size: 0.65rem;">Confidence</small>
-                        </div>
-                    </div>
-
-                    <div class="my-3">
-                        {% if result == 'Approved' %}
-                            <h3 class="text-success fw-bold m-0">Approved</h3>
-                            <span class="badge bg-success-subtle text-success border border-success border-opacity-20 px-3 py-2 rounded-pill mt-2">Low Default Risk</span>
-                        {% else %}
-                            <h3 class="text-danger fw-bold m-0">Rejected</h3>
-                            <span class="badge bg-danger-subtle text-danger border border-danger border-opacity-20 px-3 py-2 rounded-pill mt-2">High Default Risk</span>
-                        {% endif %}
-                    </div>
-
-                    <div class="row mt-4 pt-3 border-top border-secondary-subtle g-3 text-start small">
-                        <div class="col-6">
-                            <span class="text-muted d-block">Latency</span>
-                            <strong>{{ prediction_time }} ms</strong>
-                        </div>
-                        <div class="col-6">
-                            <span class="text-muted d-block">Risk Level</span>
-                            <span class="fw-bold {% if risk_level == 'Low' %}text-success{% elif 'Medium' in risk_level %}text-warning{% else %}text-danger{% endif %}">{{ risk_level }}</span>
-                        </div>
-                        <div class="col-6 mt-3">
-                            <span class="text-muted d-block">Model Algorithm</span>
-                            <strong>{{ model_used }}</strong>
-                        </div>
-                        <div class="col-6 mt-3">
-                            <span class="text-muted d-block">Credit Bureau Code</span>
-                            <strong>{{ credit_history }}</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 2. Right side: Dynamic Plain-English Explanation & Recommendations -->
-            <div class="col-md-7">
-                <div class="card card-glass p-5 h-100 text-start border-0">
-                    <h4 class="mb-4 text-primary"><i class="bi bi-chat-left-quote-fill me-2"></i>Decision Factors & Explanations</h4>
-                    
-                    <h6 class="fw-bold mb-3">Key Reasons:</h6>
-                    <ul class="list-group list-group-flush mb-4 bg-transparent border-0">
-                        {% for reason in reasons %}
-                            <li class="list-group-item bg-transparent border-0 px-0 d-flex align-items-start gap-2">
-                                <span class="{% if result == 'Approved' %}text-success{% else %}text-danger{% endif %} fs-5">
-                                    {% if result == 'Approved' %}<i class="bi bi-check-circle-fill"></i>{% else %}<i class="bi bi-x-circle-fill"></i>{% endif %}
-                                </span>
-                                <span>{{ reason }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-
-                    <h6 class="fw-bold mb-3">Actionable Underwriting Advice:</h6>
-                    <ul class="list-group list-group-flush mb-4 bg-transparent border-0">
-                        {% for rec in recommendations %}
-                            <li class="list-group-item bg-transparent border-0 px-0 d-flex align-items-start gap-2">
-                                <span class="text-primary fs-5"><i class="bi bi-arrow-right-circle-fill"></i></span>
-                                <span>{{ rec }}</span>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. Local surrogate Feature Importance Section -->
-        <div class="card card-glass p-5 mt-4 text-start border-0">
-            <h4 class="mb-4 text-primary"><i class="bi bi-bar-chart-steps me-2"></i>Feature Importance attributions (Local Surrogate)</h4>
-            <p class="text-muted small">Visualizes feature-level impacts output by LIME local Ridge regressions. Green values favor credit card approval; red values represent negative default risk indicators.</p>
-            
-            <div class="row g-4 mt-2">
-                <!-- Support factors (Positive impact) -->
-                <div class="col-md-6 border-end border-secondary-subtle">
-                    <h6 class="text-success fw-bold mb-3"><i class="bi bi-plus-circle me-1"></i>Support Factors (Pushes Approval)</h6>
-                    {% if support_factors %}
-                        {% for factor in support_factors %}
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small">
-                                    <span>{{ factor.feature }}</span>
-                                    <span class="text-success">+{{ "%.4f"|format(factor.impact) }}</span>
-                                </div>
-                                <div class="factor-bar-container">
-                                    <div class="factor-bar-fill factor-bar-support" style="width: {{ factor.impact * 200 }}%"></div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted small">No significant support factors found.</p>
-                    {% endif %}
-                </div>
-
-                <!-- Risk factors (Negative impact) -->
-                <div class="col-md-6">
-                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-dash-circle me-1"></i>Risk Factors (Pushes Rejection)</h6>
-                    {% if risk_factors %}
-                        {% for factor in risk_factors %}
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between small">
-                                    <span>{{ factor.feature }}</span>
-                                    <span class="text-danger">-{{ "%.4f"|format(factor.impact) }}</span>
-                                </div>
-                                <div class="factor-bar-container">
-                                    <div class="factor-bar-fill factor-bar-risk" style="width: {{ factor.impact * -200 }}%"></div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <p class="text-muted small">No significant risk factors found.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Actions panel -->
-        <div class="d-flex justify-content-center gap-3 mt-5">
-            <button type="button" id="btn-print-report" class="btn btn-outline-secondary px-4"><i class="bi bi-printer me-2"></i>Print Report</button>
-            <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="btn btn-premium px-4"><i class="bi bi-file-pdf me-2"></i>Export PDF Report</a>
-            <button type="button" id="btn-share-report" class="btn btn-outline-secondary px-4"><i class="bi bi-share me-2"></i>Share Scorecard</button>
-        </div>
-    </div>
+<div class="page-header animate-slide-up">
+  <div class="breadcrumbs">
+    <a href="{{ url_for('api.admin') }}">Dashboard</a>
+    <span class="separator"><i class="fas fa-chevron-right"></i></span>
+    <a href="{{ url_for('api.predict_get') }}">New Application</a>
+    <span class="separator"><i class="fas fa-chevron-right"></i></span>
+    <span class="text-primary">Outcome</span>
+  </div>
+  <h1>Assessment Outcome</h1>
+  <p>Real-time machine learning prediction and explainability report.</p>
 </div>
 
+<div class="grid grid-3 gap-24 mt-24">
+  
+  <!-- Gauge & Result Hero Box -->
+  <div class="result-hero {% if result == 'Approved' %}approved{% else %}rejected{% endif %} animate-scale-in">
+    <span class="badge badge-primary mb-16">{{ application_id }}</span>
+    
+    <!-- CSS Gauge Meter -->
+    <div class="gauge-container">
+      <div class="gauge-bg"></div>
+      <div class="gauge-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" id="resultGaugeFill"></div>
+      <div class="gauge-value" id="resultGaugeValue">0%</div>
+    </div>
+    
+    <div class="gauge-label">Approval Probability</div>
+    
+    <!-- Outcome Badge -->
+    <div class="result-badge {% if result == 'Approved' %}approved{% else %}rejected{% endif %}">
+      {% if result == 'Approved' %}
+        <i class="fas fa-circle-check"></i> Approved
+      {% else %}
+        <i class="fas fa-circle-xmark"></i> Rejected
+      {% endif %}
+    </div>
+
+    <!-- Metadata Details -->
+    <div class="flex justify-center gap-12 mt-16" style="font-size:12px;color:var(--text-muted);">
+      <span>Risk Profile: <strong>{{ risk_level }}</strong></span>
+      <span>•</span>
+      <span>Latency: <strong>{{ prediction_time }}ms</strong></span>
+    </div>
+  </div>
+
+  <!-- AI Explanation & Recommendations -->
+  <div class="card card-glass grid-2-span animate-slide-up stagger-1" style="grid-column: span 2;">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fas fa-brain text-accent mr-8"></i> Explainable AI (XAI) Overview</h2>
+      <span class="badge badge-accent">Interactive LIME Attributions</span>
+    </div>
+
+    <h3>Natural Language Summary</h3>
+    <p class="mt-8 mb-16" style="font-size:15px;line-height:1.7;">
+      {% if result == 'Approved' %}
+        <strong>Congratulations!</strong> The application has a <strong>{{ probability }}%</strong> approval probability. The profile matches default safety limits and has stable monthly cashflows.
+      {% else %}
+        The application has a <strong>{{ probability }}%</strong> approval probability. Our scoring models have flagged multiple default risk indicators.
+      {% endif %}
+    </p>
+
+    <!-- Reasons Grid -->
+    <h4 class="mt-24 mb-8">Key Assessment Reasons</h4>
+    <div class="flex flex-col gap-8 mb-24">
+      {% for reason in reasons %}
+        <div class="flex items-start gap-8" style="font-size:14px;color:var(--text-secondary);">
+          <i class="fas {% if result == 'Approved' %}fa-plus text-success{% else %}fa-circle-exclamation text-danger{% endif %} mt-4"></i>
+          <span>{{ reason }}</span>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Recommendations Grid -->
+    <h4>Actionable Recommendations</h4>
+    <div class="flex flex-col gap-8">
+      {% for rec in recommendations %}
+        <div class="flex items-start gap-8" style="font-size:14px;color:var(--text-secondary);">
+          <i class="fas fa-circle-check text-accent mt-4"></i>
+          <span>{{ rec }}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- LIME Local Features Attributions -->
+<div class="card card-glass mt-24 animate-slide-up stagger-2">
+  <div class="card-header">
+    <h2 class="card-title"><i class="fas fa-chart-bar text-primary mr-8"></i> Predictive Feature Contribution Weights</h2>
+    <span class="badge badge-primary">Model: {{ model_used }}</span>
+  </div>
+
+  <div class="factor-grid">
+    <!-- Positive Contributions -->
+    <div class="card card-glass">
+      <h3 class="mb-16 text-success"><i class="fas fa-chevron-up"></i> Supporting Factors</h3>
+      <div class="flex flex-col gap-12">
+        {% if support_factors %}
+          {% for factor in support_factors %}
+            <div class="factor-card positive">
+              <div class="factor-icon text-success" style="background:var(--success-light);"><i class="fas fa-circle-plus"></i></div>
+              <div class="flex-col">
+                <span style="font-size:13px;font-weight:600;color:var(--text-primary);">{{ factor.feature }}</span>
+                <span style="font-size:11px;color:var(--text-muted);">Weight: +{{ factor.weight | round(3) }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <span class="text-muted" style="font-size:13px;">No significant supporting factors registered.</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Negative Contributions -->
+    <div class="card card-glass">
+      <h3 class="mb-16 text-danger"><i class="fas fa-chevron-down"></i> Risk Factors</h3>
+      <div class="flex flex-col gap-12">
+        {% if risk_factors %}
+          {% for factor in risk_factors %}
+            <div class="factor-card negative">
+              <div class="factor-icon text-danger" style="background:var(--danger-light);"><i class="fas fa-circle-minus"></i></div>
+              <div class="flex-col">
+                <span style="font-size:13px;font-weight:600;color:var(--text-primary);">{{ factor.feature }}</span>
+                <span style="font-size:11px;color:var(--text-muted);">Weight: {{ factor.weight | round(3) }}</span>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <span class="text-muted" style="font-size:13px;">No significant risk factors registered.</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Action buttons -->
+<div class="flex gap-16 mt-32 no-print animate-slide-up stagger-3">
+  <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="btn btn-primary btn-lg">
+    <i class="fas fa-file-pdf"></i> View Printable Report
+  </a>
+  <a href="{{ url_for('api.predict_get') }}" class="btn btn-ghost btn-lg">
+    <i class="fas fa-arrow-left"></i> Start New Application
+  </a>
+  <a href="{{ url_for('api.history') }}" class="btn btn-ghost btn-lg">
+    <i class="fas fa-clock-history"></i> History Logs
+  </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const prob = parseFloat("{{ probability }}");
+  const gaugeFill = document.getElementById('resultGaugeFill');
+  const gaugeVal = document.getElementById('resultGaugeValue');
+
+  if (gaugeFill && gaugeVal) {
+    setTimeout(() => {
+      // Convert probability 0-100 to rotation degree 0-180deg
+      const deg = (prob / 100) * 180;
+      gaugeFill.style.transform = `rotate(${deg}deg)`;
+      
+      // Animate text countup
+      let count = 0;
+      const interval = setInterval(() => {
+        if (count >= prob) {
+          gaugeVal.textContent = prob.toFixed(1) + '%';
+          clearInterval(interval);
+        } else {
+          count += Math.max(1, (prob - count) / 10);
+          gaugeVal.textContent = count.toFixed(1) + '%';
+        }
+      }, 30);
+    }, 400);
+  }
+});
+</script>
 {% endblock %}

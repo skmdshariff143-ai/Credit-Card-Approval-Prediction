@@ -1,150 +1,148 @@
-{% extends "base.html" %}
-{% block title %}Profile - CreditGuard AI{% endblock %}
+{% extends 'base.html' %}
+{% block title %}CreditGuard AI — User Profile{% endblock %}
+
 {% block content %}
-
-<div class="row justify-content-center py-4">
-    <div class="col-lg-10" data-aos="fade-up">
-        <h2 class="display-6 fw-bold mb-1"><span class="text-gradient">My Profile</span></h2>
-        <p class="text-muted mb-4">Manage your account settings and view personal analytics.</p>
-    </div>
+<div class="page-header animate-slide-up">
+  <div class="breadcrumbs">
+    <a href="{{ url_for('api.admin') }}">Dashboard</a>
+    <span class="separator"><i class="fas fa-chevron-right"></i></span>
+    <span class="text-primary">User Profile</span>
+  </div>
+  <h1>Account Settings</h1>
+  <p>Manage your profile details, password configuration, and view usage statistics.</p>
 </div>
 
-<div class="row justify-content-center g-4">
-    <!-- Profile Card -->
-    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="card card-glass border-0 p-4 text-center h-100">
-            <div class="mx-auto mb-3">
-                <div class="rounded-circle d-flex align-items-center justify-content-center"
-                     style="width: 80px; height: 80px; background: var(--grad-hero); font-size: 2rem; color: white; font-family: 'Outfit', sans-serif; font-weight: 700;">
-                    {{ current_user.initials }}
-                </div>
-            </div>
-            <h4 class="fw-bold mb-1">{{ current_user.full_name }}</h4>
-            <p class="text-muted small mb-1">@{{ current_user.username }}</p>
-            <p class="text-muted small mb-3"><i class="bi bi-envelope me-1"></i>{{ current_user.email }}</p>
-            <span class="badge rounded-pill bg-primary bg-opacity-25 text-primary px-3 py-2 mb-3">
-                <i class="bi bi-calendar3 me-1"></i>Member since {{ current_user.created_at[:10] if current_user.created_at else 'N/A' }}
-            </span>
-
-            <hr class="my-3">
-
-            <!-- Edit Profile Form -->
-            <form method="POST" action="{{ url_for('auth.profile_edit') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="edit_full_name" name="full_name"
-                           value="{{ current_user.full_name }}" placeholder="Full Name">
-                    <label for="edit_full_name"><i class="bi bi-person me-2"></i>Full Name</label>
-                </div>
-                <div class="form-floating mb-3">
-                    <input type="email" class="form-control" id="edit_email" name="email"
-                           value="{{ current_user.email }}" placeholder="Email">
-                    <label for="edit_email"><i class="bi bi-envelope me-2"></i>Email</label>
-                </div>
-                <button type="submit" class="btn btn-premium btn-sm w-100">
-                    <i class="bi bi-pencil-square me-1"></i>Update Profile
-                </button>
-            </form>
+<div class="grid grid-3 gap-24 mt-24">
+  
+  <!-- Profile Summary and Statistics -->
+  <div class="flex-col gap-24 animate-scale-in">
+    <!-- User Card -->
+    <div class="card card-glass text-center">
+      <div class="sidebar-logo" style="width:72px;height:72px;font-size:32px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg, var(--primary), var(--secondary));">
+        <i class="fas fa-user"></i>
+      </div>
+      <h2 class="mb-4">{{ current_user.full_name }}</h2>
+      <span class="badge badge-primary">@{{ current_user.username }}</span>
+      
+      <div class="text-left mt-24 pt-16" style="border-top:1px solid var(--border-color);font-size:13px;color:var(--text-secondary);">
+        <div class="flex justify-between py-4">
+          <span>Email</span>
+          <span style="font-weight:500;color:var(--text-primary);">{{ current_user.email }}</span>
         </div>
+        <div class="flex justify-between py-4">
+          <span>Member Since</span>
+          <span style="font-weight:500;color:var(--text-primary);">{{ current_user.created_at.split(' ')[0] if current_user.created_at else 'N/A' }}</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-        <div class="row g-3 mb-4">
-            <div class="col-6">
-                <div class="card card-glass border-0 p-3">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-3 p-2 me-3" style="background: var(--accent-glow);">
-                            <i class="bi bi-bar-chart-line-fill fs-4 text-primary"></i>
-                        </div>
-                        <div>
-                            <div class="small text-muted">Total Evaluations</div>
-                            <div class="fs-4 fw-bold">{{ stats.total }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="card card-glass border-0 p-3">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-3 p-2 me-3" style="background: rgba(16, 185, 129, 0.15);">
-                            <i class="bi bi-check-circle-fill fs-4 text-success"></i>
-                        </div>
-                        <div>
-                            <div class="small text-muted">Approved</div>
-                            <div class="fs-4 fw-bold text-success">{{ stats.approved }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="card card-glass border-0 p-3">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-3 p-2 me-3" style="background: rgba(239, 68, 68, 0.15);">
-                            <i class="bi bi-x-circle-fill fs-4 text-danger"></i>
-                        </div>
-                        <div>
-                            <div class="small text-muted">Rejected</div>
-                            <div class="fs-4 fw-bold text-danger">{{ stats.rejected }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-6">
-                <div class="card card-glass border-0 p-3">
-                    <div class="d-flex align-items-center">
-                        <div class="rounded-3 p-2 me-3" style="background: rgba(59, 130, 246, 0.15);">
-                            <i class="bi bi-percent fs-4 text-primary"></i>
-                        </div>
-                        <div>
-                            <div class="small text-muted">Approval Rate</div>
-                            <div class="fs-4 fw-bold">{{ stats.approval_rate }}%</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- Usage Statistics -->
+    <div class="card card-glass">
+      <h3 class="mb-16"><i class="fas fa-chart-line text-accent mr-8"></i> Usage Analytics</h3>
+      <div class="flex-col gap-12">
+        <div class="flex justify-between items-center p-12" style="background:var(--bg-glass);border-radius:var(--radius-sm);">
+          <span style="font-size:13px;color:var(--text-secondary);">Predictions Evaluated</span>
+          <span style="font-family:var(--font-mono);font-weight:700;font-size:16px;">{{ stats.total }}</span>
+        </div>
+        <div class="flex justify-between items-center p-12" style="background:var(--bg-glass);border-radius:var(--radius-sm);">
+          <span style="font-size:13px;color:var(--text-secondary);">Approved Files</span>
+          <span class="text-success" style="font-family:var(--font-mono);font-weight:700;font-size:16px;">{{ stats.approved }}</span>
+        </div>
+        <div class="flex justify-between items-center p-12" style="background:var(--bg-glass);border-radius:var(--radius-sm);">
+          <span style="font-size:13px;color:var(--text-secondary);">Approval Conversion</span>
+          <span class="text-accent" style="font-family:var(--font-mono);font-weight:700;font-size:16px;">{{ stats.approval_rate }}%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Profile Forms -->
+  <div class="card card-glass grid-2-span animate-slide-up stagger-1" style="grid-column: span 2;">
+    <div class="card-header">
+      <h2 class="card-title"><i class="fas fa-sliders text-primary mr-8"></i> Account Configurations</h2>
+    </div>
+
+    <!-- Update Details Form -->
+    <h3 class="mb-16"><i class="fas fa-user-pen text-accent mr-8"></i> Update Personal Details</h3>
+    <form method="POST" action="{{ url_for('auth.profile') }}" class="mb-32">
+      {{ profile_form.hidden_tag() }}
+      <input type="hidden" name="form_type" value="profile">
+
+      <div class="grid grid-2 gap-16">
+        <div class="form-group">
+          <label class="form-label" for="full_name">Full Name</label>
+          <div class="form-control-icon">
+            <i class="fas fa-user"></i>
+            {{ profile_form.full_name(class="form-control", id="full_name") }}
+          </div>
+          {% if profile_form.full_name.errors %}
+            <div class="form-error">{{ profile_form.full_name.errors[0] }}</div>
+          {% endif %}
         </div>
 
-        <!-- Recent Predictions -->
-        <div class="card card-glass border-0 p-4">
-            <h6 class="fw-bold mb-3"><i class="bi bi-clock-history me-2"></i>Recent Evaluations</h6>
-            {% if recent %}
-            <div class="table-responsive">
-                <table class="table table-borderless table-sm mb-0 small">
-                    <thead>
-                        <tr class="border-bottom border-secondary-subtle">
-                            <th>App ID</th>
-                            <th>Date</th>
-                            <th>Decision</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for r in recent %}
-                        <tr>
-                            <td class="text-muted">{{ r.application_id[:12] }}...</td>
-                            <td class="text-muted">{{ r.timestamp[:10] }}</td>
-                            <td>
-                                {% if r.prediction == 'Approved' %}
-                                    <span class="badge bg-success bg-opacity-25 text-success rounded-pill">Approved</span>
-                                {% else %}
-                                    <span class="badge bg-danger bg-opacity-25 text-danger rounded-pill">Rejected</span>
-                                {% endif %}
-                            </td>
-                            <td class="fw-bold">{{ "%.1f"|format(r.probability) }}%</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            {% else %}
-            <div class="text-center text-muted py-4">
-                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
-                <p class="mb-0">No evaluations yet. <a href="{{ url_for('api.predict_get') }}" class="text-primary text-decoration-none fw-bold">Start your first one</a>.</p>
-            </div>
-            {% endif %}
+        <div class="form-group">
+          <label class="form-label" for="email">Email Address</label>
+          <div class="form-control-icon">
+            <i class="fas fa-envelope"></i>
+            {{ profile_form.email(class="form-control", id="email") }}
+          </div>
+          {% if profile_form.email.errors %}
+            <div class="form-error">{{ profile_form.email.errors[0] }}</div>
+          {% endif %}
         </div>
-    </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-8">
+        <i class="fas fa-floppy-disk"></i> Save Profile Details
+      </button>
+    </form>
+
+    <!-- Update Password Form -->
+    <h3 class="mb-16" style="border-top:1px solid var(--border-color);padding-top:24px;"><i class="fas fa-key text-danger mr-8"></i> Change Password</h3>
+    <form method="POST" action="{{ url_for('auth.profile') }}">
+      {{ password_form.hidden_tag() }}
+      <input type="hidden" name="form_type" value="password">
+
+      <div class="form-group">
+        <label class="form-label" for="current_password">Current Password</label>
+        <div class="form-control-icon">
+          <i class="fas fa-lock"></i>
+          {{ password_form.current_password(class="form-control", placeholder="Verify your current password", id="current_password") }}
+        </div>
+        {% if password_form.current_password.errors %}
+          <div class="form-error">{{ password_form.current_password.errors[0] }}</div>
+        {% endif %}
+      </div>
+
+      <div class="grid grid-2 gap-16">
+        <div class="form-group">
+          <label class="form-label" for="new_password">New Password</label>
+          <div class="form-control-icon">
+            <i class="fas fa-key"></i>
+            {{ password_form.new_password(class="form-control", placeholder="Choose strong password", id="new_password") }}
+          </div>
+          {% if password_form.new_password.errors %}
+            <div class="form-error">{{ password_form.new_password.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="confirm_password">Confirm New Password</label>
+          <div class="form-control-icon">
+            <i class="fas fa-circle-check"></i>
+            {{ password_form.confirm_password(class="form-control", placeholder="Repeat new password", id="confirm_password") }}
+          </div>
+          {% if password_form.confirm_password.errors %}
+            <div class="form-error">{{ password_form.confirm_password.errors[0] }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-danger mt-8">
+        <i class="fas fa-lock-open"></i> Update Account Password
+      </button>
+    </form>
+  </div>
+
 </div>
-
 {% endblock %}
