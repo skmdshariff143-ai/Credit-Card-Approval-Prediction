@@ -42,3 +42,18 @@ Detailed step-by-step setup guides are provided below.
    ```bash
    python src/deployment/deploy.py
    ```
+
+## 4. Vercel Serverless Deployment
+1. Install Vercel CLI (`npm install -g vercel`) and log in.
+2. Link repository:
+   ```bash
+   vercel
+   ```
+3. Set environment variable configurations in Vercel settings panel:
+   - `FLASK_ENV`: `production`
+   - `SECRET_KEY`: `<production_secret>`
+4. Deploy to production:
+   ```bash
+   vercel --prod
+   ```
+

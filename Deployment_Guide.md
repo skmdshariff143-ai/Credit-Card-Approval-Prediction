@@ -93,3 +93,36 @@ This guide provides step-by-step instructions for running and deploying the **Cr
    python deploy_ibm.py
    ```
    This script registers the best model from `models/` with Watson ML and provisions an online scoring service. It will output the `Scoring Endpoint URL` (e.g. `https://us-south.ml.cloud.ibm.com/ml/v4/deployments/.../predictions`).
+
+---
+
+## 4. Vercel Serverless Deployment
+
+### Prerequisites
+- Active [Vercel](https://vercel.com) account.
+- Vercel CLI installed (`npm install -g vercel`) or GitHub repository connected.
+
+### Configuration
+The project is fully pre-configured for Vercel deployment using the root [vercel.json](file:///e:/Credit-Card-Approval-Prediction/vercel.json) file:
+- **Runtime**: `@vercel/python` serverless engine
+- **WSGI Entrypoint**: [app/app.py](file:///e:/Credit-Card-Approval-Prediction/app/app.py)
+
+### Steps
+1. **Deploy using Vercel CLI**:
+   From the repository root, run:
+   ```bash
+   vercel
+   ```
+   Follow the prompts to link the project.
+2. **Configure Environment Variables**:
+   In your Vercel Dashboard under **Settings > Environment Variables**, add:
+   - `FLASK_ENV`: `production`
+   - `SECRET_KEY`: `<your-secure-random-key>`
+   - `VERCEL`: `1` (Automatically set by Vercel, but good to configure for local Vercel emulators)
+3. **Promote to Production**:
+   Run:
+   ```bash
+   vercel --prod
+   ```
+   Alternatively, connect your GitHub repository directly to Vercel for automated deployments on every `push` to the `main` branch.
+
