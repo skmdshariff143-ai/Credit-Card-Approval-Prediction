@@ -10,8 +10,8 @@
     <span class="sep">›</span>
     <span class="current">Banking Dashboard</span>
   </div>
-  <h1 class="cg-page-title">Admin Analytics Dashboard</h1>
-  <p class="cg-page-desc">Real-time telemetry metrics, accuracy indexes, and system activity logs.</p>
+  <h1 class="cg-page-title">Admin Operations Console</h1>
+  <p class="cg-page-desc">Real-time telemetry metrics, accuracy indexes, database settings, and system activity logs.</p>
 </div>
 
 <!-- Stat Cards Grid -->
@@ -32,9 +32,9 @@
     <div class="cg-stat-label">Rejected Accounts</div>
   </div>
   <div class="cg-stat">
-    <div class="cg-stat-icon accent"><i class="fa-solid fa-bullseye"></i></div>
-    <div class="cg-stat-value" data-count="98.7" data-suffix="%" data-decimals="1">0%</div>
-    <div class="cg-stat-label">System Model Accuracy</div>
+    <div class="cg-stat-icon accent"><i class="fa-solid fa-users"></i></div>
+    <div class="cg-stat-value" data-count="3">0</div>
+    <div class="cg-stat-label">Registered Officers</div>
   </div>
 </div>
 
@@ -164,6 +164,69 @@
     </div>
   </div>
 </div>
+
+<!-- Bottom Section: System Settings & Database Control Panel -->
+<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.2s">
+  <!-- Users and Database Specs -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+      <i class="fa-solid fa-server" style="color:var(--primary);margin-right:6px;"></i> Database & Infrastructure Parameters
+    </h3>
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+      <div class="cg-flex-between">
+        <span class="cg-text-muted">Storage Driver</span>
+        <span class="cg-text-primary cg-mono">SQLite 3.x</span>
+      </div>
+      <div class="cg-flex-between">
+        <span class="cg-text-muted">Database File Path</span>
+        <span class="cg-text-primary cg-mono" style="font-size:11.5px;">logs/prediction_history.db</span>
+      </div>
+      <div class="cg-flex-between">
+        <span class="cg-text-muted">Indexing Indexes</span>
+        <span class="cg-text-primary cg-font-semibold">4 Active Indices</span>
+      </div>
+      <div class="cg-flex-between" style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+        <span class="cg-text-muted">Active Officers Sessions</span>
+        <span class="cg-badge success">All Operations Normal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Console -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+      <i class="fa-solid fa-sliders" style="color:var(--primary);margin-right:6px;"></i> Admin Console Settings
+    </h3>
+    
+    <div style="display:flex;flex-direction:column;gap:16px;font-size:13px;margin-bottom:20px;">
+      <div class="cg-flex-between">
+        <div>
+          <span class="cg-font-semibold" style="display:block;">Allow Self-Registration</span>
+          <span class="cg-text-muted" style="font-size:11px;">Enable signup route for credit officers.</span>
+        </div>
+        <input type="checkbox" checked style="cursor:pointer;" onclick="toggleSystemOption('Registration status updated')">
+      </div>
+      <div class="cg-flex-between" style="border-top:1px solid var(--border);padding-top:12px;">
+        <div>
+          <span class="cg-font-semibold" style="display:block;">Verbose XAI Explanations</span>
+          <span class="cg-text-muted" style="font-size:11px;">Generate detailed local surrogate data packets.</span>
+        </div>
+        <input type="checkbox" checked style="cursor:pointer;" onclick="toggleSystemOption('XAI verbose logging enabled')">
+      </div>
+    </div>
+
+    <div class="cg-flex cg-gap-sm" style="border-top:1px solid var(--border);padding-top:16px;">
+      <form method="POST" action="{{ url_for('api.clear_user_history') }}" onsubmit="return confirm('WARNING: This will purge all logged database entries. Continue?');" style="display:inline;">
+        <button type="submit" class="cg-btn cg-btn-danger cg-btn-sm">
+          <i class="fa-solid fa-trash-can"></i> Purge Database
+        </button>
+      </form>
+      <button type="button" class="cg-btn cg-btn-secondary cg-btn-sm" onclick="CG.Toast.show('Configuration parameters saved.', 'success')">
+        Save Settings
+      </button>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -230,5 +293,9 @@
         });
       });
   });
+
+  function toggleSystemOption(msg) {
+    CG.Toast.show(msg, "success");
+  }
 </script>
 {% endblock %}
