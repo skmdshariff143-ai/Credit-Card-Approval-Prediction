@@ -79,3 +79,8 @@ Thumbs.db
 # Ignore heavy serialized artifacts if required, but keep metadata & comparison files
 # models/*.pkl
 # models/*.joblib
+
+# Root junctions for static/templates
+/static
+/templates
+
