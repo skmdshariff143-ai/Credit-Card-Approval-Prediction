@@ -757,3 +757,37 @@ table.cg-table { width: 100%; border-collapse: collapse; }
   .cg-card { padding: 16px; }
   .cg-stat { padding: 14px 16px; }
 }
+
+/* ── Glowing Ambient Background Blobs ── */
+.cg-glow-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.05;
+  z-index: -1;
+  pointer-events: none;
+}
+.cg-glow-blob.blob-1 {
+  width: 300px;
+  height: 300px;
+  background: var(--primary);
+  top: 15%;
+  left: 25%;
+  animation: cg-drift-1 12s ease-in-out infinite alternate;
+}
+.cg-glow-blob.blob-2 {
+  width: 400px;
+  height: 400px;
+  background: var(--accent);
+  bottom: 15%;
+  right: 20%;
+  animation: cg-drift-2 15s ease-in-out infinite alternate;
+}
+@keyframes cg-drift-1 {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(80px, 40px) scale(1.15); }
+}
+@keyframes cg-drift-2 {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(-60px, -30px) scale(1.1); }
+}
