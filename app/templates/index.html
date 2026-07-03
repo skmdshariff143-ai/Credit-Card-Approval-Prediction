@@ -1,190 +1,181 @@
 {% extends 'base.html' %}
-{% block title %}CreditGuard AI | Advanced Risk Assessment Platform{% endblock %}
+{% block title %}CreditGuard AI | Premium Decisioning Suite{% endblock %}
 
 {% block content %}
-<div class="landing-hero-container">
-    <!-- Static Landing Page Navigation -->
-    <header class="landing-header-nav no-print">
-        <div class="landing-brand-logo">
-            <div class="logo-box"><i class="fas fa-shield-halved"></i></div>
-            <span>CreditGuard AI</span>
+<div class="container-fluid py-4 px-md-5">
+    
+    <!-- Static Landing Top Header -->
+    <header class="d-flex align-items-center justify-content-between pb-4 mb-4 border-bottom border-light-subtle no-print" data-aos="fade-down">
+        <div class="d-flex align-items-center gap-3">
+            <div class="sidebar-logo"><i class="fa-solid fa-shield-halved"></i></div>
+            <h1 class="h4 fw-bold m-0 letter-spacing-1 text-primary-emphasis">CreditGuard AI</h1>
         </div>
-        <div class="landing-nav-links">
-            <a href="#features">Features</a>
-            <a href="#pipeline">ML Pipeline</a>
-            <a href="#tech">Technology</a>
-            <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" target="_blank"><i class="fab fa-github"></i> Source</a>
-        </div>
-        <div class="landing-nav-actions">
+        <div class="d-flex align-items-center gap-3">
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('api.admin') }}" class="btn btn-primary">Dashboard</a>
+                <a href="{{ url_for('api.admin') }}" class="btn-premium btn-primary py-2 px-4 fs-7"><i class="fa-solid fa-gauge mr-8"></i> Go to Dashboard</a>
             {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn btn-ghost">Log In</a>
-                <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Get Started</a>
+                <a href="{{ url_for('auth.login') }}" class="btn-premium btn-secondary py-2 px-3 fs-7">Login</a>
+                <a href="{{ url_for('auth.register') }}" class="btn-premium btn-primary py-2 px-4 fs-7">Get Started</a>
             {% endif %}
         </div>
     </header>
 
-    <!-- Animated Hero Section -->
-    <section class="hero-split-layout">
-        <div class="hero-text-content animate-slide-up">
-            <span class="badge-accent-tag"><i class="fas fa-bolt"></i> Real-time AI Risk Evaluation</span>
-            <h1>Intelligent Credit <span class="gradient-headline">Decisioning</span></h1>
-            <p>Automate default screening using optimized machine learning models, local surrogate explanations, and dynamic DTI safety boundaries.</p>
-            <div class="hero-cta-buttons">
-                <a href="{{ url_for('api.predict_get') }}" class="btn btn-primary btn-lg"><i class="fas fa-play"></i> Run Assessment</a>
-                <a href="{{ url_for('api.about') }}" class="btn btn-ghost btn-lg"><i class="fas fa-circle-nodes"></i> Model Metrics</a>
+    <!-- Animated split Hero Section -->
+    <section class="row align-items-center py-5 mb-5 g-5">
+        <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
+            <span class="badge-premium primary mb-3"><i class="fa-solid fa-bolt text-primary"></i> Production-Ready AI Risk Scoring</span>
+            <h1 class="display-3 fw-bold mb-3 letter-spacing-1">Intelligent Credit <span class="gradient-text-glow">Decisioning</span></h1>
+            <p class="fs-5 text-secondary mb-4" style="line-height: 1.6;">Evaluate applicant delinquency risks instantly using optimized ensemble learning pipelines, local surrogate explainability weights, and custom Debt-To-Income safety rails.</p>
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{{ url_for('api.predict_get') }}" class="btn-premium btn-primary btn-lg"><i class="fa-solid fa-play"></i> Run Assessment</a>
+                <a href="{{ url_for('api.about') }}" class="btn-premium btn-secondary btn-lg"><i class="fa-solid fa-circle-nodes"></i> Model Metrics</a>
             </div>
         </div>
-        
-        <div class="hero-visual-card animate-scale-in">
-            <div class="card-3d-perspective">
-                <div class="fintech-credit-card">
-                    <div class="card-chip-element"></div>
-                    <div class="card-sensor-logo"><i class="fas fa-wifi"></i></div>
-                    <div class="card-brand-symbol"><i class="fas fa-shield-halved"></i></div>
-                    <div class="card-number-mask">5412 •••• •••• 9823</div>
-                    <div class="card-info-bottom">
-                        <div class="card-holder-name">
-                            <label>Issuer Platform</label>
-                            <span>CreditGuard AI</span>
+
+        <div class="col-lg-6 d-flex justify-content-center" data-aos="fade-left" data-aos-delay="200">
+            <div class="card-credit-3d-wrapper">
+                <div class="card-credit-3d">
+                    <div style="width: 44px; height: 32px; background: linear-gradient(135deg, #fcd34d, #d97706); border-radius: 6px; position: relative; margin-bottom: 24px;"></div>
+                    <div style="position: absolute; top: 32px; left: 88px; font-size: 16px; color: rgba(255,255,255,0.4);"><i class="fa-solid fa-wifi"></i></div>
+                    <div style="position: absolute; top: 24px; right: 28px; font-size: 26px; color: rgba(255, 255, 255, 0.8);"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div style="font-family: var(--font-mono); font-size: 20px; letter-spacing: 3px; color: rgba(255, 255, 255, 0.9); margin-bottom: 24px;">5412 •••• •••• 9823</div>
+                    <div class="d-flex justify-content-between align-items-end">
+                        <div>
+                            <label style="display:block; font-size:9px; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px; margin-bottom:4px;">Issuer Platform</label>
+                            <span style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.9);">CreditGuard AI</span>
                         </div>
-                        <div class="card-validity">
-                            <label>Expires</label>
-                            <span>08/29</span>
+                        <div>
+                            <label style="display:block; font-size:9px; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px; margin-bottom:4px;">Valid Thru</label>
+                            <span style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.9);">08/29</span>
                         </div>
                     </div>
-                    <div class="card-decorative-circle"></div>
+                    <div style="position: absolute; right: -40px; bottom: -40px; width: 180px; height: 180px; border-radius: 50%; border: 24px solid rgba(255, 255, 255, 0.025);"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Statistics Cards -->
-    <section class="landing-statistics-grid animate-slide-up stagger-1">
-        <div class="landing-stat-card card-glass">
-            <h3>98.7%</h3>
-            <p>Model Precision</p>
-        </div>
-        <div class="landing-stat-card card-glass">
-            <h3>50K+</h3>
-            <p>Evaluations Run</p>
-        </div>
-        <div class="landing-stat-card card-glass">
-            <h3>4</h3>
-            <p>Classifiers Compared</p>
-        </div>
-        <div class="landing-stat-card card-glass">
-            <h3>&lt; 8ms</h3>
-            <p>Scoring Speed</p>
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="landing-content-section" id="features">
-        <div class="section-title-wrapper animate-slide-up">
-            <span class="badge-accent-tag">Capabilities</span>
-            <h2>Enterprise-Grade Risk Infrastructure</h2>
-            <p>A comprehensive scoring environment combining structural models with financial rules overlays.</p>
-        </div>
-
-        <div class="landing-features-grid">
-            <div class="feature-card-item card-glass animate-slide-up stagger-1">
-                <div class="icon-avatar primary"><i class="fas fa-brain"></i></div>
-                <h4>Predictive AI Classifier</h4>
-                <p>Calculates credit default probability using Random Forest, XGBoost, and Decision Tree pipelines.</p>
+    <!-- Statistics Section -->
+    <section class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="100">
+        <div class="col-md-3 col-sm-6">
+            <div class="card-premium text-center">
+                <h3 class="display-6 fw-bold gradient-text-glow font-mono">98.7%</h3>
+                <p class="fs-7 text-secondary mb-0">Model Precision</p>
             </div>
-            
-            <div class="feature-card-item card-glass animate-slide-up stagger-2">
-                <div class="icon-avatar success"><i class="fas fa-chart-pie"></i></div>
-                <h4>Explainable Analytics</h4>
-                <p>Generates natural language surrogate logic, explaining how each demographic input affects risk.</p>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card-premium text-center">
+                <h3 class="display-6 fw-bold gradient-text-glow font-mono">50K+</h3>
+                <p class="fs-7 text-secondary mb-0">Assessments Run</p>
             </div>
-            
-            <div class="feature-card-item card-glass animate-slide-up stagger-3">
-                <div class="icon-avatar info"><i class="fas fa-bolt"></i></div>
-                <h4>In-Memory Scoring</h4>
-                <p>Preloaded models during application startup deliver instant risk evaluations under 10ms.</p>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card-premium text-center">
+                <h3 class="display-6 fw-bold gradient-text-glow font-mono">4</h3>
+                <p class="fs-7 text-secondary mb-0">Classifiers Trained</p>
             </div>
-
-            <div class="feature-card-item card-glass animate-slide-up stagger-4">
-                <div class="icon-avatar warning"><i class="fas fa-shield-halved"></i></div>
-                <h4>Debt-to-Income Overlay</h4>
-                <p>Validates DTI safety ratios, overriding statistical predictions if financial parameters trigger.</p>
-            </div>
-
-            <div class="feature-card-item card-glass animate-slide-up stagger-5">
-                <div class="icon-avatar danger"><i class="fas fa-folder-tree"></i></div>
-                <h4>SQLite Ledger</h4>
-                <p>Stores predictions history logs, supporting search queries, risk filters, sorting, and exports.</p>
-            </div>
-
-            <div class="feature-card-item card-glass animate-slide-up stagger-6">
-                <div class="icon-avatar secondary"><i class="fas fa-file-pdf"></i></div>
-                <h4>PDF Assessment Reports</h4>
-                <p>Generates printable and downloadable PDF risk audit reports complete with QR verification codes.</p>
+        </div>
+        <div class="col-md-3 col-sm-6">
+            <div class="card-premium text-center">
+                <h3 class="display-6 fw-bold gradient-text-glow font-mono">&lt; 8ms</h3>
+                <p class="fs-7 text-secondary mb-0">Evaluation Latency</p>
             </div>
         </div>
     </section>
 
-    <!-- Machine Learning Pipeline Section -->
-    <section class="landing-content-section" id="pipeline">
-        <div class="section-title-wrapper animate-slide-up">
-            <span class="badge-accent-tag">MLOps Training</span>
-            <h2>Integrated Training Pipeline</h2>
-            <p>Our pipeline balances target distributions, pre-processes characteristics, and optimizes classifiers.</p>
+    <!-- Features Grid -->
+    <section class="py-5 mb-5 border-top border-light-subtle">
+        <div class="text-center max-w-600 mx-auto mb-5" data-aos="fade-up">
+            <span class="badge-premium primary mb-2">Capabilities</span>
+            <h2 class="fw-bold h2 mb-3">Enterprise-Grade Risk Infrastructure</h2>
+            <p class="text-secondary fs-7">A comprehensive scoring environment combining optimized ML models with persistent database records.</p>
         </div>
 
-        <div class="pipeline-flow-container animate-slide-up stagger-1">
-            <div class="pipeline-node">
-                <div class="node-icon"><i class="fas fa-filter"></i></div>
-                <h5>1. Imbalance Fix</h5>
-                <p>SMOTE synthesizes minority target samples, correcting class ratios.</p>
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-premium h-100">
+                    <div class="stat-icon-wrapper primary mb-4"><i class="fa-solid fa-brain"></i></div>
+                    <h4 class="h5 fw-bold mb-2">Predictive ML Classifiers</h4>
+                    <p class="fs-7 text-secondary mb-0">Runs applicant parameters through XGBoost, Random Forest, Decision Tree, and Logistic Regression models.</p>
+                </div>
             </div>
-            <div class="pipeline-connector"><i class="fas fa-chevron-right"></i></div>
-            <div class="pipeline-node">
-                <div class="node-icon"><i class="fas fa-gears"></i></div>
-                <h5>2. Encoding & Scaling</h5>
-                <p>One-hot encodes assets, caps numeric outliers, and normalizes values.</p>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
+                <div class="card-premium h-100">
+                    <div class="stat-icon-wrapper success mb-4"><i class="fa-solid fa-chart-pie"></i></div>
+                    <h4 class="h5 fw-bold mb-2">Explainable AI (XAI)</h4>
+                    <p class="fs-7 text-secondary mb-0">Extracts local surrogate feature weights to explain the specific demographic reasons supporting approval or risk rejection.</p>
+                </div>
             </div>
-            <div class="pipeline-connector"><i class="fas fa-chevron-right"></i></div>
-            <div class="pipeline-node">
-                <div class="node-icon"><i class="fas fa-sliders"></i></div>
-                <h5>3. Model Scoring</h5>
-                <p>Applies XGBoost and Random Forest parameters to find risk values.</p>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-premium h-100">
+                    <div class="stat-icon-wrapper info mb-4"><i class="fa-solid fa-bolt"></i></div>
+                    <h4 class="h5 fw-bold mb-2">Instant In-Memory Inference</h4>
+                    <p class="fs-7 text-secondary mb-0">Preloaded pipeline singletons execute calculations during application startup for sub-10ms scoring response times.</p>
+                </div>
             </div>
-            <div class="pipeline-connector"><i class="fas fa-chevron-right"></i></div>
-            <div class="pipeline-node">
-                <div class="node-icon"><i class="fas fa-shield-check"></i></div>
-                <h5>4. Overlay Checks</h5>
-                <p>Validates DTI ratios and bureau rating checks before logging.</p>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="250">
+                <div class="card-premium h-100">
+                    <div class="stat-icon-wrapper warning mb-4"><i class="fa-solid fa-scale-balanced"></i></div>
+                    <h4 class="h5 fw-bold mb-2">DTI & Credit Check Overlays</h4>
+                    <p class="fs-7 text-secondary mb-0">Applies DTI business safety boundaries and Bureau rating rules to override predictions when financial constraints are triggered.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="card-premium h-100">
+                    <div class="stat-icon-wrapper danger mb-4"><i class="fa-solid fa-database"></i></div>
+                    <h4 class="h5 fw-bold mb-2">SQLite Audit Ledger</h4>
+                    <p class="fs-7 text-secondary mb-0">Logs prediction outputs securely, supporting full-text queries, sorted parameters, risk category filter chips, and deletions.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="350">
+                <div class="card-premium h-100">
+                    <div class="stat-icon-wrapper primary style-accent mb-4" style="background-color:rgba(0, 229, 255, 0.1); color:var(--accent);"><i class="fa-solid fa-file-pdf"></i></div>
+                    <h4 class="h5 fw-bold mb-2">Printable Assessment Reports</h4>
+                    <p class="fs-7 text-secondary mb-0">Compiles high-fidelity credit assessment documents containing digital QR code tags and audit signature blocks.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Technology Stack Section -->
-    <section class="landing-content-section" id="tech">
-        <div class="section-title-wrapper animate-slide-up">
-            <span class="badge-accent-tag">Frameworks</span>
-            <h2>Modern Technology Stack</h2>
-            <p>CreditGuard AI leverages production-grade frameworks for high performance and stability.</p>
+    <!-- ML Pipeline Flow Section -->
+    <section class="py-5 mb-5 border-top border-light-subtle">
+        <div class="text-center max-w-600 mx-auto mb-5" data-aos="fade-up">
+            <span class="badge-premium primary mb-2">MLOps Workflow</span>
+            <h2 class="fw-bold h2 mb-3">Model Training Pipeline</h2>
+            <p class="text-secondary fs-7">Our pipeline balances targets, caps numerical characteristics, and runs grid optimizations.</p>
         </div>
 
-        <div class="tech-stack-flex animate-slide-up stagger-1">
-            <div class="tech-stack-chip"><i class="fab fa-python text-primary"></i> Python 3.12</div>
-            <div class="tech-stack-chip"><i class="fas fa-server text-accent"></i> Flask 3.0</div>
-            <div class="tech-stack-chip"><i class="fas fa-gears text-success"></i> Scikit-Learn</div>
-            <div class="tech-stack-chip"><i class="fas fa-bolt text-warning"></i> XGBoost</div>
-            <div class="tech-stack-chip"><i class="fas fa-database text-danger"></i> SQLite 3</div>
-            <div class="tech-stack-chip"><i class="fas fa-chart-pie text-secondary"></i> Chart.js</div>
-            <div class="tech-stack-chip"><i class="fab fa-html5" style="color: #e34f26;"></i> HTML5</div>
-            <div class="tech-stack-chip"><i class="fab fa-css3-alt" style="color: #1572b6;"></i> CSS3</div>
+        <div class="pipeline-flow-container mt-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="pipeline-node flex-fill">
+                <div class="node-icon"><i class="fa-solid fa-filter"></i></div>
+                <h5 class="fw-bold fs-7 mb-1">1. Preprocessing</h5>
+                <p class="fs-8 text-secondary mb-0">Caps outliers via 1.5 IQR bounds, median imputes missing features.</p>
+            </div>
+            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="pipeline-node flex-fill">
+                <div class="node-icon"><i class="fa-solid fa-scale-unbalanced"></i></div>
+                <h5 class="fw-bold fs-7 mb-1">2. Target Balance</h5>
+                <p class="fs-8 text-secondary mb-0">SMOTE oversamples the minority default class target counts.</p>
+            </div>
+            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="pipeline-node flex-fill">
+                <div class="node-icon"><i class="fa-solid fa-sliders"></i></div>
+                <h5 class="fw-bold fs-7 mb-1">3. Grid Selection</h5>
+                <p class="fs-8 text-secondary mb-0">Trains 4 classifiers, prioritizing high recall on risk indicators.</p>
+            </div>
+            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="pipeline-node flex-fill">
+                <div class="node-icon"><i class="fa-solid fa-laptop-code"></i></div>
+                <h5 class="fw-bold fs-7 mb-1">4. API Serving</h5>
+                <p class="fs-8 text-secondary mb-0">Serializes the best estimator and warm-loads it on local app servers.</p>
+            </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="landing-page-footer">
-        <p>© 2026 CreditGuard AI Platform. All rights reserved. Created for premium credit risk automation.</p>
+    <footer class="text-center pt-5 border-top border-light-subtle no-print">
+        <p class="fs-8 text-muted mb-0">© 2026 CreditGuard AI Risk Suite. Built with Flask, Scikit-Learn, and Bootstrap 5.</p>
     </footer>
+
 </div>
 {% endblock %}

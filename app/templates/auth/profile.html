@@ -1,88 +1,109 @@
 {% extends 'base.html' %}
-{% block title %}CreditGuard AI | My Profile{% endblock %}
+{% block title %}CreditGuard AI | Profile Settings{% endblock %}
 
 {% block content %}
-<div class="workspace-page-header animate-slide-up">
-    <div class="header-breadcrumbs">
-        <a href="{{ url_for('api.admin') }}">Dashboard</a>
-        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
-        <span class="active-crumb">My Profile</span>
-    </div>
-    <h1>Account Profile</h1>
-    <p>Manage your account settings, update credentials, and view usage statistics.</p>
-</div>
-
-<div class="grid grid-2 gap-24 animate-slide-up stagger-1">
-    <!-- Profile Card -->
-    <div class="card card-glass text-center p-32">
-        <div class="mobile-user-initials" style="width:72px;height:72px;font-size:28px;margin:0 auto 20px;border-radius:var(--radius-md);">
-            {{ current_user.username[:2].upper() }}
+<div class="container-fluid py-4 px-md-5">
+    
+    <div class="workspace-page-header mb-4" data-aos="fade-down">
+        <div class="header-breadcrumbs">
+            <a href="{{ url_for('api.admin') }}">Dashboard</a>
+            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
+            <span class="active-crumb">My Profile</span>
         </div>
-        <h3 style="font-family:var(--font-heading);font-size:22px;">{{ current_user.full_name or current_user.username }}</h3>
-        <p class="text-secondary" style="font-size:14px;">{{ current_user.email or 'No email set' }}</p>
-        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-color);">
-            <span class="badge badge-primary"><i class="fas fa-shield-halved"></i> Active Account</span>
-        </div>
+        <h1 class="h3 fw-bold m-0 mt-2">Account Profile Settings</h1>
+        <p class="text-secondary mb-0">Update account credentials, notification configurations, and security passwords.</p>
     </div>
 
-    <!-- Update Profile Form -->
-    <div class="card card-glass">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-user-pen text-primary"></i> Update Profile</h3>
+    <div class="row g-4 align-items-stretch" data-aos="fade-up" data-aos-delay="100">
+        
+        <!-- Left: User Details Card -->
+        <div class="col-lg-5">
+            <div class="card-premium h-100 text-center py-5 d-flex flex-column justify-content-between">
+                <div>
+                    <div style="width: 76px; height: 76px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; font-size: 32px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: var(--shadow-neon);">
+                        {{ current_user.username[:2].upper() }}
+                    </div>
+                    <h3 class="h5 fw-bold mb-1">{{ current_user.full_name or current_user.username }}</h3>
+                    <span class="fs-7 text-secondary">{{ current_user.email or 'No email registered' }}</span>
+                </div>
+                
+                <div class="mt-4 pt-4 border-top border-light-subtle">
+                    <span class="badge-premium primary"><i class="fa-solid fa-shield-halved me-2"></i> Role: Risk Assessor</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Profile Form -->
+        <div class="col-lg-7">
+            <div class="card-premium">
+                <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
+                    <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-user-pen text-primary me-2"></i> Update Profile Information</h3>
+                </div>
+                <form method="POST" action="{{ url_for('auth.profile') }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="form_type" value="profile">
+
+                    <div class="form-group mb-3">
+                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="full_name">Full Name</label>
+                        <div class="form-floating-premium">
+                            <i class="fa-solid fa-id-card form-icon-left"></i>
+                            <input type="text" name="full_name" id="full_name" class="form-control-premium" value="{{ current_user.full_name or '' }}" placeholder="Enter full name">
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="email">Email Address</label>
+                        <div class="form-floating-premium">
+                            <i class="fa-solid fa-envelope form-icon-left"></i>
+                            <input type="email" name="email" id="email" class="form-control-premium" value="{{ current_user.email or '' }}" placeholder="Enter email address">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-premium btn-primary">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Profile Changes
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Password Updates -->
+    <div class="card-premium mt-4 animate-slide-up stagger-1">
+        <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
+            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-key text-warning me-2"></i> Modify Account Password</h3>
         </div>
         <form method="POST" action="{{ url_for('auth.profile') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="form_type" value="profile">
+            <input type="hidden" name="form_type" value="password">
 
-            <div class="form-group">
-                <label class="form-label" for="full_name">Full Name</label>
-                <div class="form-control-icon-wrapper">
-                    <i class="fas fa-id-card"></i>
-                    <input type="text" name="full_name" id="full_name" class="form-control" value="{{ current_user.full_name or '' }}" placeholder="Your full name">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="current_password">Current Password</label>
+                        <div class="form-floating-premium">
+                            <i class="fa-solid fa-lock form-icon-left"></i>
+                            <input type="password" name="current_password" id="current_password" class="form-control-premium" required placeholder="Enter current password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="new_password">New Password</label>
+                        <div class="form-floating-premium">
+                            <i class="fa-solid fa-shield-halved form-icon-left"></i>
+                            <input type="password" name="new_password" id="new_password" class="form-control-premium" required minlength="6" placeholder="Enter new password">
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="email">Email Address</label>
-                <div class="form-control-icon-wrapper">
-                    <i class="fas fa-envelope"></i>
-                    <input type="email" name="email" id="email" class="form-control" value="{{ current_user.email or '' }}" placeholder="your@email.com">
-                </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary"><i class="fas fa-floppy-disk"></i> Save Changes</button>
+            <button type="submit" class="btn-premium btn-secondary mt-3 text-warning border-warning-subtle">
+                <i class="fa-solid fa-key"></i> Update Password Credentials
+            </button>
         </form>
     </div>
-</div>
 
-<!-- Change Password -->
-<div class="card card-glass mt-24 animate-slide-up stagger-2">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-key text-warning"></i> Change Password</h3>
-    </div>
-    <form method="POST" action="{{ url_for('auth.profile') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="form_type" value="password">
-
-        <div class="grid grid-2 gap-24">
-            <div class="form-group">
-                <label class="form-label" for="current_password">Current Password</label>
-                <div class="form-control-icon-wrapper">
-                    <i class="fas fa-lock"></i>
-                    <input type="password" name="current_password" id="current_password" class="form-control" required placeholder="Enter current password">
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="new_password">New Password</label>
-                <div class="form-control-icon-wrapper">
-                    <i class="fas fa-shield-halved"></i>
-                    <input type="password" name="new_password" id="new_password" class="form-control" required minlength="6" placeholder="Enter new password">
-                </div>
-            </div>
-        </div>
-
-        <button type="submit" class="btn btn-warning"><i class="fas fa-key"></i> Update Password</button>
-    </form>
 </div>
 {% endblock %}

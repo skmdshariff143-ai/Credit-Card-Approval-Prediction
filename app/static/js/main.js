@@ -4,218 +4,225 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-  
+
   // 1. PAGE TRANSITION LOADER LIFECYCLE
-  const loader = document.getElementById('pageLoader');
-  if (loader) {
+  const loaderMask = document.getElementById('pageLoaderMask');
+  if (loaderMask) {
     setTimeout(() => {
-      loader.classList.add('hidden');
-    }, 180);
+      loaderMask.classList.add('hidden');
+    }, 250);
   }
 
-  // 2. MODERN LIGHT/DARK THEME TOGGLE
-  const themeSwitchControl = document.getElementById('themeSwitchControl');
+  // 2. INITIALIZE SCROLL ANIMATIONS (AOS) & ICONS (Lucide)
+  if (typeof aos !== 'undefined' || typeof AOS !== 'undefined') {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out-cubic',
+      once: true
+    });
+  }
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+
+  // 3. GSAP INITIAL ANIMATION LOAD
+  if (typeof gsap !== 'undefined') {
+    gsap.from(".workspace-wrapper", {
+      opacity: 0,
+      y: 15,
+      duration: 0.6,
+      ease: "power2.out"
+    });
+  }
+
+  // 4. DARK / LIGHT THEME PREFERENCE CONTROLLER
   const themeTogglerBtn = document.getElementById('themeTogglerBtn');
-  const activeTheme = localStorage.getItem('theme') || 'dark';
+  const storedTheme = localStorage.getItem('theme') || 'dark';
 
-  document.documentElement.setAttribute('data-theme', activeTheme);
+  document.documentElement.setAttribute('data-theme', storedTheme);
   
-  // Align toggle label if exist
   if (themeTogglerBtn) {
-    const label = themeTogglerBtn.querySelector('.theme-label-text');
-    if (label) {
-      label.textContent = (activeTheme === 'dark') ? 'Dark Mode' : 'Light Mode';
+    const labelSpan = themeTogglerBtn.parentElement.querySelector('.theme-switch-label');
+    if (labelSpan) {
+      labelSpan.textContent = (storedTheme === 'dark') ? 'Dark Mode' : 'Light Mode';
     }
-  }
 
-  if (themeSwitchControl) {
-    themeSwitchControl.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme');
-      const target = (current === 'dark') ? 'light' : 'dark';
+    themeTogglerBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme');
+      const target = (active === 'dark') ? 'light' : 'dark';
       
       document.documentElement.setAttribute('data-theme', target);
       localStorage.setItem('theme', target);
-
-      if (themeTogglerBtn) {
-        const label = themeTogglerBtn.querySelector('.theme-label-text');
-        if (label) {
-          label.textContent = (target === 'dark') ? 'Dark Mode' : 'Light Mode';
-        }
+      
+      if (labelSpan) {
+        labelSpan.textContent = (target === 'dark') ? 'Dark Mode' : 'Light Mode';
       }
     });
   }
 
-  // 3. MOBILE SIDEBAR DRAWER INTERACTIONS
-  const sidebarToggle = document.getElementById('sidebarToggle');
-  const sidebarDrawer = document.getElementById('sidebarDrawer');
-  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+  // 5. MOBILE DRAWER NAVIGATION MENU
+  const menuOpenBtn = document.getElementById('mobileMenuOpen');
+  const sidebarPanel = document.getElementById('sidebarPanel');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-  if (sidebarToggle && sidebarDrawer && sidebarBackdrop) {
-    const toggleSidebar = () => {
-      sidebarDrawer.classList.toggle('open');
-      sidebarBackdrop.classList.toggle('active');
+  if (menuOpenBtn && sidebarPanel && sidebarOverlay) {
+    const toggleMenu = () => {
+      sidebarPanel.classList.toggle('open');
+      sidebarOverlay.classList.toggle('active');
     };
 
-    sidebarToggle.addEventListener('click', toggleSidebar);
-    sidebarBackdrop.addEventListener('click', toggleSidebar);
-
-    // Close on navigation
-    const navLinks = sidebarDrawer.querySelectorAll('.menu-item');
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        sidebarDrawer.classList.remove('open');
-        sidebarBackdrop.classList.remove('active');
-      });
-    });
+    menuOpenBtn.addEventListener('click', toggleMenu);
+    sidebarOverlay.addEventListener('click', toggleMenu);
   }
 
-  // 4. MULTI-STEP WIZARD ENGINE (5 Steps)
+  // 6. MULTI-STEP WIZARD ENGINE (5 Steps)
   const wizardForm = document.getElementById('wizardForm');
   if (wizardForm) {
-    const panels = Array.from(wizardForm.querySelectorAll('.wizard-step-panel'));
-    const indicators = Array.from(document.querySelectorAll('.timeline-step'));
-    const fill = document.getElementById('wizardProgressFill');
+    const panels = Array.from(wizardForm.querySelectorAll('.wizard-panel'));
+    const stepNodes = Array.from(document.querySelectorAll('.wizard-step-node'));
+    const fillBar = document.getElementById('wizardProgressFill');
     
     const backBtn = document.getElementById('wizardBack');
     const nextBtn = document.getElementById('wizardNext');
     const submitBtn = document.getElementById('wizardSubmit');
     
-    let currentStep = 1;
-    const totalSteps = 5;
+    let activeStep = 1;
+    const maxSteps = 5;
 
-    // Validate active step fields
-    const validateStep = (step) => {
-      const activePanel = panels.find(p => parseInt(p.dataset.step) === step);
-      if (!activePanel) return true;
+    // Validate current panel entries
+    const checkPanelInputs = (step) => {
+      const panel = panels.find(p => parseInt(p.dataset.step) === step);
+      if (!panel) return true;
 
-      const inputs = Array.from(activePanel.querySelectorAll('input, select'));
-      let isValid = true;
+      const fields = Array.from(panel.querySelectorAll('input, select'));
+      let status = true;
 
-      inputs.forEach(input => {
+      fields.forEach(field => {
         // Clear any old validation messages
-        const parent = input.closest('.form-group');
-        if (parent) {
-          const oldMsg = parent.querySelector('.form-error');
+        const formGroup = field.closest('.form-floating-premium') || field.closest('.form-group');
+        if (formGroup) {
+          const oldMsg = formGroup.querySelector('.form-error');
           if (oldMsg) oldMsg.remove();
         }
 
-        // Run verification checks
-        if (input.hasAttribute('required') && !input.value.trim()) {
-          isValid = false;
-          showErrorMsg(input, 'This entry is required.');
-        } else if (input.id === 'age_years' && input.value) {
-          const age = parseFloat(input.value);
+        if (field.hasAttribute('required') && !field.value.trim()) {
+          status = false;
+          appendError(field, 'This entry is required.');
+        } else if (field.id === 'age_years' && field.value) {
+          const age = parseFloat(field.value);
           if (isNaN(age) || age < 18 || age > 99) {
-            isValid = false;
-            showErrorMsg(input, 'Applicant age must be between 18 and 99 years.');
+            status = false;
+            appendError(field, 'Applicant age must be between 18 and 99 years.');
           }
-        } else if (input.id === 'amt_income_total' && input.value) {
-          const income = parseFloat(input.value);
+        } else if (field.id === 'amt_income_total' && field.value) {
+          const income = parseFloat(field.value);
           if (isNaN(income) || income <= 0) {
-            isValid = false;
-            showErrorMsg(input, 'Annual gross income must be a positive value.');
+            status = false;
+            appendError(field, 'Annual gross income must be a positive value.');
           }
-        } else if (input.id === 'existing_debt' && input.value) {
-          const debt = parseFloat(input.value);
+        } else if (field.id === 'existing_debt' && field.value) {
+          const debt = parseFloat(field.value);
           if (isNaN(debt) || debt < 0) {
-            isValid = false;
-            showErrorMsg(input, 'Debt payments cannot be negative.');
+            status = false;
+            appendError(field, 'Debt outflow cannot be negative.');
           }
-        } else if (input.id === 'loan_amount' && input.value) {
-          const limit = parseFloat(input.value);
+        } else if (field.id === 'loan_amount' && field.value) {
+          const limit = parseFloat(field.value);
           if (isNaN(limit) || limit <= 0) {
-            isValid = false;
-            showErrorMsg(input, 'Credit limit must be a positive value.');
+            status = false;
+            appendError(field, 'Requested limit must be a positive value.');
           }
         }
       });
 
-      return isValid;
+      return status;
     };
 
-    const showErrorMsg = (input, msg) => {
-      const parent = input.closest('.form-group');
-      if (parent) {
-        const err = document.createElement('div');
-        err.className = 'form-error animate-slide-up';
-        err.textContent = msg;
-        parent.appendChild(err);
+    const appendError = (field, text) => {
+      const formGroup = field.closest('.form-floating-premium') || field.closest('.form-group');
+      if (formGroup) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'form-error animate-slide-up text-danger mt-1 fs-7';
+        errorDiv.textContent = text;
+        formGroup.appendChild(errorDiv);
       }
     };
 
-    // Extract entries to populate Step 4 (Review) summary grid
-    const populateReviewSummary = () => {
-      const summaryGrid = document.getElementById('reviewSummary');
-      if (!summaryGrid) return;
-      
-      summaryGrid.innerHTML = '';
-      
-      const elementsMap = [
-        { label: 'Gender', id: 'code_gender' },
-        { label: 'Age', id: 'age_years', suffix: ' Years' },
+    // Populates Step 4 Review summary blocks
+    const compileSummaryDetails = () => {
+      const summaryBox = document.getElementById('reviewSummary');
+      if (!summaryBox) return;
+
+      summaryBox.innerHTML = '';
+
+      const mapping = [
+        { label: 'Applicant Gender', id: 'code_gender' },
+        { label: 'Applicant Age', id: 'age_years', suffix: ' Years' },
         { label: 'Marital Status', id: 'name_family_status' },
-        { label: 'Children', id: 'cnt_children' },
-        { label: 'Family Members', id: 'cnt_fam_members' },
-        { label: 'Education', id: 'name_education_type' },
+        { label: 'Children Count', id: 'cnt_children' },
+        { label: 'Family Size', id: 'cnt_fam_members' },
+        { label: 'Education Level', id: 'name_education_type' },
         { label: 'Housing Type', id: 'name_housing_type' },
-        { label: 'Income Category', id: 'name_income_type' },
+        { label: 'Income Source', id: 'name_income_type' },
         { label: 'Occupation Sector', id: 'occupation_type' },
-        { label: 'Employment Duration', id: 'years_employed', suffix: ' Yrs' },
+        { label: 'Experience duration', id: 'years_employed', suffix: ' Yrs' },
         { label: 'Gross Annual Income', id: 'amt_income_total', prefix: '$' },
-        { label: 'Monthly Debt Outflow', id: 'existing_debt', prefix: '$' },
+        { label: 'Monthly Liabilities', id: 'existing_debt', prefix: '$' },
         { label: 'Requested Limit', id: 'loan_amount', prefix: '$' },
-        { label: 'Credit Rating', id: 'credit_history' }
+        { label: 'Bureau Repay History', id: 'credit_history' }
       ];
 
-      elementsMap.forEach(field => {
-        const input = document.getElementById(field.id);
-        if (input) {
-          let text = '';
-          if (input.tagName === 'SELECT') {
-            text = input.options[input.selectedIndex].text;
+      mapping.forEach(item => {
+        const field = document.getElementById(item.id);
+        if (field) {
+          let valText = '';
+          if (field.tagName === 'SELECT') {
+            valText = field.options[field.selectedIndex].text;
           } else {
-            text = input.value || 'N/A';
+            valText = field.value || 'N/A';
           }
-          
-          if (field.prefix && text !== 'N/A') text = field.prefix + text;
-          if (field.suffix && text !== 'N/A') text = text + field.suffix;
+
+          if (item.prefix && valText !== 'N/A') valText = item.prefix + valText;
+          if (item.suffix && valText !== 'N/A') valText = valText + item.suffix;
 
           const block = document.createElement('div');
-          block.className = 'wizard-summary-item';
+          block.className = 'col-sm-6 mb-3';
           block.innerHTML = `
-            <label>${field.label}</label>
-            <span>${text}</span>
+            <div class="p-3 rounded bg-glass border border-light-subtle">
+              <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">${item.label}</label>
+              <span class="fs-6 fw-semibold text-primary-emphasis">${valText}</span>
+            </div>
           `;
-          summaryGrid.appendChild(block);
+          summaryBox.appendChild(block);
         }
       });
     };
 
-    // Change step view layout
-    const transitionStep = () => {
-      panels.forEach(panel => {
-        panel.classList.toggle('active', parseInt(panel.dataset.step) === currentStep);
+    // Transition wizard panels
+    const displayActivePanel = () => {
+      panels.forEach(p => {
+        p.classList.toggle('active', parseInt(p.dataset.step) === activeStep);
       });
 
-      // Fill line length
-      if (fill) {
-        const pct = ((currentStep - 1) / (totalSteps - 1)) * 100;
-        fill.style.width = `${pct}%`;
+      // Fill bar
+      if (fillBar) {
+        const pct = ((activeStep - 1) / (maxSteps - 1)) * 100;
+        fillBar.style.width = `${pct}%`;
       }
 
-      // Step indicators
-      indicators.forEach(ind => {
-        const stepNum = parseInt(ind.dataset.step);
-        ind.classList.toggle('active', stepNum === currentStep);
-        ind.classList.toggle('completed', stepNum < currentStep);
+      // Steps indicator bubbles
+      stepNodes.forEach(node => {
+        const stepNum = parseInt(node.dataset.step);
+        node.classList.toggle('active', stepNum === activeStep);
+        node.classList.toggle('completed', stepNum < activeStep);
       });
 
-      // Controls buttons toggle
+      // Show/Hide navigation controls
       if (backBtn) {
-        backBtn.style.visibility = (currentStep === 1) ? 'hidden' : 'visible';
+        backBtn.style.visibility = (activeStep === 1) ? 'hidden' : 'visible';
       }
 
-      if (currentStep === totalSteps) {
+      if (activeStep === maxSteps) {
         if (nextBtn) nextBtn.style.display = 'none';
         if (submitBtn) submitBtn.style.display = 'inline-flex';
       } else {
@@ -223,17 +230,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (submitBtn) submitBtn.style.display = 'none';
       }
 
-      if (currentStep === 4) {
-        populateReviewSummary();
+      if (activeStep === 4) {
+        compileSummaryDetails();
       }
     };
 
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
-        if (validateStep(currentStep)) {
-          if (currentStep < totalSteps) {
-            currentStep++;
-            transitionStep();
+        if (checkPanelInputs(activeStep)) {
+          if (activeStep < maxSteps) {
+            activeStep++;
+            displayActivePanel();
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }
         }
@@ -242,36 +249,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (backBtn) {
       backBtn.addEventListener('click', () => {
-        if (currentStep > 1) {
-          currentStep--;
-          transitionStep();
+        if (activeStep > 1) {
+          activeStep--;
+          displayActivePanel();
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       });
     }
 
-    // Load initial layout
-    transitionStep();
-  }
-
-  // 5. BUTTON RIPPLE CLICK DECORATOR
-  const btnElements = document.querySelectorAll('.btn');
-  btnElements.forEach(btn => {
-    btn.addEventListener('click', function(e) {
-      const boundaries = this.getBoundingClientRect();
-      const clickX = e.clientX - boundaries.left;
-      const clickY = e.clientY - boundaries.top;
-
-      const rippleCircle = document.createElement('span');
-      rippleCircle.className = 'ripple';
-      rippleCircle.style.left = `${clickX}px`;
-      rippleCircle.style.top = `${clickY}px`;
-
-      this.appendChild(rippleCircle);
-      setTimeout(() => {
-        rippleCircle.remove();
-      }, 600);
+    // Step indicators clickable navigations
+    stepNodes.forEach(node => {
+      node.addEventListener('click', () => {
+        const targetStep = parseInt(node.dataset.step);
+        if (targetStep < activeStep) {
+          activeStep = targetStep;
+          displayActivePanel();
+        } else if (targetStep > activeStep) {
+          // Validate intermediate steps
+          let canGo = true;
+          for (let s = activeStep; s < targetStep; s++) {
+            if (!checkPanelInputs(s)) {
+              canGo = false;
+              break;
+            }
+          }
+          if (canGo) {
+            activeStep = targetStep;
+            displayActivePanel();
+          }
+        }
+      });
     });
-  });
+
+    displayActivePanel();
+  }
 
 });

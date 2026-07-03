@@ -2,187 +2,193 @@
 {% block title %}CreditGuard AI | Evaluation Result{% endblock %}
 
 {% block content %}
-<div class="workspace-page-header animate-slide-up">
-    <div class="header-breadcrumbs">
-        <a href="{{ url_for('api.admin') }}">Dashboard</a>
-        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
-        <a href="{{ url_for('api.predict_get') }}">Evaluation</a>
-        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
-        <span class="active-crumb">Result</span>
-    </div>
-    <h1>Risk Scoring Results</h1>
-    <p>Real-time machine learning prediction and LIME local feature contribution weights.</p>
-</div>
-
-<div class="result-dashboard-grid mt-24 animate-scale-in">
+<div class="container-fluid py-4 px-md-5">
     
-    <!-- Large Approval Card (Visual Block) -->
-    <div class="large-approval-card {% if result == 'Approved' %}approved{% else %}rejected{% endif %}">
-        <span class="card-app-id">{{ application_id }}</span>
+    <div class="workspace-page-header mb-4" data-aos="fade-down">
+        <div class="header-breadcrumbs">
+            <a href="{{ url_for('api.admin') }}">Dashboard</a>
+            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
+            <a href="{{ url_for('api.predict_get') }}">Evaluation</a>
+            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
+            <span class="active-crumb">Result</span>
+        </div>
+        <h1 class="h3 fw-bold m-0 mt-2">Evaluation Risk Result</h1>
+        <p class="text-secondary mb-0">Local surrogate attribution values and decision outcome logs.</p>
+    </div>
+
+    <!-- Results Split Layout -->
+    <div class="row g-4 align-items-stretch" data-aos="fade-up" data-aos-delay="100">
         
-        <!-- Circular Progress / Confidence Meter -->
-        <div class="circular-progress-wrapper">
-            <svg class="progress-ring-svg" width="160" height="160">
-                <circle class="progress-ring-bg" stroke="rgba(255, 255, 255, 0.06)" stroke-width="12" fill="transparent" r="70" cx="80" cy="80"/>
-                <circle class="progress-ring-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" id="resultRingFill" stroke-width="12" fill="transparent" r="70" cx="80" cy="80"
-                        stroke-dasharray="439.82" stroke-dashoffset="439.82"/>
-            </svg>
-            <div class="progress-center-value" id="resultRingText">0%</div>
-        </div>
-
-        <div class="confidence-label">Approval Confidence</div>
-
-        <div class="result-status-badge {% if result == 'Approved' %}approved{% else %}rejected{% endif %}">
-            {% if result == 'Approved' %}
-                <i class="fas fa-circle-check"></i> Approved
-            {% else %}
-                <i class="fas fa-circle-xmark"></i> Rejected
-            {% endif %}
-        </div>
-
-        <div class="risk-profile-meta">
-            <span>Risk Level: <strong>{{ risk_level }}</strong></span>
-            <span>•</span>
-            <span>Latency: <strong>{{ prediction_time }}ms</strong></span>
-        </div>
-    </div>
-
-    <!-- AI Explanation Card -->
-    <div class="card card-glass animate-slide-up stagger-1">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-brain text-accent"></i> AI Explanation</h3>
-            <span class="panel-badge-step">Explainable AI (XAI)</span>
-        </div>
-        
-        <p class="explanation-summary-text mt-8">
-            {% if result == 'Approved' %}
-                <strong>Approved Profile:</strong> The classifier verified applicant credentials. 
-                Excellent income safety bounds and assets conform to issue guidelines.
-            {% else %}
-                <strong>Risk Profile Detected:</strong> Scoring algorithms registered delinquency parameters. 
-                High debt burden or inadequate employment duration indicates financial risk.
-            {% endif %}
-        </p>
-
-        <!-- Dynamic Reasons list -->
-        <h4 class="mt-16 mb-8" style="font-size: 13px; text-transform: uppercase; color: var(--text-muted);">Key Risk Reasons</h4>
-        <div class="explanation-factor-list">
-            {% for reason in reasons %}
-                <div class="factor-list-item">
-                    <i class="fas {% if result == 'Approved' %}fa-plus-circle text-success{% else %}fa-exclamation-circle text-danger{% endif %}"></i>
-                    <span>{{ reason }}</span>
+        <!-- Left: Status Ring Card -->
+        <div class="col-lg-5">
+            <div class="results-banner-card h-100 {% if result == 'Approved' %}approved{% else %}rejected{% endif %} d-flex flex-column align-items-center justify-content-center">
+                <span class="card-app-id mb-4">{{ application_id }}</span>
+                
+                <!-- Circular SVG Progress -->
+                <div class="circular-gauge-box mb-4">
+                    <svg class="gauge-svg-ring" width="180" height="180">
+                        <circle stroke="rgba(255, 255, 255, 0.05)" stroke-width="12" fill="transparent" r="76" cx="90" cy="90"/>
+                        <circle class="gauge-circle-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" id="gaugeFill" stroke-width="12" fill="transparent" r="76" cx="90" cy="90"
+                                stroke-dasharray="477.52" stroke-dashoffset="477.52"/>
+                    </svg>
+                    <div class="gauge-text-score" id="gaugeValue">0%</div>
                 </div>
-            {% endfor %}
-        </div>
-    </div>
 
-    <!-- Recommendation Cards -->
-    <div class="card card-glass animate-slide-up stagger-2">
-        <div class="card-header">
-            <h3 class="card-title"><i class="fas fa-list-check text-warning"></i> Action Recommendations</h3>
-            <span class="panel-badge-step">Guidance</span>
-        </div>
+                <div class="fs-7 text-secondary mb-4">Inference Decision Score</div>
 
-        <div class="explanation-factor-list mt-8">
-            {% for rec in recommendations %}
-                <div class="factor-list-item">
-                    <i class="fas fa-circle-check text-accent"></i>
-                    <span>{{ rec }}</span>
+                <div class="result-status-badge {% if result == 'Approved' %}approved{% else %}rejected{% endif %} mb-4">
+                    {% if result == 'Approved' %}
+                        <i class="fa-solid fa-circle-check"></i> Approved
+                    {% else %}
+                        <i class="fa-solid fa-circle-xmark"></i> Rejected
+                    {% endif %}
                 </div>
-            {% endfor %}
-        </div>
-    </div>
 
-</div>
-
-<!-- LIME Feature Contribution Weights -->
-<div class="card card-glass mt-24 animate-slide-up stagger-3">
-    <div class="card-header">
-        <h3 class="card-title"><i class="fas fa-chart-column text-primary"></i> Predictive Feature Contribution Weights</h3>
-        <span class="panel-badge-step">Classifier: {{ model_used }}</span>
-    </div>
-
-    <div class="factor-contribution-grid mt-16">
-        <!-- Positives -->
-        <div class="card card-glass">
-            <h4 class="text-success mb-16"><i class="fas fa-chevron-up"></i> Supporting Elements</h4>
-            <div class="contributions-stack">
-                {% if support_factors %}
-                    {% for factor in support_factors %}
-                        <div class="contribution-item-bar positive">
-                            <span class="feature-label">{{ factor.feature }}</span>
-                            <span class="feature-weight">+{{ factor.weight | round(3) }}</span>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <span class="text-muted" style="font-size:13px;">No significant supporting factors.</span>
-                {% endif %}
+                <div class="risk-profile-meta mt-3 fs-7 text-muted">
+                    <span>Risk Profile: <strong class="text-primary-emphasis">{{ risk_level }}</strong></span>
+                    <span class="mx-2">•</span>
+                    <span>Scoring Latency: <strong class="text-primary-emphasis">{{ prediction_time }}ms</strong></span>
+                </div>
             </div>
         </div>
 
-        <!-- Negatives -->
-        <div class="card card-glass">
-            <h4 class="text-danger mb-16"><i class="fas fa-chevron-down"></i> Risk Flags</h4>
-            <div class="contributions-stack">
-                {% if risk_factors %}
-                    {% for factor in risk_factors %}
-                        <div class="contribution-item-bar negative">
-                            <span class="feature-label">{{ factor.feature }}</span>
-                            <span class="feature-weight">{{ factor.weight | round(3) }}</span>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <span class="text-muted" style="font-size:13px;">No significant risk factors detected.</span>
-                {% endif %}
+        <!-- Right: AI Explanation & Recommendations -->
+        <div class="col-lg-7">
+            <div class="d-flex flex-column gap-4 h-100">
+                <!-- AI Explanation -->
+                <div class="card-premium flex-fill">
+                    <div class="card-header border-bottom border-light-subtle pb-2 mb-3">
+                        <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-brain text-accent me-2"></i> AI Explanation</h4>
+                    </div>
+                    <p class="fs-6 text-secondary mb-4" style="line-height:1.7;">
+                        {% if result == 'Approved' %}
+                            <strong>delinquency cleared:</strong> Machine learning algorithms validated applicant socio-demographic values. Strong asset counts and balanced annual liabilities classify profile as low-risk issuer guidelines.
+                        {% else %}
+                            <strong>delinquency risk detected:</strong> Predictor estimators registered risk indicators on applicant characteristics. Short employment history or high debt ratios exceed default classification boundaries.
+                        {% endif %}
+                    </p>
+
+                    <h5 class="fs-9 text-muted text-uppercase fw-bold letter-spacing-1 mb-3">Primary Risk Attributions</h5>
+                    <div class="d-flex flex-column gap-2">
+                        {% for reason in reasons %}
+                            <div class="d-flex align-items-start gap-2 fs-7 text-secondary">
+                                <i class="fa-solid {% if result == 'Approved' %}fa-circle-plus text-success{% else %}fa-circle-exclamation text-danger{% endif %} mt-1"></i>
+                                <span>{{ reason }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Recommendations -->
+                <div class="card-premium">
+                    <div class="card-header border-bottom border-light-subtle pb-2 mb-3">
+                        <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-list-check text-warning me-2"></i> Officer Recommendations</h4>
+                    </div>
+                    <div class="d-flex flex-column gap-2">
+                        {% for rec in recommendations %}
+                            <div class="d-flex align-items-start gap-2 fs-7 text-secondary">
+                                <i class="fa-solid fa-circle-check text-accent mt-1"></i>
+                                <span>{{ rec }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- LIME Attribution Chart -->
+    <div class="card-premium mt-4" data-aos="fade-up" data-aos-delay="200">
+        <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center">
+            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-chart-column text-primary me-2"></i> Local Surrogate Feature Attributions</h3>
+            <span class="badge-premium primary">Model: {{ model_used }}</span>
+        </div>
+
+        <div class="row g-4">
+            <!-- Supporting factors -->
+            <div class="col-md-6">
+                <div class="card-premium bg-transparent">
+                    <h4 class="h6 fw-bold text-success mb-3"><i class="fa-solid fa-circle-chevron-up"></i> Supporting Elements</h4>
+                    <div class="d-flex flex-column gap-2">
+                        {% if support_factors %}
+                            {% for factor in support_factors %}
+                                <div class="contribution-row-bar positive">
+                                    <span class="fs-7 fw-semibold text-secondary-emphasis">{{ factor.feature }}</span>
+                                    <span class="fs-7 fw-bold font-mono text-success">+{{ factor.weight | round(3) }}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="fs-7 text-muted mb-0">No significant positive feature weights identified.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk factors -->
+            <div class="col-md-6">
+                <div class="card-premium bg-transparent">
+                    <h4 class="h6 fw-bold text-danger mb-3"><i class="fa-solid fa-circle-chevron-down"></i> Risk Flags</h4>
+                    <div class="d-flex flex-column gap-2">
+                        {% if risk_factors %}
+                            {% for factor in risk_factors %}
+                                <div class="contribution-row-bar negative">
+                                    <span class="fs-7 fw-semibold text-secondary-emphasis">{{ factor.feature }}</span>
+                                    <span class="fs-7 fw-bold font-mono text-danger">{{ factor.weight | round(3) }}</span>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="fs-7 text-muted mb-0">No significant negative feature weights identified.</p>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Bottom Action Controls -->
-<div class="results-actions-row no-print mt-32 animate-slide-up stagger-4">
-    <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="btn btn-primary btn-lg">
-        <i class="fas fa-file-pdf"></i> Download PDF Report
-    </a>
-    
-    <button onclick="alert('Result successfully saved to SQLite persistent store.')" class="btn btn-ghost btn-lg">
-        <i class="fas fa-floppy-disk"></i> Save Result
-    </button>
-    
-    <a href="{{ url_for('api.predict_get') }}" class="btn btn-ghost btn-lg">
-        <i class="fas fa-plus"></i> New Prediction
-    </a>
+    <!-- Actions Control Row -->
+    <div class="no-print d-flex justify-content-center gap-3 pt-4 mt-4 border-top border-light-subtle" data-aos="fade-up" data-aos-delay="250">
+        <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="btn-premium btn-primary btn-lg">
+            <i class="fa-solid fa-file-pdf"></i> Download PDF Report
+        </a>
+        <button onclick="alert('Prediction log successfully saved to database.')" class="btn-premium btn-secondary btn-lg">
+            <i class="fa-solid fa-floppy-disk"></i> Save Result
+        </button>
+        <a href="{{ url_for('api.predict_get') }}" class="btn-premium btn-secondary btn-lg">
+            <i class="fa-solid fa-rotate"></i> New Prediction
+        </a>
+    </div>
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const prob = parseFloat("{{ probability }}");
-    const ringFill = document.getElementById('resultRingFill');
-    const ringText = document.getElementById('resultRingText');
+    const scoreVal = parseFloat("{{ probability }}");
+    const fillRing = document.getElementById('gaugeFill');
+    const valueText = document.getElementById('gaugeValue');
 
-    if (ringFill && ringText) {
-        // Circumference of radius 70 is 2 * pi * 70 = 439.822
-        const circumference = 439.822;
+    if (fillRing && valueText) {
+        const circumference = 2 * Math.PI * 76; // r=76 -> 477.52
         
         setTimeout(() => {
-            const offset = circumference - (prob / 100) * circumference;
-            ringFill.style.strokeDashoffset = offset;
+            const offsetOffset = circumference - (scoreVal / 100) * circumference;
+            fillRing.style.strokeDashoffset = offsetOffset;
             
-            // Countup animation
-            let current = 0;
-            const step = () => {
-                if (current >= prob) {
-                    ringText.textContent = prob.toFixed(1) + '%';
+            // Score countup animation
+            let activeScore = 0;
+            const animateScore = () => {
+                if (activeScore >= scoreVal) {
+                    valueText.textContent = scoreVal.toFixed(1) + '%';
                 } else {
-                    current += Math.max(0.5, (prob - current) / 10);
-                    ringText.textContent = current.toFixed(1) + '%';
-                    requestAnimationFrame(step);
+                    activeScore += Math.max(0.4, (scoreVal - activeScore) / 12);
+                    valueText.textContent = activeScore.toFixed(1) + '%';
+                    requestAnimationFrame(animateScore);
                 }
             };
-            requestAnimationFrame(step);
-        }, 350);
+            requestAnimationFrame(animateScore);
+        }, 300);
     }
 });
 </script>
