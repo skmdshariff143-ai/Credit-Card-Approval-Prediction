@@ -1,70 +1,69 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="auth-page">
-  <div class="auth-card animate-scale-in">
-    <div class="text-center mb-24">
-      <div class="sidebar-logo" style="width:56px;height:56px;font-size:26px;margin:0 auto 16px;border-radius:16px;">
-        <i class="fas fa-shield-halved"></i>
-      </div>
-      <h1>Welcome Back</h1>
-      <p class="auth-subtitle">Sign in to your CreditGuard AI account</p>
-    </div>
-
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-    {% for category, message in messages %}
-    <div class="alert alert-{{ category }}">
-      <i class="fas fa-info-circle"></i>
-      <span>{{ message }}</span>
-      <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
-    </div>
-    {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-    <form method="POST" action="{{ url_for('auth.login') }}">
-      {{ form.hidden_tag() }}
-
-      <div class="form-group">
-        <label class="form-label" for="email">Email Address</label>
-        <div class="form-control-icon">
-          <i class="fas fa-envelope"></i>
-          {{ form.email(class="form-control", placeholder="you@example.com", id="email") }}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditGuard AI | Sign In</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="auth-centering-page">
+    <div class="auth-box-card animate-scale-in">
+        <div class="auth-header-wrapper">
+            <div class="auth-avatar-logo"><i class="fas fa-shield-halved"></i></div>
+            <h2>Welcome Back</h2>
+            <p class="auth-subtitle">Sign in to access the CreditGuard AI risk dashboard.</p>
         </div>
-        {% if form.email.errors %}
-        <div class="form-error">{{ form.email.errors[0] }}</div>
-        {% endif %}
-      </div>
 
-      <div class="form-group">
-        <label class="form-label" for="password">Password</label>
-        <div class="form-control-icon">
-          <i class="fas fa-lock"></i>
-          {{ form.password(class="form-control", placeholder="Enter your password", id="password") }}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="toast-alert alert-{{ category if category != 'error' else 'danger' }}" style="margin-bottom:16px;">
+                    <i class="fas {% if category == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %}"></i>
+                    <div class="toast-content">{{ message }}</div>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('auth.login') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <div class="form-control-icon-wrapper">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="username" id="username" class="form-control" placeholder="Enter your username" required autofocus>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <div class="form-control-icon-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Enter your password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full" style="margin-top:8px;">
+                <i class="fas fa-right-to-bracket"></i> Sign In
+            </button>
+        </form>
+
+        <div class="auth-footer-prompt">
+            <a href="{{ url_for('auth.forgot_password') }}">Forgot password?</a>
+            <span style="margin:0 8px;">·</span>
+            Don't have an account? <a href="{{ url_for('auth.register') }}">Create one</a>
         </div>
-        {% if form.password.errors %}
-        <div class="form-error">{{ form.password.errors[0] }}</div>
-        {% endif %}
-      </div>
-
-      <div class="flex justify-between items-center mb-24">
-        <label class="flex items-center gap-8" style="font-size:13px;color:var(--text-secondary);cursor:pointer;">
-          {{ form.remember(class="") }}
-          <span>Remember me</span>
-        </label>
-        <a href="{{ url_for('auth.forgot_password') }}" style="font-size:13px;">Forgot password?</a>
-      </div>
-
-      <button type="submit" class="btn btn-primary w-full btn-lg">
-        <i class="fas fa-right-to-bracket"></i>
-        Sign In
-      </button>
-    </form>
-
-    <div class="auth-footer">
-      Don't have an account?
-      <a href="{{ url_for('auth.register') }}">Create account</a>
     </div>
-  </div>
 </div>
-{% endblock %}
+<script>
+    const t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+</script>
+</body>
+</html>

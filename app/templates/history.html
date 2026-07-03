@@ -1,164 +1,153 @@
 {% extends 'base.html' %}
-{% block title %}CreditGuard AI — Prediction Logs{% endblock %}
+{% block title %}CreditGuard AI | Prediction History{% endblock %}
 
 {% block content %}
-<div class="page-header animate-slide-up">
-  <div class="breadcrumbs">
-    <a href="{{ url_for('api.admin') }}">Dashboard</a>
-    <span class="separator"><i class="fas fa-chevron-right"></i></span>
-    <span class="text-primary">Evaluation History</span>
-  </div>
-  <h1>Evaluation History Logs</h1>
-  <p>Track, filter, and manage all credit card prediction assessments.</p>
+<div class="workspace-page-header animate-slide-up">
+    <div class="header-breadcrumbs">
+        <a href="{{ url_for('api.admin') }}">Dashboard</a>
+        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+        <span class="active-crumb">Prediction History</span>
+    </div>
+    <h1>Prediction History</h1>
+    <p>Browse, filter, sort, and export historical credit risk evaluations stored in the SQLite ledger.</p>
 </div>
 
-<!-- Toolbar Controls Row -->
-<div class="flex justify-between items-center mb-24 no-print animate-slide-up stagger-1">
-  <div class="flex gap-12">
-    <!-- Export CSV Endpoint -->
-    <a href="{{ url_for('api.history') }}?export=csv&search={{ search }}&decision={{ decision }}&risk_level={{ risk_level }}&sort_by={{ sort_by }}&order={{ order }}" class="btn btn-ghost">
-      <i class="fas fa-file-csv text-success"></i> Export CSV
-    </a>
-
-    <!-- Clear User Logs -->
-    <form method="POST" action="{{ url_for('api.clear_user_history') }}" onsubmit="return confirm('WARNING: This will permanently delete your entire prediction history. Continue?');">
-      <button type="submit" class="btn btn-danger">
-        <i class="fas fa-trash-can"></i> Clear History
-      </button>
-    </form>
-  </div>
-
-  <!-- Search Input Box -->
-  <form method="GET" action="{{ url_for('api.history') }}" class="data-table-search">
-    <div class="form-group mb-0">
-      <div class="form-control-icon">
-        <i class="fas fa-magnifying-glass"></i>
-        <input type="text" name="search" class="form-control" placeholder="Search Application ID, gender..." value="{{ search }}">
-      </div>
-    </div>
-  </form>
-</div>
-
-<!-- Data Table Wrapper -->
-<div class="data-table-wrapper animate-slide-up stagger-2">
-  
-  <!-- Filter Chips Area -->
-  <div class="data-table-toolbar no-print">
-    <div class="flex-col gap-8 w-full">
-      
-      <!-- Decision Filter -->
-      <div class="flex items-center gap-12">
-        <span style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;width:80px;">Decision:</span>
-        <div class="data-table-filters">
-          <a href="{{ url_for('api.history') }}?decision=All&risk_level={{ risk_level }}&search={{ search }}" class="filter-chip {% if decision == 'All' or not decision %}active{% endif %}">All Decisions</a>
-          <a href="{{ url_for('api.history') }}?decision=Approved&risk_level={{ risk_level }}&search={{ search }}" class="filter-chip {% if decision == 'Approved' %}active{% endif %}">Approved Only</a>
-          <a href="{{ url_for('api.history') }}?decision=Rejected&risk_level={{ risk_level }}&search={{ search }}" class="filter-chip {% if decision == 'Rejected' %}active{% endif %}">Rejected Only</a>
-        </div>
-      </div>
-
-      <!-- Risk Level Filter -->
-      <div class="flex items-center gap-12 mt-8">
-        <span style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;width:80px;">Risk Profile:</span>
-        <div class="data-table-filters">
-          <a href="{{ url_for('api.history') }}?risk_level=All&decision={{ decision }}&search={{ search }}" class="filter-chip {% if risk_level == 'All' or not risk_level %}active{% endif %}">All Profiles</a>
-          <a href="{{ url_for('api.history') }}?risk_level=Low&decision={{ decision }}&search={{ search }}" class="filter-chip {% if risk_level == 'Low' %}active{% endif %}">Low Risk</a>
-          <a href="{{ url_for('api.history') }}?risk_level=Medium-Low&decision={{ decision }}&search={{ search }}" class="filter-chip {% if risk_level == 'Medium-Low' %}active{% endif %}">Med-Low</a>
-          <a href="{{ url_for('api.history') }}?risk_level=Medium-High&decision={{ decision }}&search={{ search }}" class="filter-chip {% if risk_level == 'Medium-High' %}active{% endif %}">Med-High</a>
-          <a href="{{ url_for('api.history') }}?risk_level=High&decision={{ decision }}&search={{ search }}" class="filter-chip {% if risk_level == 'High' %}active{% endif %}">High Risk</a>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Responsive Data Table -->
-  <div style="overflow-x: auto;">
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Application ID</th>
-          <th>Assessment Date</th>
-          <th>Gender</th>
-          <th>Annual Income</th>
-          <th>Prediction</th>
-          <th>Risk Profile</th>
-          <th>Confidence</th>
-          <th class="no-print">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% if history %}
-          {% for record in history %}
-            <tr>
-              <td style="font-family:var(--font-mono);font-weight:600;color:var(--primary-light);">{{ record.application_id }}</td>
-              <td style="font-size:13px;color:var(--text-secondary);">{{ record.timestamp }}</td>
-              <td>{{ record.gender }}</td>
-              <td style="font-family:var(--font-mono);">${{ "{:,.0f}".format(record.income) }}</td>
-              <td>
-                {% if record.prediction == 'Approved' %}
-                  <span class="badge badge-success"><i class="fas fa-circle-check"></i> Approved</span>
-                {% else %}
-                  <span class="badge badge-danger"><i class="fas fa-circle-xmark"></i> Rejected</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if record.risk_level == 'Low' %}
-                  <span class="badge badge-success">Low</span>
-                {% elif record.risk_level == 'Medium-Low' %}
-                  <span class="badge badge-primary">Medium-Low</span>
-                {% elif record.risk_level == 'Medium-High' %}
-                  <span class="badge badge-warning">Medium-High</span>
-                {% else %}
-                  <span class="badge badge-danger">High</span>
-                {% endif %}
-              </td>
-              <td style="font-family:var(--font-mono);font-weight:600;">{{ record.probability | round(1) }}%</td>
-              <td class="no-print">
-                <div class="flex gap-8">
-                  <a href="{{ url_for('api.get_report', application_id=record.application_id) }}" class="btn btn-ghost btn-sm" title="View Printable Report">
-                    <i class="fas fa-file-pdf"></i> Report
-                  </a>
-                  
-                  <form method="POST" action="{{ url_for('api.delete_history_entry', application_id=record.application_id) }}" onsubmit="return confirm('Delete this record?');">
-                    <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger);" title="Delete Log">
-                      <i class="fas fa-trash-can"></i>
-                    </button>
-                  </form>
+<div class="data-table-container animate-slide-up stagger-1">
+    <!-- Toolbar -->
+    <div class="table-toolbar-box">
+        <div class="toolbar-left-actions">
+            <form method="GET" action="{{ url_for('api.history') }}" class="search-form-control-box">
+                <div class="form-control-icon-wrapper">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" name="search" class="form-control" placeholder="Search by application ID or income..." value="{{ search }}" />
                 </div>
-              </td>
-            </tr>
-          {% endfor %}
-        {% else %}
-          <tr>
-            <td colspan="8" class="text-center p-32 text-muted">
-              <i class="fas fa-folder-open mb-16" style="font-size:36px;display:block;"></i>
-              No application history records match the selected filters.
-            </td>
-          </tr>
-        {% endif %}
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Pagination Controls Footer -->
-  {% if total_pages > 1 %}
-    <div class="table-pagination no-print">
-      <span>Page {{ page }} of {{ total_pages }}</span>
-      <div class="pagination-buttons">
-        {% if page > 1 %}
-          <a href="{{ url_for('api.history') }}?page={{ page - 1 }}&search={{ search }}&decision={{ decision }}&risk_level={{ risk_level }}" class="page-btn"><i class="fas fa-chevron-left"></i></a>
-        {% endif %}
-        
-        {% for p in range(1, total_pages + 1) %}
-          <a href="{{ url_for('api.history') }}?page={{ p }}&search={{ search }}&decision={{ decision }}&risk_level={{ risk_level }}" class="page-btn {% if p == page %}active{% endif %}">{{ p }}</a>
-        {% endfor %}
-
-        {% if page < total_pages %}
-          <a href="{{ url_for('api.history') }}?page={{ page + 1 }}&search={{ search }}&decision={{ decision }}&risk_level={{ risk_level }}" class="page-btn"><i class="fas fa-chevron-right"></i></a>
-        {% endif %}
-      </div>
+                <input type="hidden" name="sort_by" value="{{ sort_by }}">
+                <input type="hidden" name="order" value="{{ order }}">
+                <input type="hidden" name="decision" value="{{ decision }}">
+                <input type="hidden" name="risk_level" value="{{ risk_level }}">
+            </form>
+        </div>
+        <div class="flex gap-8">
+            <form method="POST" action="{{ url_for('api.clear_user_history') }}" onsubmit="return confirm('Permanently delete all history records?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger btn-sm"><i class="fas fa-trash-can"></i> Clear All</button>
+            </form>
+        </div>
     </div>
-  {% endif %}
 
+    <!-- Filter Chips -->
+    <div class="table-filter-row-chips">
+        <div class="filter-category-line">
+            <span class="filter-category-lbl">Decision</span>
+            <div class="chips-stack">
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision='All', risk_level=risk_level) }}" class="chip-item {% if decision == 'All' %}active{% endif %}">All</a>
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision='Approved', risk_level=risk_level) }}" class="chip-item {% if decision == 'Approved' %}active{% endif %}">Approved</a>
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision='Rejected', risk_level=risk_level) }}" class="chip-item {% if decision == 'Rejected' %}active{% endif %}">Rejected</a>
+            </div>
+        </div>
+        <div class="filter-category-line">
+            <span class="filter-category-lbl">Risk Level</span>
+            <div class="chips-stack">
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision=decision, risk_level='All') }}" class="chip-item {% if risk_level == 'All' %}active{% endif %}">All</a>
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision=decision, risk_level='Low') }}" class="chip-item {% if risk_level == 'Low' %}active{% endif %}">Low</a>
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision=decision, risk_level='Medium-Low') }}" class="chip-item {% if risk_level == 'Medium-Low' %}active{% endif %}">Med-Low</a>
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision=decision, risk_level='Medium-High') }}" class="chip-item {% if risk_level == 'Medium-High' %}active{% endif %}">Med-High</a>
+                <a href="{{ url_for('api.history', search=search, sort_by=sort_by, order=order, decision=decision, risk_level='High') }}" class="chip-item {% if risk_level == 'High' %}active{% endif %}">High</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div style="overflow-x: auto;">
+        <table class="modern-data-table">
+            <thead>
+                <tr>
+                    <th>
+                        <a href="{{ url_for('api.history', search=search, sort_by='application_id', order='ASC' if sort_by == 'application_id' and order == 'DESC' else 'DESC', decision=decision, risk_level=risk_level) }}">
+                            App ID <i class="fas fa-sort" style="opacity:0.4;"></i>
+                        </a>
+                    </th>
+                    <th>Date</th>
+                    <th>
+                        <a href="{{ url_for('api.history', search=search, sort_by='income', order='ASC' if sort_by == 'income' and order == 'DESC' else 'DESC', decision=decision, risk_level=risk_level) }}">
+                            Income <i class="fas fa-sort" style="opacity:0.4;"></i>
+                        </a>
+                    </th>
+                    <th>Outcome</th>
+                    <th>Risk</th>
+                    <th>
+                        <a href="{{ url_for('api.history', search=search, sort_by='probability', order='ASC' if sort_by == 'probability' and order == 'DESC' else 'DESC', decision=decision, risk_level=risk_level) }}">
+                            Confidence <i class="fas fa-sort" style="opacity:0.4;"></i>
+                        </a>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if history %}
+                    {% for record in history %}
+                    <tr>
+                        <td style="font-family:var(--font-mono);font-weight:600;color:var(--primary-light);">{{ record.application_id }}</td>
+                        <td style="font-size:13px;color:var(--text-secondary);">{{ record.timestamp }}</td>
+                        <td style="font-family:var(--font-mono);">${{ "{:,.0f}".format(record.income) }}</td>
+                        <td>
+                            {% if record.prediction == 'Approved' %}
+                                <span class="badge badge-success"><i class="fas fa-circle-check"></i> Approved</span>
+                            {% else %}
+                                <span class="badge badge-danger"><i class="fas fa-circle-xmark"></i> Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if record.risk_level == 'Low' %}
+                                <span class="badge badge-success">Low</span>
+                            {% elif record.risk_level == 'Medium-Low' %}
+                                <span class="badge badge-primary">Med-Low</span>
+                            {% elif record.risk_level == 'Medium-High' %}
+                                <span class="badge badge-warning">Med-High</span>
+                            {% else %}
+                                <span class="badge badge-danger">High</span>
+                            {% endif %}
+                        </td>
+                        <td style="font-family:var(--font-mono);font-weight:600;">{{ record.probability | round(1) }}%</td>
+                        <td>
+                            <div class="flex gap-8">
+                                <a href="{{ url_for('api.get_report', application_id=record.application_id) }}" class="btn btn-ghost btn-sm" title="View Report"><i class="fas fa-file-lines"></i></a>
+                                <form method="POST" action="{{ url_for('api.delete_history_entry', application_id=record.application_id) }}" style="display:inline;" onsubmit="return confirm('Delete this record?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-ghost btn-sm" title="Delete"><i class="fas fa-trash-can text-danger"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center p-32 text-muted">
+                            <i class="fas fa-inbox" style="font-size:28px;opacity:0.3;display:block;margin-bottom:12px;"></i>
+                            No prediction records found matching current filters.
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="table-pagination-footer">
+        <span>Page {{ page }} of {{ total_pages }}</span>
+        <div class="pagination-controls-stack">
+            {% if page > 1 %}
+                <a href="{{ url_for('api.history', page=page-1, search=search, sort_by=sort_by, order=order, decision=decision, risk_level=risk_level) }}" class="pagination-btn"><i class="fas fa-chevron-left"></i></a>
+            {% endif %}
+            {% for p in range(1, total_pages + 1) %}
+                <a href="{{ url_for('api.history', page=p, search=search, sort_by=sort_by, order=order, decision=decision, risk_level=risk_level) }}" class="pagination-btn {% if p == page %}active{% endif %}">{{ p }}</a>
+            {% endfor %}
+            {% if page < total_pages %}
+                <a href="{{ url_for('api.history', page=page+1, search=search, sort_by=sort_by, order=order, decision=decision, risk_level=risk_level) }}" class="pagination-btn"><i class="fas fa-chevron-right"></i></a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

@@ -1,148 +1,88 @@
 {% extends 'base.html' %}
-{% block title %}CreditGuard AI — User Profile{% endblock %}
+{% block title %}CreditGuard AI | My Profile{% endblock %}
 
 {% block content %}
-<div class="page-header animate-slide-up">
-  <div class="breadcrumbs">
-    <a href="{{ url_for('api.admin') }}">Dashboard</a>
-    <span class="separator"><i class="fas fa-chevron-right"></i></span>
-    <span class="text-primary">User Profile</span>
-  </div>
-  <h1>Account Settings</h1>
-  <p>Manage your profile details, password configuration, and view usage statistics.</p>
+<div class="workspace-page-header animate-slide-up">
+    <div class="header-breadcrumbs">
+        <a href="{{ url_for('api.admin') }}">Dashboard</a>
+        <span class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></span>
+        <span class="active-crumb">My Profile</span>
+    </div>
+    <h1>Account Profile</h1>
+    <p>Manage your account settings, update credentials, and view usage statistics.</p>
 </div>
 
-<div class="grid grid-3 gap-24 mt-24">
-  
-  <!-- Profile Summary and Statistics -->
-  <div class="flex-col gap-24 animate-scale-in">
-    <!-- User Card -->
-    <div class="card card-glass text-center">
-      <div class="sidebar-logo" style="width:72px;height:72px;font-size:32px;margin:0 auto 16px;border-radius:50%;background:linear-gradient(135deg, var(--primary), var(--secondary));">
-        <i class="fas fa-user"></i>
-      </div>
-      <h2 class="mb-4">{{ current_user.full_name }}</h2>
-      <span class="badge badge-primary">@{{ current_user.username }}</span>
-      
-      <div class="text-left mt-24 pt-16" style="border-top:1px solid var(--border-color);font-size:13px;color:var(--text-secondary);">
-        <div class="flex justify-between py-4">
-          <span>Email</span>
-          <span style="font-weight:500;color:var(--text-primary);">{{ current_user.email }}</span>
+<div class="grid grid-2 gap-24 animate-slide-up stagger-1">
+    <!-- Profile Card -->
+    <div class="card card-glass text-center p-32">
+        <div class="mobile-user-initials" style="width:72px;height:72px;font-size:28px;margin:0 auto 20px;border-radius:var(--radius-md);">
+            {{ current_user.username[:2].upper() }}
         </div>
-        <div class="flex justify-between py-4">
-          <span>Member Since</span>
-          <span style="font-weight:500;color:var(--text-primary);">{{ current_user.created_at.split(' ')[0] if current_user.created_at else 'N/A' }}</span>
+        <h3 style="font-family:var(--font-heading);font-size:22px;">{{ current_user.full_name or current_user.username }}</h3>
+        <p class="text-secondary" style="font-size:14px;">{{ current_user.email or 'No email set' }}</p>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-color);">
+            <span class="badge badge-primary"><i class="fas fa-shield-halved"></i> Active Account</span>
         </div>
-      </div>
     </div>
 
-    <!-- Usage Statistics -->
+    <!-- Update Profile Form -->
     <div class="card card-glass">
-      <h3 class="mb-16"><i class="fas fa-chart-line text-accent mr-8"></i> Usage Analytics</h3>
-      <div class="flex-col gap-12">
-        <div class="flex justify-between items-center p-12" style="background:var(--bg-glass);border-radius:var(--radius-sm);">
-          <span style="font-size:13px;color:var(--text-secondary);">Predictions Evaluated</span>
-          <span style="font-family:var(--font-mono);font-weight:700;font-size:16px;">{{ stats.total }}</span>
+        <div class="card-header">
+            <h3 class="card-title"><i class="fas fa-user-pen text-primary"></i> Update Profile</h3>
         </div>
-        <div class="flex justify-between items-center p-12" style="background:var(--bg-glass);border-radius:var(--radius-sm);">
-          <span style="font-size:13px;color:var(--text-secondary);">Approved Files</span>
-          <span class="text-success" style="font-family:var(--font-mono);font-weight:700;font-size:16px;">{{ stats.approved }}</span>
-        </div>
-        <div class="flex justify-between items-center p-12" style="background:var(--bg-glass);border-radius:var(--radius-sm);">
-          <span style="font-size:13px;color:var(--text-secondary);">Approval Conversion</span>
-          <span class="text-accent" style="font-family:var(--font-mono);font-weight:700;font-size:16px;">{{ stats.approval_rate }}%</span>
-        </div>
-      </div>
-    </div>
-  </div>
+        <form method="POST" action="{{ url_for('auth.profile') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="form_type" value="profile">
 
-  <!-- Update Profile Forms -->
-  <div class="card card-glass grid-2-span animate-slide-up stagger-1" style="grid-column: span 2;">
+            <div class="form-group">
+                <label class="form-label" for="full_name">Full Name</label>
+                <div class="form-control-icon-wrapper">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" name="full_name" id="full_name" class="form-control" value="{{ current_user.full_name or '' }}" placeholder="Your full name">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="email">Email Address</label>
+                <div class="form-control-icon-wrapper">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" name="email" id="email" class="form-control" value="{{ current_user.email or '' }}" placeholder="your@email.com">
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"><i class="fas fa-floppy-disk"></i> Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<!-- Change Password -->
+<div class="card card-glass mt-24 animate-slide-up stagger-2">
     <div class="card-header">
-      <h2 class="card-title"><i class="fas fa-sliders text-primary mr-8"></i> Account Configurations</h2>
+        <h3 class="card-title"><i class="fas fa-key text-warning"></i> Change Password</h3>
     </div>
-
-    <!-- Update Details Form -->
-    <h3 class="mb-16"><i class="fas fa-user-pen text-accent mr-8"></i> Update Personal Details</h3>
-    <form method="POST" action="{{ url_for('auth.profile') }}" class="mb-32">
-      {{ profile_form.hidden_tag() }}
-      <input type="hidden" name="form_type" value="profile">
-
-      <div class="grid grid-2 gap-16">
-        <div class="form-group">
-          <label class="form-label" for="full_name">Full Name</label>
-          <div class="form-control-icon">
-            <i class="fas fa-user"></i>
-            {{ profile_form.full_name(class="form-control", id="full_name") }}
-          </div>
-          {% if profile_form.full_name.errors %}
-            <div class="form-error">{{ profile_form.full_name.errors[0] }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label class="form-label" for="email">Email Address</label>
-          <div class="form-control-icon">
-            <i class="fas fa-envelope"></i>
-            {{ profile_form.email(class="form-control", id="email") }}
-          </div>
-          {% if profile_form.email.errors %}
-            <div class="form-error">{{ profile_form.email.errors[0] }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-primary mt-8">
-        <i class="fas fa-floppy-disk"></i> Save Profile Details
-      </button>
-    </form>
-
-    <!-- Update Password Form -->
-    <h3 class="mb-16" style="border-top:1px solid var(--border-color);padding-top:24px;"><i class="fas fa-key text-danger mr-8"></i> Change Password</h3>
     <form method="POST" action="{{ url_for('auth.profile') }}">
-      {{ password_form.hidden_tag() }}
-      <input type="hidden" name="form_type" value="password">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="form_type" value="password">
 
-      <div class="form-group">
-        <label class="form-label" for="current_password">Current Password</label>
-        <div class="form-control-icon">
-          <i class="fas fa-lock"></i>
-          {{ password_form.current_password(class="form-control", placeholder="Verify your current password", id="current_password") }}
-        </div>
-        {% if password_form.current_password.errors %}
-          <div class="form-error">{{ password_form.current_password.errors[0] }}</div>
-        {% endif %}
-      </div>
+        <div class="grid grid-2 gap-24">
+            <div class="form-group">
+                <label class="form-label" for="current_password">Current Password</label>
+                <div class="form-control-icon-wrapper">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="current_password" id="current_password" class="form-control" required placeholder="Enter current password">
+                </div>
+            </div>
 
-      <div class="grid grid-2 gap-16">
-        <div class="form-group">
-          <label class="form-label" for="new_password">New Password</label>
-          <div class="form-control-icon">
-            <i class="fas fa-key"></i>
-            {{ password_form.new_password(class="form-control", placeholder="Choose strong password", id="new_password") }}
-          </div>
-          {% if password_form.new_password.errors %}
-            <div class="form-error">{{ password_form.new_password.errors[0] }}</div>
-          {% endif %}
+            <div class="form-group">
+                <label class="form-label" for="new_password">New Password</label>
+                <div class="form-control-icon-wrapper">
+                    <i class="fas fa-shield-halved"></i>
+                    <input type="password" name="new_password" id="new_password" class="form-control" required minlength="6" placeholder="Enter new password">
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="confirm_password">Confirm New Password</label>
-          <div class="form-control-icon">
-            <i class="fas fa-circle-check"></i>
-            {{ password_form.confirm_password(class="form-control", placeholder="Repeat new password", id="confirm_password") }}
-          </div>
-          {% if password_form.confirm_password.errors %}
-            <div class="form-error">{{ password_form.confirm_password.errors[0] }}</div>
-          {% endif %}
-        </div>
-      </div>
-
-      <button type="submit" class="btn btn-danger mt-8">
-        <i class="fas fa-lock-open"></i> Update Account Password
-      </button>
+        <button type="submit" class="btn btn-warning"><i class="fas fa-key"></i> Update Password</button>
     </form>
-  </div>
-
 </div>
 {% endblock %}
