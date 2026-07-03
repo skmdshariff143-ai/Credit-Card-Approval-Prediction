@@ -1,6 +1,7 @@
 import os
 import sys
 import traceback
+from flask import Flask
 
 # Ensure root directory is on Python path
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -10,7 +11,11 @@ try:
 except Exception as e:
     print("IMPORT ERROR IN APP.PY:")
     traceback.print_exc()
-    raise e
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    
+    # Expose dummy app to allow Vercel build phase to complete successfully
+    app = Flask(__name__)
+    @app.route("/", defaults={"path": ""})
+    @app.route("/<path:path>")
+    def fallback(path):
+        err_msg = traceback.format_exc()
+        return f"<h1>Deployment Startup Error</h1><pre>{err_msg}</pre>", 500
