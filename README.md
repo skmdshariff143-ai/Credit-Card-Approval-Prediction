@@ -21,6 +21,16 @@
 
 ---
 
+## ✨ What's New in v2.0 — Premium UI Transformation
+- 🎨 **Dark Futuristic Theme**: Complete redesign with glassmorphism, CSS custom properties, and a curated color palette (Primary `#6C63FF`, Accent `#00E5FF`).
+- 📐 **Sidebar Navigation**: Enterprise-grade persistent sidebar with section labels, active state indicators, and responsive mobile drawer.
+- 🧙 **4-Step Application Wizard**: Animated multi-step form with progress bar, live validation, and dynamic review summary.
+- 📊 **Interactive Chart.js Dashboard**: Doughnut, bar, and line charts with daily/monthly toggle for prediction analytics.
+- 🎯 **CSS Gauge Meter**: Animated probability gauge on the prediction result page with countup animation.
+- 🌗 **Dark/Light Theme Toggle**: Persistent localStorage theme preference with smooth CSS transitions.
+- 🖨️ **Professional Reports**: Printable PDF-ready credit assessment reports with QR code validation blocks.
+- 🎬 **Demo Package**: Complete demo recording scripts, voiceover narrations, and checklist in `demo/`.
+
 ## 🌐 Live Deployments & Presentation Links
 - 🚀 **Live Production Application**: [credit-card-approval-prediction.onrender.com](https://credit-card-approval-prediction.onrender.com) (Hosted on Render)
 - 🖥️ **Static Portfolio Website**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/) (Hosted on GitHub Pages)
@@ -61,7 +71,7 @@ Commercial banks process millions of credit card applications daily. Standard ru
 - **Backend Core**: Python 3.10+, Flask, SQLite3, WSGI Gunicorn
 - **Machine Learning**: Scikit-Learn, XGBoost, SMOTE (Imbalanced-Learn), NumPy, Pandas
 - **Explainability**: LIME Local Surrogate (Ridge Regression Model-agnostic)
-- **Frontend Layer**: Vanilla HTML5, CSS3 (Glassmorphism design), JS, Chart.js, Bootstrap 5, FontAwesome
+- **Frontend Layer**: Vanilla HTML5, CSS3 (Custom Dark Futuristic Design System), JavaScript, Chart.js, Font Awesome 6, Google Fonts (Poppins/Inter/Manrope)
 - **CI/CD & DevOps**: GitHub Actions, Docker, Docker Compose, Gunicorn, GitHub Pages
 - **Testing Suite**: Pytest (108 system test cases, coverage checks)
 
@@ -90,7 +100,7 @@ Commercial banks process millions of credit card applications daily. Standard ru
 │   ├── database/         # SQLite schema initialization and CRUD queries
 │   ├── routes/           # Auth, API endpoints, and view controllers
 │   ├── services/         # Predict, LIME explainability, and history services
-│   ├── static/           # CSS glassmorphism rules, logos, Chart.js js files
+│   ├── static/           # CSS design system (dark theme tokens), JS wizard engine, Chart.js
 │   └── templates/        # Responsive HTML layouts (admin, form, login, result)
 ├── config/               # Logging configurations and environment parameter limits
 ├── data/raw/             # Original raw source datasets
