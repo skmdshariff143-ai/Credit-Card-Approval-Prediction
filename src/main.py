@@ -27,8 +27,8 @@ def safe_sklearn_tags(self):
 
 ClassifierMixin.__sklearn_tags__ = safe_sklearn_tags
 
-from configs.config import config  # noqa: E402
-from configs.constants import TARGET_COL  # noqa: E402
+from config.config import config  # noqa: E402
+from config.constants import TARGET_COL  # noqa: E402
 from src.models.compare_models import ModelComparator  # noqa: E402
 from src.models.evaluate import ModelEvaluator  # noqa: E402
 from src.models.hyperparameter_tuning import HyperparameterTuner  # noqa: E402
@@ -94,6 +94,15 @@ def run_model_pipeline():
         # Calculate metrics
         metrics = calculate_all_metrics(y_test, y_pred, y_prob)
         comparator.add_model_metrics(name, metrics, train_time, inf_time)
+
+        # Register model in registry
+        try:
+            from src.models.model_registry import ModelRegistry
+            registry = ModelRegistry()
+            params = tuned_model.get_params() if hasattr(tuned_model, "get_params") else {}
+            registry.register_model(name, tuned_model, params, metrics)
+        except Exception as reg_err:
+            logger.warning(f"Failed to register model {name} in registry: {str(reg_err)}")
 
         # Generate model visual plots
         evaluator.plot_confusion_matrix(name, y_test, y_pred)

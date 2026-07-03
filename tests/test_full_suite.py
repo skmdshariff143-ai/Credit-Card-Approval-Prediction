@@ -12,10 +12,10 @@ mock_wml = MagicMock()
 sys.modules["ibm_watson_machine_learning"] = mock_wml
 
 # Import components to test
-from configs.config import config  # noqa: E402
-from configs.constants import TARGET_COL  # noqa: E402
-from src.api.history import HistoryManager  # noqa: E402
-from src.api.validators import InputValidator  # noqa: E402
+from config.config import config  # noqa: E402
+from config.constants import TARGET_COL  # noqa: E402
+from app.database.history import HistoryManager  # noqa: E402
+from app.routes.validators import InputValidator  # noqa: E402
 from src.data.data_split import perform_stratified_split  # noqa: E402
 from src.data.dataset_info import DatasetMetadataGenerator  # noqa: E402
 from src.data.load_data import DataLoader  # noqa: E402
@@ -38,10 +38,9 @@ from src.preprocessing.scaling import NumericalScaler  # noqa: E402
 from src.utils.exceptions import (  # noqa: E402
     DataLoadingError,
     DataPreprocessingError,
-    DataValidationError,
 )
-from src.utils.helper import load_json, load_pkl, save_json, save_pkl  # noqa: E402
-from src.utils.tracker import ExperimentTracker  # noqa: E402
+from app.utils.helper import load_json, load_pkl, save_json, save_pkl  # noqa: E402
+from app.utils.tracker import ExperimentTracker  # noqa: E402
 from src.visualization.eda import calculate_missing_matrix, generate_summary_stats  # noqa: E402
 from src.visualization.plots import VizPlotter  # noqa: E402
 
@@ -343,8 +342,8 @@ def test_model_registry(tmp_path):
         )
 
         reg.register_model("logistic_regression", model, {"C": 1.0}, {"F1": 0.8})
-        assert os.path.exists(os.path.join(tmp_path, "logistic_regression.pkl"))
-        assert os.path.exists(os.path.join(tmp_path, "logistic_regression_metadata.json"))
+        assert os.path.exists(os.path.join(tmp_path, "trained", "logistic_regression.pkl"))
+        assert os.path.exists(os.path.join(tmp_path, "trained", "logistic_regression_metadata.json"))
 
 
 # --- UTILS SECTION TESTS ---
@@ -460,13 +459,14 @@ def test_input_validator():
 
     # Invalid data
     invalid_data = valid_data.copy()
-    invalid_data["age_years"] = 10  # below limit
-    with pytest.raises(DataValidationError):
+    invalid_data["age_years"] = 10
+    from app.utils.exceptions import ValidationError as AppValidationError
+    with pytest.raises(AppValidationError):
         InputValidator.validate_predict_json(invalid_data)
 
 
 def test_classification_metrics():
-    from src.utils.metrics import calculate_classification_metrics
+    from app.utils.metrics import calculate_classification_metrics
 
     y_true = [0, 1, 0, 1]
     y_pred = [0, 1, 1, 1]
@@ -557,7 +557,7 @@ def test_main_pipeline_run(mock_cv_score, mock_savefig, tmp_path):
 def test_explanation_engine():
     from sklearn.linear_model import LogisticRegression
 
-    from src.models.explainability import ExplanationEngine
+    from app.services.explainability import ExplanationEngine
 
     # Mock preprocessor/pipeline
     mock_pipeline = MagicMock()
@@ -579,7 +579,7 @@ def test_explanation_engine():
 
 
 def test_explanation_engine_surrogate():
-    from src.models.explainability import ExplanationEngine
+    from app.services.explainability import ExplanationEngine
 
     # Mock preprocessor/pipeline
     mock_pipeline = MagicMock()
@@ -602,10 +602,10 @@ def test_explanation_engine_surrogate():
     assert len(res["risk_factors"]) > 0 or len(res["support_factors"]) > 0
 
 
-@patch("src.models.predict.load_pkl")
+@patch("app.services.predict.load_pkl")
 @patch("os.path.exists")
 def test_predictor_api(mock_exists, mock_load):
-    from src.api.prediction import PredictorAPI
+    from app.services.prediction import PredictorAPI
 
     mock_exists.return_value = True
 
@@ -640,7 +640,7 @@ def test_predictor_api(mock_exists, mock_load):
         "flag_email": 0,
     }
 
-    with patch("src.api.history.HistoryManager.add_entry") as mock_add_entry:
+    with patch("app.database.history.HistoryManager.add_entry") as mock_add_entry:
         res = api.process_and_predict(form_data)
         assert res["decision"] == "Approved"
         assert mock_add_entry.called

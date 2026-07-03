@@ -46,6 +46,10 @@ class FeatureEngineer:
             if "AMT_INCOME_TOTAL" in df_feat.columns and "CNT_FAM_MEMBERS" in df_feat.columns:
                 df_feat["INCOME_PER_MEMBER"] = df_feat["AMT_INCOME_TOTAL"] / df_feat["CNT_FAM_MEMBERS"].clip(lower=1)
 
+            # Employed to Age Ratio
+            if "YEARS_EMPLOYED" in df_feat.columns and "AGE_YEARS" in df_feat.columns:
+                df_feat["EMPLOYED_TO_AGE_RATIO"] = df_feat["YEARS_EMPLOYED"] / df_feat["AGE_YEARS"].clip(lower=18.0)
+
             # Income Groups (Low < 100k, Medium 100k-250k, High > 250k)
             if "AMT_INCOME_TOTAL" in df_feat.columns:
                 df_feat["INCOME_GROUP"] = pd.cut(

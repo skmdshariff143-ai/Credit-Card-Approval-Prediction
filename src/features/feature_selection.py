@@ -4,8 +4,8 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import mutual_info_classif
 
-from configs.config import config
-from configs.constants import RANDOM_STATE
+from config.config import config
+from config.constants import RANDOM_STATE
 from src.utils.exceptions import FeatureEngineeringError
 from src.utils.logger import get_logger
 

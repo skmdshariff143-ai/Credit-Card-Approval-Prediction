@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Create Account - CreditGuard AI{% endblock %}
+{% block content %}
+
+<div class="row justify-content-center py-5">
+    <div class="col-md-6 col-lg-5" data-aos="fade-up">
+        <div class="text-center mb-4">
+            <span class="fs-1 bg-primary text-white px-3 py-2 rounded-4 d-inline-block mb-3"><i class="bi bi-person-plus-fill"></i></span>
+            <h2 class="display-6 fw-bold">Create Account</h2>
+            <p class="text-muted">Join the CreditGuard AI platform to evaluate credit risk.</p>
+        </div>
+
+        <div class="card card-glass border-0 p-4 p-md-5">
+            <form method="POST" action="{{ url_for('auth.register') }}" class="needs-validation" novalidate>
+                {{ form.hidden_tag() }}
+
+                <div class="form-floating mb-3">
+                    {{ form.full_name(class="form-control", id="full_name", placeholder="Full Name", autocomplete="name") }}
+                    <label for="full_name"><i class="bi bi-person me-2"></i>Full Name</label>
+                    {% if form.full_name.errors %}
+                        <div class="text-danger small mt-1">{{ form.full_name.errors[0] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.username(class="form-control", id="username", placeholder="Username", autocomplete="username") }}
+                    <label for="username"><i class="bi bi-at me-2"></i>Username</label>
+                    {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{{ form.username.errors[0] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.email(class="form-control", id="email", placeholder="Email", autocomplete="email") }}
+                    <label for="email"><i class="bi bi-envelope me-2"></i>Email Address</label>
+                    {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{{ form.email.errors[0] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-floating mb-3">
+                    {{ form.password(class="form-control", id="password", placeholder="Password", autocomplete="new-password") }}
+                    <label for="password"><i class="bi bi-lock me-2"></i>Password</label>
+                    <div class="form-text small">Minimum 8 characters.</div>
+                    {% if form.password.errors %}
+                        <div class="text-danger small mt-1">{{ form.password.errors[0] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-floating mb-4">
+                    {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="Confirm", autocomplete="new-password") }}
+                    <label for="confirm_password"><i class="bi bi-lock-fill me-2"></i>Confirm Password</label>
+                    {% if form.confirm_password.errors %}
+                        <div class="text-danger small mt-1">{{ form.confirm_password.errors[0] }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="d-grid mb-4">
+                    {{ form.submit(class="btn btn-premium btn-lg") }}
+                </div>
+
+                <p class="text-center text-muted small mb-0">
+                    Already have an account? <a href="{{ url_for('auth.login') }}" class="text-primary fw-bold text-decoration-none">Sign in</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

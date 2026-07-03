@@ -2,7 +2,7 @@ import os
 
 import pandas as pd
 
-from configs.config import config
+from config.config import config
 from src.utils.helper import save_json
 from src.utils.logger import get_logger
 

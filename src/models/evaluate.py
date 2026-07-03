@@ -1,12 +1,13 @@
 import os
-
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.metrics import auc, confusion_matrix, precision_recall_curve, roc_curve
 
-from configs.config import config
+from config.config import config
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)

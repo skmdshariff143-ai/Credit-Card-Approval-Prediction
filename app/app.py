@@ -3,12 +3,20 @@ import sys
 
 from dotenv import load_dotenv
 from flask import Flask, render_template
+from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 
 # Ensure root directory is on Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Load environmental variables
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
+
+# Initialize Flask-Login extension at module level
+login_manager = LoginManager()
+login_manager.login_view = "auth.login"
+login_manager.login_message = "Please sign in to access this page."
+login_manager.login_message_category = "info"
 
 
 def create_app() -> Flask:
@@ -20,22 +28,45 @@ def create_app() -> Flask:
     # Configure environment configurations
     env = os.getenv("FLASK_ENV", "development")
     if env == "production":
-        from configs.production import ProductionConfig
+        from config.production import ProductionConfig
 
         app.config.from_object(ProductionConfig)
     elif env == "testing":
-        from configs.testing import TestingConfig
+        from config.testing import TestingConfig
 
         app.config.from_object(TestingConfig)
     else:
-        from configs.development import DevelopmentConfig
+        from config.development import DevelopmentConfig
 
         app.config.from_object(DevelopmentConfig)
 
+    # Initialize Flask extensions
+    csrf = CSRFProtect(app)
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        """Flask-Login callback to reload user from session cookie."""
+        from app.database.database import DatabaseManager
+        from app.models.user import User
+
+        db = DatabaseManager()
+        row = db.get_user_by_id(int(user_id))
+        return User.from_db_row(row)
+
     # Import and register API Blueprints containing routes
-    from src.api.routes import api_bp
+    from app.routes.routes import api_bp
 
     app.register_blueprint(api_bp)
+
+    # Register Authentication Blueprint
+    from app.routes.auth import auth_bp
+
+    app.register_blueprint(auth_bp)
+
+    # Exempt REST API endpoints from CSRF (they use JSON, not form submissions)
+    from app.routes.routes import api_predict
+    csrf.exempt(api_predict)
 
     # Error Handlers
     @app.errorhandler(404)
@@ -48,7 +79,7 @@ def create_app() -> Flask:
 
     # Pre-load ML model and pipeline at startup to optimize response time and warm the container
     try:
-        from src.models.predict import _predictor
+        from app.services.predict import _predictor
 
         _predictor.load_pipeline()
         _predictor.load_model()

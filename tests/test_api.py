@@ -6,18 +6,6 @@ import pytest
 from app.app import create_app
 
 
-@pytest.fixture
-def client():
-    """
-    Flask test client fixture.
-    """
-    app = create_app()
-    app.config["TESTING"] = True
-    app.config["WTF_CSRF_ENABLED"] = False  # Disable CSRF for unit tests
-    with app.test_client() as client:
-        yield client
-
-
 def test_landing_page(client):
     """
     Test landing page renders correct title.
@@ -84,7 +72,7 @@ def test_api_v1_history(client):
     assert isinstance(data, list)
 
 
-@patch("src.api.prediction.PredictorAPI.process_and_predict")
+@patch("app.services.prediction.PredictorAPI.process_and_predict")
 def test_rest_api_scoring(mock_predict, client):
     """
     Test REST API predict JSON endpoint.
@@ -100,7 +88,7 @@ def test_rest_api_scoring(mock_predict, client):
     assert data["approval_probability_percent"] == 98.5
 
 
-@patch("src.api.prediction.PredictorAPI.process_and_predict")
+@patch("app.services.prediction.PredictorAPI.process_and_predict")
 def test_predict_page_post_success(mock_predict, client):
     """
     Test HTML predict page submission.
@@ -208,7 +196,7 @@ def test_create_app_envs():
 
 
 def test_health_endpoint_exception(client):
-    with patch("src.models.predict.RiskPredictor", side_effect=Exception("Model load fail")):
+    with patch("app.services.predict.RiskPredictor", side_effect=Exception("Model load fail")):
         response = client.get("/health")
         assert response.status_code == 200
         data = json.loads(response.data)
@@ -216,22 +204,22 @@ def test_health_endpoint_exception(client):
 
 
 def test_export_history_csv_exception(client):
-    with patch("src.api.routes.db_manager.get_predictions", side_effect=Exception("DB fail")):
+    with patch("app.routes.routes.db_manager.get_user_predictions", side_effect=Exception("DB fail")):
         response = client.get("/history/export/csv", follow_redirects=False)
         assert response.status_code == 302
         assert "history" in response.location
 
 
 def test_export_history_json_exception(client):
-    with patch("src.api.routes.db_manager.get_predictions", side_effect=Exception("DB fail")):
+    with patch("app.routes.routes.db_manager.get_user_predictions", side_effect=Exception("DB fail")):
         response = client.get("/history/export/json", follow_redirects=False)
         assert response.status_code == 302
         assert "history" in response.location
 
 
 def test_input_validator_exceptions():
-    from src.api.validators import InputValidator
-    from src.utils.exceptions import ValidationError
+    from app.routes.validators import InputValidator
+    from app.utils.exceptions import ValidationError
 
     with pytest.raises(ValidationError):
         InputValidator.validate_predict_json({})
@@ -314,7 +302,7 @@ def test_report_page_not_found(client):
 
 def test_db_manager_methods():
     """Test SQLite database manager methods directly."""
-    from src.api.routes import db_manager
+    from app.routes.routes import db_manager
 
     db_manager.init_db()
 
@@ -354,7 +342,7 @@ def test_db_manager_methods():
 
 def test_report_page_success(client):
     """Test report page renders successfully when ID exists."""
-    from src.api.routes import db_manager
+    from app.routes.routes import db_manager
 
     db_manager.add_prediction(
         input_features={"code_gender": "F"},
@@ -386,7 +374,7 @@ def test_history_page_filters(client):
 def test_500_error_page_request(client):
     """Test 500 error page renders successfully when an error is raised by a route."""
     client.application.config["PROPAGATE_EXCEPTIONS"] = False
-    with patch("src.api.routes.db_manager.get_predictions", side_effect=Exception("Database crash")):
+    with patch("app.routes.routes.db_manager.get_predictions", side_effect=Exception("Database crash")):
         response = client.get("/admin")
         assert response.status_code == 500
         assert b"500" in response.data or b"Error" in response.data

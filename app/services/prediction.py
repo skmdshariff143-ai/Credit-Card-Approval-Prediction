@@ -1,8 +1,8 @@
 import pandas as pd
 
-from src.models.predict import InferenceEngine
-from src.utils.exceptions import ModelTrainingError
-from src.utils.logger import get_logger
+from app.services.predict import InferenceEngine
+from app.utils.exceptions import ModelTrainingError
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -50,7 +50,7 @@ class PredictorAPI:
             result = self.engine.predict(input_df)
 
             # Log prediction to HistoryManager
-            from src.api.history import HistoryManager
+            from app.database.history import HistoryManager
 
             history = HistoryManager()
             history.add_entry(
@@ -61,3 +61,7 @@ class PredictorAPI:
         except Exception as e:
             logger.error(f"Failed to process API prediction: {str(e)}")
             raise ModelTrainingError(f"Prediction failed: {str(e)}")
+
+    def get_model_name(self) -> str:
+        """Dynamic lookup for model name."""
+        return self.engine.get_model_name()

@@ -1,6 +1,6 @@
 
-from src.utils.exceptions import ValidationError
-from src.utils.logger import get_logger
+from app.utils.exceptions import ValidationError
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

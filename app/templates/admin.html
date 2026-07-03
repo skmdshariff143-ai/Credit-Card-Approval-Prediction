@@ -3,16 +3,16 @@
 {% block content %}
 
 <div class="text-start mb-5" data-aos="fade-up">
-    <h2>Operations Analytics Dashboard</h2>
+    <h2 class="display-6 fw-bold">Operations Analytics Dashboard</h2>
     <p class="text-muted">Review application metrics, approval statistics, and risk distribution trends.</p>
 </div>
 
 <!-- Statistics Grid Panel -->
-<div class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="100">
+<div class="row g-3 g-sm-4 mb-5" data-aos="fade-up" data-aos-delay="100">
     <!-- Total Predictions Card -->
-    <div class="col-md-4 col-lg-2">
-        <div class="card card-glass p-3 h-100 border border-secondary-subtle">
-            <div class="card-body text-start">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card card-glass p-3 h-100 border-0">
+            <div class="card-body text-start p-2 p-sm-3">
                 <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Logs</span>
                 <h3 class="fw-bold mb-0" id="statsTotalCount">{{ stats.total }}</h3>
                 <span class="text-muted small">Evaluations run</span>
@@ -21,56 +21,67 @@
     </div>
     
     <!-- Approved Card -->
-    <div class="col-md-4 col-lg-2">
-        <div class="card card-glass p-3 h-100 border border-success-subtle bg-success-subtle bg-opacity-10">
-            <div class="card-body text-start">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card card-glass p-3 h-100 border-0" style="border-left: 3px solid var(--success-text) !important;">
+            <div class="card-body text-start p-2 p-sm-3">
                 <span class="text-success small fw-bold text-uppercase d-block mb-1">Approved</span>
                 <h3 class="fw-bold text-success mb-0" id="statsApprovedCount">{{ stats.approved }}</h3>
-                <span class="text-muted small">Credit cards issued</span>
+                <span class="text-muted small">Cards issued</span>
             </div>
         </div>
     </div>
     
     <!-- Rejected Card -->
-    <div class="col-md-4 col-lg-2">
-        <div class="card card-glass p-3 h-100 border border-danger-subtle bg-danger-subtle bg-opacity-10">
-            <div class="card-body text-start">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card card-glass p-3 h-100 border-0" style="border-left: 3px solid var(--danger-text) !important;">
+            <div class="card-body text-start p-2 p-sm-3">
                 <span class="text-danger small fw-bold text-uppercase d-block mb-1">Rejected</span>
                 <h3 class="fw-bold text-danger mb-0" id="statsRejectedCount">{{ stats.rejected }}</h3>
-                <span class="text-muted small">Risk profiles flagged</span>
+                <span class="text-muted small">Risk flagged</span>
             </div>
         </div>
     </div>
     
     <!-- Approval Rate Card -->
-    <div class="col-md-4 col-lg-2">
-        <div class="card card-glass p-3 h-100 border border-secondary-subtle">
-            <div class="card-body text-start">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card card-glass p-3 h-100 border-0">
+            <div class="card-body text-start p-2 p-sm-3">
                 <span class="text-muted small fw-bold text-uppercase d-block mb-1">Approval Rate</span>
                 <h3 class="fw-bold text-primary mb-0">{{ stats.approval_rate }}%</h3>
-                <span class="text-muted small">Platform conversion</span>
+                <span class="text-muted small">Conversion</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejection Rate Card -->
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card card-glass p-3 h-100 border-0" style="border-left: 3px solid var(--danger-text) !important;">
+            <div class="card-body text-start p-2 p-sm-3">
+                <span class="text-danger small fw-bold text-uppercase d-block mb-1">Rejection Rate</span>
+                <h3 class="fw-bold text-danger mb-0">{{ (100.0 - stats.approval_rate)|round(2) }}%</h3>
+                <span class="text-muted small">Platform rejects</span>
             </div>
         </div>
     </div>
     
     <!-- Average Income Card -->
-    <div class="col-md-4 col-lg-2">
-        <div class="card card-glass p-3 h-100 border border-secondary-subtle">
-            <div class="card-body text-start">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card card-glass p-3 h-100 border-0">
+            <div class="card-body text-start p-2 p-sm-3">
                 <span class="text-muted small fw-bold text-uppercase d-block mb-1">Avg Income</span>
                 <h3 class="fw-bold text-success mb-0">${{ "{:,.0f}".format(stats.avg_income) }}</h3>
-                <span class="text-muted small">Applicant average</span>
+                <span class="text-muted small">Applicants avg</span>
             </div>
         </div>
     </div>
     
     <!-- Average Debt Card -->
-    <div class="col-md-4 col-lg-2">
-        <div class="card card-glass p-3 h-100 border border-secondary-subtle">
-            <div class="card-body text-start">
+    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+        <div class="card card-glass p-3 h-100 border-0">
+            <div class="card-body text-start p-2 p-sm-3">
                 <span class="text-muted small fw-bold text-uppercase d-block mb-1">Avg Debt</span>
                 <h3 class="fw-bold text-danger mb-0">${{ "{:,.0f}".format(stats.avg_debt) }}</h3>
-                <span class="text-muted small">Outstanding average</span>
+                <span class="text-muted small">Outstanding avg</span>
             </div>
         </div>
     </div>
@@ -80,7 +91,7 @@
 <div class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="200">
     <!-- Approval Rate Pie Chart -->
     <div class="col-lg-4">
-        <div class="card card-glass p-4 h-100 border border-secondary-subtle text-start">
+        <div class="card card-glass p-4 h-100 border-0 text-start">
             <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-pie-chart-fill me-2"></i>Decision Split</h5>
             <div style="max-height: 250px;" class="d-flex justify-content-center">
                 <canvas id="adminChartApproval"></canvas>
@@ -90,7 +101,7 @@
     
     <!-- Income Distribution Bar Chart -->
     <div class="col-lg-8">
-        <div class="card card-glass p-4 h-100 border border-secondary-subtle text-start">
+        <div class="card card-glass p-4 h-100 border-0 text-start">
             <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-bar-chart-fill me-2"></i>Income Distribution</h5>
             <div style="height: 250px;">
                 <canvas id="adminChartIncome"></canvas>
@@ -100,8 +111,14 @@
 
     <!-- Trend Line Chart -->
     <div class="col-lg-6">
-        <div class="card card-glass p-4 h-100 border border-secondary-subtle text-start">
-            <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-graph-up me-2"></i>Predictions Run Over Time</h5>
+        <div class="card card-glass p-4 h-100 border-0 text-start">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold mb-0 text-primary"><i class="bi bi-graph-up me-2"></i>Predictions Run Over Time</h5>
+                <div class="btn-group btn-group-sm" role="group" aria-label="Trend Scale">
+                    <button type="button" class="btn btn-outline-primary active" id="btnDailyTrend">Daily</button>
+                    <button type="button" class="btn btn-outline-primary" id="btnMonthlyTrend">Monthly</button>
+                </div>
+            </div>
             <div style="height: 230px;">
                 <canvas id="adminChartTrend"></canvas>
             </div>
@@ -110,7 +127,7 @@
 
     <!-- Risk Level Distribution -->
     <div class="col-lg-6">
-        <div class="card card-glass p-4 h-100 border border-secondary-subtle text-start">
+        <div class="card card-glass p-4 h-100 border-0 text-start">
             <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-shield-exclamation me-2"></i>Risk Profile Distribution</h5>
             <div style="height: 230px;">
                 <canvas id="adminChartRisk"></canvas>
@@ -123,10 +140,10 @@
 <div class="row" data-aos="fade-up" data-aos-delay="300">
     <div class="col-lg-12 text-start">
         <h4 class="mb-4 text-primary"><i class="bi bi-clock-history me-2"></i>Recent Underwriting Applications</h4>
-        <div class="card card-glass border border-secondary-subtle overflow-hidden">
+        <div class="card card-glass border-0 overflow-hidden">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0 small">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th class="ps-4">App ID</th>
                             <th>Timestamp</th>
@@ -148,7 +165,7 @@
                                     <td>{{ record.employment }}</td>
                                     <td>{{ "%.1f"|format(record.probability) }}%</td>
                                     <td>
-                                        <span class="badge {% if record.prediction == 'Approved' %}bg-success-subtle text-success border border-success-subtle{% else %}bg-danger-subtle text-danger border border-danger-subtle{% endif %}">
+                                        <span class="badge {% if record.prediction == 'Approved' %}bg-success-subtle text-success{% else %}bg-danger-subtle text-danger{% endif %} rounded-pill px-3">
                                             {{ record.prediction }}
                                         </span>
                                     </td>

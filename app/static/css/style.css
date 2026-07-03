@@ -1,139 +1,292 @@
 /* ==========================================================================
-   Premium Glassmorphic Bank-Grade Stylesheet
+   Premium Glassmorphic Bank-Grade Stylesheet (Apple + Fluent + Material)
    Fonts: Poppins, Outfit
    Author: Principal UI/UX Architect
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 :root, [data-bs-theme="light"] {
-    --bg-gradient: linear-gradient(135deg, #f0f4f8 0%, #dbe3eb 100%);
-    --card-bg: rgba(255, 255, 255, 0.7);
-    --card-border: rgba(255, 255, 255, 0.4);
-    --card-shadow: 0 10px 30px rgba(13, 110, 253, 0.04);
-    --text-main: #2b303a;
-    --text-muted: #6c757d;
-    --accent-color: #0d6efd;
-    --accent-glow: rgba(13, 110, 253, 0.15);
+    --bg-gradient: radial-gradient(circle at 0% 0%, #f7fafc 0%, #e2e8f0 100%);
+    --card-bg: rgba(255, 255, 255, 0.45);
+    --card-border: rgba(255, 255, 255, 0.6);
+    --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --accent-color: #2563eb;
+    --accent-glow: rgba(37, 99, 235, 0.15);
     
-    --grad-blue: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-    --grad-green: linear-gradient(135deg, #198754 0%, #157347 100%);
-    --grad-red: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%);
-    --grad-orange: linear-gradient(135deg, #fd7e14 0%, #e86d05 100%);
+    --grad-blue: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    --grad-green: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    --grad-red: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    --grad-orange: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+    --grad-purple: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    --grad-hero: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
     
-    --success-bg: rgba(25, 135, 84, 0.1);
-    --success-border: rgba(25, 135, 84, 0.2);
-    --success-text: #198754;
-    --danger-bg: rgba(220, 53, 69, 0.1);
-    --danger-border: rgba(220, 53, 69, 0.2);
-    --danger-text: #dc3545;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --success-border: rgba(16, 185, 129, 0.2);
+    --success-text: #059669;
+    --danger-bg: rgba(239, 68, 68, 0.1);
+    --danger-border: rgba(239, 68, 68, 0.2);
+    --danger-text: #dc2626;
     
-    --nav-bg: rgba(255, 255, 255, 0.85);
+    --nav-bg: rgba(255, 255, 255, 0.6);
     --nav-border: rgba(255, 255, 255, 0.4);
+    
+    --blob-1: rgba(37, 99, 235, 0.08);
+    --blob-2: rgba(124, 58, 237, 0.08);
+    --input-bg: rgba(255, 255, 255, 0.5);
+    --input-border: rgba(0, 0, 0, 0.1);
 }
 
 [data-bs-theme="dark"] {
-    --bg-gradient: linear-gradient(135deg, #070b13 0%, #0e1622 100%);
-    --card-bg: rgba(15, 23, 42, 0.75);
-    --card-border: rgba(255, 255, 255, 0.06);
-    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    --text-main: #f1f5f9;
+    --bg-gradient: radial-gradient(circle at 0% 0%, #0b0f19 0%, #020408 100%);
+    --card-bg: rgba(15, 23, 42, 0.65);
+    --card-border: rgba(255, 255, 255, 0.05);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+    --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --accent-color: #3b82f6;
-    --accent-glow: rgba(59, 130, 246, 0.25);
+    --accent-glow: rgba(59, 130, 246, 0.3);
     
     --grad-blue: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     --grad-green: linear-gradient(135deg, #10b981 0%, #047857 100%);
     --grad-red: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
     --grad-orange: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+    --grad-purple: linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%);
+    --grad-hero: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     
-    --success-bg: rgba(16, 185, 129, 0.15);
-    --success-border: rgba(16, 185, 129, 0.3);
+    --success-bg: rgba(16, 185, 129, 0.12);
+    --success-border: rgba(16, 185, 129, 0.25);
     --success-text: #34d399;
-    --danger-bg: rgba(239, 68, 68, 0.15);
-    --danger-border: rgba(239, 68, 68, 0.3);
+    --danger-bg: rgba(239, 68, 68, 0.12);
+    --danger-border: rgba(239, 68, 68, 0.25);
     --danger-text: #fca5a5;
     
-    --nav-bg: rgba(15, 23, 42, 0.85);
-    --nav-border: rgba(255, 255, 255, 0.05);
+    --nav-bg: rgba(15, 23, 42, 0.65);
+    --nav-border: rgba(255, 255, 255, 0.04);
+    
+    --blob-1: rgba(59, 130, 246, 0.12);
+    --blob-2: rgba(139, 92, 246, 0.12);
+    --input-bg: rgba(15, 23, 42, 0.4);
+    --input-border: rgba(255, 255, 255, 0.08);
 }
 
-/* --------------------------------------------------------------------------
-   Global Resets
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   Global Resets & Backdrop Blobs
+   ========================================================================== */
 body {
     font-family: 'Poppins', sans-serif;
     color: var(--text-main);
     background: var(--bg-gradient) no-repeat fixed;
     background-size: cover;
     min-height: 100vh;
-    transition: background 0.3s ease, color 0.3s ease;
+    overflow-x: hidden;
+    position: relative;
+    transition: background 0.5s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s ease;
+}
+
+/* Background Glowing Blurs (Fluent/Apple Aesthetic) */
+.bg-blobs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.85;
+    animation: float-blob 25s infinite alternate ease-in-out;
+}
+
+.blob-1 {
+    top: -10%;
+    left: 10%;
+    width: 40vw;
+    height: 40vw;
+    background: var(--blob-1);
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    bottom: -10%;
+    right: 10%;
+    width: 45vw;
+    height: 45vw;
+    background: var(--blob-2);
+    animation-delay: -5s;
+}
+
+@keyframes float-blob {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(5%, 8%) scale(1.1); }
+    100% { transform: translate(-3%, -5%) scale(0.95); }
 }
 
 h1, h2, h3, h4, h5, h6, .navbar-brand {
     font-family: 'Outfit', sans-serif;
     font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
-/* --------------------------------------------------------------------------
-   Premium Components & Glassmorphism
-   -------------------------------------------------------------------------- */
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.2);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.4);
+}
+
+/* ==========================================================================
+   Top Page Progress Loader
+   ========================================================================== */
+.top-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
+    background-size: 200% 100%;
+    z-index: 10000;
+    animation: loadingPulse 2s infinite linear;
+    display: none;
+}
+
+@keyframes loadingPulse {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ==========================================================================
+   Navigation Bar
+   ========================================================================== */
 .navbar-glass {
     background: var(--nav-bg) !important;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
     border-bottom: 1px solid var(--nav-border);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s ease;
 }
 
+.nav-link {
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.nav-link:hover {
+    color: var(--accent-color) !important;
+    background: rgba(100, 116, 139, 0.08);
+}
+
+/* ==========================================================================
+   Frosted Glass Card Components
+   ========================================================================== */
 .card-glass {
     background: var(--card-bg) !important;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-radius: 20px !important;
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    border-radius: 24px !important;
     border: 1px solid var(--card-border) !important;
     box-shadow: var(--card-shadow) !important;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease;
 }
 
 .card-glass:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
 }
 
+[data-bs-theme="dark"] .card-glass:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ==========================================================================
+   Premium Buttons & Inputs
+   ========================================================================== */
 .text-gradient {
-    background: linear-gradient(135deg, #0d6efd 0%, #00e5ff 100%);
+    background: var(--grad-hero);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: 800;
+    font-weight: 900;
 }
 
 .btn-premium {
-    background: var(--grad-blue);
+    background: var(--grad-hero);
     border: none;
     color: #ffffff !important;
     font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    border-radius: 12px;
-    padding: 0.8rem 2.2rem;
-    box-shadow: 0 4px 15px var(--accent-glow);
-    transition: all 0.25s ease;
+    border-radius: 14px;
+    padding: 0.85rem 2.2rem;
+    box-shadow: 0 4px 20px var(--accent-glow);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 22px rgba(13, 110, 253, 0.35);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35);
 }
 
-/* --------------------------------------------------------------------------
-   Multi-Step Form Wizard Styling
-   -------------------------------------------------------------------------- */
+.btn-premium:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Beautiful focused inputs (Material + Apple) */
+.form-floating > .form-control, 
+.form-floating > .form-select {
+    background: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    border-radius: 12px;
+    color: var(--text-main);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+}
+
+.form-floating > .form-control:focus, 
+.form-floating > .form-select:focus {
+    background: var(--card-bg) !important;
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 4px var(--accent-glow) !important;
+}
+
+.form-check-input {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+}
+
+.form-check-input:checked {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+/* ==========================================================================
+   Multi-Step Wizard Progress Node Tracks
+   ========================================================================== */
 .step-container {
     display: flex;
     justify-content: space-between;
     position: relative;
-    margin-bottom: 3.5rem;
-    max-width: 800px;
+    margin-bottom: 4rem;
+    max-width: 750px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -141,32 +294,28 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 .step-container::before {
     content: '';
     position: absolute;
-    top: 25px;
+    top: 24px;
     left: 0;
     width: 100%;
-    height: 3px;
-    background-color: rgba(255, 255, 255, 0.15);
+    height: 4px;
+    background-color: rgba(100, 116, 139, 0.15);
     z-index: 1;
-}
-
-[data-bs-theme="light"] .step-container::before {
-    background-color: rgba(0, 0, 0, 0.08);
 }
 
 .step-progress-bar {
     position: absolute;
-    top: 25px;
+    top: 24px;
     left: 0;
-    height: 3px;
+    height: 4px;
     background: var(--grad-blue);
     z-index: 2;
     width: 0%;
-    transition: width 0.4s ease;
+    transition: width 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .step-node {
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background-color: var(--card-bg);
     border: 3px solid var(--card-border);
@@ -178,6 +327,7 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     z-index: 3;
     transition: all 0.3s ease;
     box-shadow: var(--card-shadow);
+    color: var(--text-muted);
 }
 
 .step-node.active {
@@ -190,20 +340,21 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 .step-node.completed {
     background: var(--grad-green);
     color: white;
-    border-color: #198754;
+    border-color: #10b981;
 }
 
 .step-label {
     position: absolute;
-    top: 60px;
-    font-size: 0.78rem;
-    font-weight: 600;
+    top: 56px;
+    font-size: 0.72rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     color: var(--text-muted);
     text-align: center;
-    width: 120px;
-    transform: translateX(-30%);
+    width: 130px;
+    transform: translateX(-31%);
+    transition: color 0.3s ease;
 }
 
 .step-node.active + .step-label {
@@ -216,17 +367,21 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
 
 .wizard-step.active {
     display: block;
-    animation: fadeIn 0.4s ease forwards;
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+@keyframes slideUpFade {
+    from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* --------------------------------------------------------------------------
-   Admin Metric Card Gradients
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   Fintech Charts & Dashboard elements
+   ========================================================================== */
+.dashboard-stat-card {
+    border-left: 5px solid var(--accent-color);
+}
+
 .admin-card-blue {
     background: var(--grad-blue) !important;
     color: white !important;
@@ -248,45 +403,145 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
     color: white !important;
 }
 
-/* --------------------------------------------------------------------------
-   Visual attributions & Bars
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   Radial Risk gauge score & Explainability Graph
+   ========================================================================== */
+.radial-score-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.radial-score-ring {
+    transform: rotate(-90deg);
+}
+
+.radial-score-bg {
+    fill: none;
+    stroke: rgba(100, 116, 139, 0.1);
+    stroke-width: 14;
+}
+
+.radial-score-bar {
+    fill: none;
+    stroke-width: 14;
+    stroke-linecap: round;
+    stroke-dasharray: 565.48;
+    stroke-dashoffset: 565.48;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.score-text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
 .factor-bar-container {
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(100, 116, 139, 0.1);
     height: 8px;
     border-radius: 4px;
     overflow: hidden;
     margin-top: 5px;
 }
 
-[data-bs-theme="light"] .factor-bar-container {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
 .factor-bar-fill {
     height: 100%;
     border-radius: 4px;
+    transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .factor-bar-risk {
-    background-color: #dc3545;
+    background: var(--grad-red);
 }
 
 .factor-bar-support {
-    background-color: #198754;
+    background: var(--grad-green);
 }
 
-/* --------------------------------------------------------------------------
+/* ==========================================================================
+   Data Tables (History, Admin, Reports)
+   ========================================================================== */
+.card-glass .table {
+    color: var(--text-main);
+    --bs-table-bg: transparent;
+    --bs-table-hover-bg: rgba(100, 116, 139, 0.06);
+}
+
+.card-glass .table thead th {
+    background: rgba(100, 116, 139, 0.06);
+    border-bottom: 2px solid var(--card-border);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 1rem 0.75rem;
+}
+
+.card-glass .table tbody td {
+    border-color: var(--card-border);
+    padding: 0.85rem 0.75rem;
+    vertical-align: middle;
+}
+
+.card-glass .table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+[data-bs-theme="dark"] .card-glass .table thead th {
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+[data-bs-theme="dark"] .card-glass .table tbody td {
+    border-color: rgba(255, 255, 255, 0.04);
+}
+
+/* Badge refinements */
+.badge {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+/* Form floating label color in dark mode */
+[data-bs-theme="dark"] .form-floating > label {
+    color: var(--text-muted);
+}
+
+/* Smooth form-control that aren't inside form-floating */
+.form-control:not(.form-floating .form-control),
+.form-select:not(.form-floating .form-select) {
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 12px;
+    color: var(--text-main);
+    transition: all 0.3s ease;
+}
+
+.form-control:not(.form-floating .form-control):focus,
+.form-select:not(.form-floating .form-select):focus {
+    background: var(--card-bg);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+/* ==========================================================================
    Print media optimization
-   -------------------------------------------------------------------------- */
+   ========================================================================== */
 @media print {
     body {
         background: #ffffff !important;
         color: #000000 !important;
-        font-size: 12pt;
+        font-size: 11pt;
     }
-    .navbar-glass, footer, .btn-premium, .card-glass:hover, .no-print {
+    .navbar-glass, footer, .btn-premium, .card-glass:hover, .no-print, .bg-blobs {
         display: none !important;
     }
     .card-glass {
@@ -300,3 +555,4 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
         padding: 0 !important;
     }
 }
+

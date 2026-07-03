@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from configs.config import config
-from src.models.explainability import ExplanationEngine
+from config.config import config
+from app.services.explainability import ExplanationEngine
 from src.utils.helper import load_pkl
 from src.utils.logger import get_logger
 

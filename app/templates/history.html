@@ -12,23 +12,47 @@
                 <p class="text-muted mb-0">Browse, search, and sort applicant credit records stored in SQLite.</p>
             </div>
             
-            <div class="d-flex gap-2">
-                <a href="{{ url_for('api.export_history_csv') }}" class="btn btn-outline-success"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Export CSV</a>
-                <a href="{{ url_for('api.export_history_json') }}" class="btn btn-outline-info"><i class="bi bi-file-code me-2"></i>Export JSON</a>
+            <div class="d-flex gap-2 align-items-center">
+                <a href="{{ url_for('api.export_history_csv') }}" class="btn btn-outline-success btn-sm d-inline-flex align-items-center"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Export CSV</a>
+                <a href="{{ url_for('api.export_history_json') }}" class="btn btn-outline-info btn-sm d-inline-flex align-items-center"><i class="bi bi-file-code me-1"></i>Export JSON</a>
+                <form action="{{ url_for('api.clear_user_history') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear your entire credit prediction history? This action cannot be undone.');" class="d-inline">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm d-inline-flex align-items-center"><i class="bi bi-trash3-fill me-1"></i>Clear History</button>
+                </form>
             </div>
         </div>
 
         <!-- Search & Filter Controls -->
-        <div class="card card-glass p-4 mb-4 border border-secondary-subtle">
-            <form method="GET" action="{{ url_for('api.history') }}" class="row g-3 align-items-center">
-                <div class="col-md-4 text-start">
+        <div class="card card-glass p-4 mb-4 border-0">
+            <form method="GET" action="{{ url_for('api.history') }}" class="row g-3 align-items-end">
+                <div class="col-md-3 text-start">
                     <label class="form-label small text-muted"><i class="bi bi-search me-1"></i>Search Records</label>
-                    <input type="text" name="search" class="form-control" placeholder="App ID, gender, sector..." value="{{ search }}">
+                    <input type="text" name="search" class="form-control form-control-sm" placeholder="App ID, sector..." value="{{ search }}">
+                </div>
+
+                <div class="col-md-2 text-start">
+                    <label class="form-label small text-muted"><i class="bi bi-shield-check me-1"></i>Decision</label>
+                    <select name="decision" class="form-select form-select-sm">
+                        <option value="All" {% if decision == 'All' %}selected{% endif %}>All Decisions</option>
+                        <option value="Approved" {% if decision == 'Approved' %}selected{% endif %}>Approved</option>
+                        <option value="Rejected" {% if decision == 'Rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+
+                <div class="col-md-2 text-start">
+                    <label class="form-label small text-muted"><i class="bi bi-exclamation-triangle me-1"></i>Risk Level</label>
+                    <select name="risk_level" class="form-select form-select-sm">
+                        <option value="All" {% if risk_level == 'All' %}selected{% endif %}>All Risks</option>
+                        <option value="Low" {% if risk_level == 'Low' %}selected{% endif %}>Low</option>
+                        <option value="Medium-Low" {% if risk_level == 'Medium-Low' %}selected{% endif %}>Medium-Low</option>
+                        <option value="Medium-High" {% if risk_level == 'Medium-High' %}selected{% endif %}>Medium-High</option>
+                        <option value="High" {% if risk_level == 'High' %}selected{% endif %}>High</option>
+                    </select>
                 </div>
                 
-                <div class="col-md-3 text-start">
+                <div class="col-md-2 text-start">
                     <label class="form-label small text-muted"><i class="bi bi-funnel me-1"></i>Sort Variable</label>
-                    <select name="sort_by" class="form-select">
+                    <select name="sort_by" class="form-select form-select-sm">
                         <option value="id" {% if sort_by == 'id' %}selected{% endif %}>Record ID</option>
                         <option value="timestamp" {% if sort_by == 'timestamp' %}selected{% endif %}>Date & Time</option>
                         <option value="income" {% if sort_by == 'income' %}selected{% endif %}>Annual Income</option>
@@ -37,25 +61,25 @@
                     </select>
                 </div>
                 
-                <div class="col-md-3 text-start">
+                <div class="col-md-2 text-start">
                     <label class="form-label small text-muted"><i class="bi bi-arrow-down-up me-1"></i>Ordering</label>
-                    <select name="order" class="form-select">
+                    <select name="order" class="form-select form-select-sm">
                         <option value="DESC" {% if order == 'DESC' %}selected{% endif %}>Descending</option>
                         <option value="ASC" {% if order == 'ASC' %}selected{% endif %}>Ascending</option>
                     </select>
                 </div>
                 
-                <div class="col-md-2 d-grid mt-auto">
-                    <button type="submit" class="btn btn-premium"><i class="bi bi-filter me-1"></i>Apply Filter</button>
+                <div class="col-md-1 d-grid">
+                    <button type="submit" class="btn btn-premium btn-sm py-2" aria-label="Filter history"><i class="bi bi-filter"></i></button>
                 </div>
             </form>
         </div>
 
         <!-- Tabular History Panel -->
-        <div class="card card-glass overflow-hidden border border-secondary-subtle">
+        <div class="card card-glass overflow-hidden border-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0 text-start small">
-                    <thead class="table-light">
+                    <thead>
                         <tr>
                             <th class="ps-4">App ID</th>
                             <th>Timestamp</th>
@@ -96,9 +120,17 @@
                                         </span>
                                     </td>
                                     <td class="text-center pe-4">
-                                        <a href="{{ url_for('api.get_report', application_id=record.application_id) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-file-earmark-pdf-fill me-1"></i>View Report
-                                        </a>
+                                        <div class="d-inline-flex gap-2 justify-content-center">
+                                            <a href="{{ url_for('api.get_report', application_id=record.application_id) }}" class="btn btn-sm btn-outline-primary d-inline-flex align-items-center">
+                                                <i class="bi bi-file-earmark-pdf-fill me-1"></i>View Report
+                                            </a>
+                                            <form action="{{ url_for('api.delete_history_entry', application_id=record.application_id) }}" method="POST" onsubmit="return confirm('Delete record {{ record.application_id }}?');" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center" aria-label="Delete prediction">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

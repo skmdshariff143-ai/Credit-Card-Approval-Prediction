@@ -4,7 +4,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
-from configs.constants import RANDOM_STATE
+from config.constants import RANDOM_STATE
 from src.utils.exceptions import ModelTrainingError
 from src.utils.logger import get_logger
 

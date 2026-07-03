@@ -13,10 +13,10 @@ class HyperparameterTuner:
     def __init__(self, cv=3):
         self.cv = cv
         self.param_grids = {
-            "logistic_regression": {"C": [0.1, 1.0, 10.0]},
-            "decision_tree": {"max_depth": [5, 10, None], "min_samples_split": [2, 5]},
-            "random_forest": {"n_estimators": [50, 100], "max_depth": [10, 15]},
-            "xgboost": {"n_estimators": [50, 100], "max_depth": [4, 6], "learning_rate": [0.05, 0.1]},
+            "logistic_regression": {"C": [0.01, 0.1, 1.0, 10.0]},
+            "decision_tree": {"max_depth": [4, 6, 8, 10], "min_samples_leaf": [2, 5]},
+            "random_forest": {"n_estimators": [100, 200], "max_depth": [10, 12, 15]},
+            "xgboost": {"n_estimators": [100, 150], "max_depth": [4, 5, 6], "learning_rate": [0.05, 0.1]},
         }
 
     def tune(self, name: str, model, X_train, y_train):

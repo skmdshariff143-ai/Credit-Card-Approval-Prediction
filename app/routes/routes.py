@@ -4,13 +4,14 @@ import time
 from datetime import datetime
 
 from flask import Blueprint, Response, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 
-from src.api.database import DatabaseManager
-from src.api.forms import CreditApprovalForm
-from src.api.prediction import PredictorAPI
-from src.api.validators import InputValidator
-from src.utils.limiter import rate_limit
-from src.utils.logger import get_logger
+from app.database.database import DatabaseManager
+from app.routes.forms import CreditApprovalForm
+from app.services.prediction import PredictorAPI
+from app.routes.validators import InputValidator
+from app.utils.limiter import rate_limit
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -32,10 +33,35 @@ def index():
 @api_bp.route("/about", methods=["GET"])
 def about():
     """Renders the About Project page containing problem definition and metrics."""
-    return render_template("about.html")
+    model_metrics = None
+    best_model_name = "Unknown"
+    try:
+        from config.config import config
+        metrics_path = os.path.join(config.get_paths()["models_dir"], "model_metrics.json")
+        if os.path.exists(metrics_path):
+            with open(metrics_path, "r") as f:
+                raw_metrics = json.load(f)
+                model_metrics = []
+                mapping = {
+                    "logistic_regression": "Logistic Regression",
+                    "decision_tree": "Decision Tree",
+                    "random_forest": "Random Forest",
+                    "xgboost": "XGBoost",
+                }
+                for row in raw_metrics:
+                    mapped_row = row.copy()
+                    model_key = str(row.get("Model", "")).lower()
+                    mapped_row["Model"] = mapping.get(model_key, row.get("Model"))
+                    model_metrics.append(mapped_row)
+        best_model_name = predictor.get_model_name()
+    except Exception as e:
+        logger.warning(f"Could not load model metrics or name: {str(e)}")
+
+    return render_template("about.html", model_metrics=model_metrics, best_model_name=best_model_name)
 
 
 @api_bp.route("/predict", methods=["GET"])
+@login_required
 def predict_get():
     """Renders the Credit Application entry form wizard."""
     form = CreditApprovalForm()
@@ -43,6 +69,7 @@ def predict_get():
 
 
 @api_bp.route("/predict", methods=["POST"])
+@login_required
 def predict_post():
     """Handles multi-step form wizard submission, applies logic overlays, saves to SQLite."""
     form = CreditApprovalForm()
@@ -128,6 +155,11 @@ def predict_post():
 
             prediction_time_ms = round((time.time() - start_time) * 1000, 2)
 
+            # Extract explanations
+            explanation = result.get("explanation", {})
+            risk_factors = explanation.get("risk_factors", [])
+            support_factors = explanation.get("support_factors", [])
+
             # Save predictions transaction to SQLite database using exact schema (Phase 11 spec)
             db_manager.add_prediction(
                 input_features=form_data,
@@ -141,14 +173,11 @@ def predict_post():
                 children=form_data["cnt_children"],
                 debt=existing_debt,
                 risk_level=risk_level,
-                model="Logistic Regression",
+                model=predictor.get_model_name(),
                 recommendation="; ".join(recommendations),
+                user_id=current_user.id if current_user.is_authenticated else None,
+                explanation=explanation,
             )
-
-            # Extract SHAP explanations
-            explanation = result.get("explanation", {})
-            risk_factors = explanation.get("risk_factors", [])
-            support_factors = explanation.get("support_factors", [])
 
             return render_template(
                 "result.html",
@@ -159,7 +188,7 @@ def predict_post():
                 support_factors=support_factors,
                 risk_level=risk_level,
                 prediction_time=prediction_time_ms,
-                model_used="Logistic Regression",
+                model_used=predictor.get_model_name(),
                 date=datetime.now().strftime("%Y-%m-%d"),
                 application_id=application_id,
                 reasons=reasons,
@@ -179,16 +208,27 @@ def predict_post():
 
 
 @api_bp.route("/history", methods=["GET"])
+@login_required
 def history():
     """Renders prediction history log list supporting filter, search, sort, pagination."""
     search = request.args.get("search", "").strip()
     sort_by = request.args.get("sort_by", "id")
     order = request.args.get("order", "DESC")
+    decision = request.args.get("decision", "All").strip()
+    risk_level = request.args.get("risk_level", "All").strip()
     page = int(request.args.get("page", 1))
     limit = 10
 
-    # Retrieve all matches from database
-    history_records = db_manager.get_predictions(limit=1000, search=search or None, sort_by=sort_by, order=order)
+    # Retrieve user's predictions from database
+    history_records = db_manager.get_user_predictions(
+        user_id=current_user.id,
+        limit=1000,
+        search=search or None,
+        sort_by=sort_by,
+        order=order,
+        decision=decision,
+        risk_level=risk_level,
+    )
 
     # Simple list slice pagination
     start = (page - 1) * limit
@@ -204,10 +244,34 @@ def history():
         search=search,
         sort_by=sort_by,
         order=order,
+        decision=decision,
+        risk_level=risk_level,
     )
 
 
+@api_bp.route("/history/delete/<application_id>", methods=["POST"])
+@login_required
+def delete_history_entry(application_id):
+    """Deletes a single prediction history entry for the logged-in user."""
+    success = db_manager.delete_prediction(application_id, current_user.id)
+    if success:
+        flash(f"Application record {application_id} successfully deleted.", "success")
+    else:
+        flash(f"Failed to delete record {application_id} or unauthorized.", "danger")
+    return redirect(url_for("api.history"))
+
+
+@api_bp.route("/history/clear", methods=["POST"])
+@login_required
+def clear_user_history():
+    """Clears all prediction logs and reports for the current user."""
+    db_manager.clear_user_history(current_user.id)
+    flash("Your entire evaluation history log has been cleared.", "success")
+    return redirect(url_for("api.history"))
+
+
 @api_bp.route("/admin", methods=["GET"])
+@login_required
 def admin():
     """Renders Admin Dashboard statistics panels (Phase 11 spec)."""
     stats = db_manager.get_admin_stats()
@@ -216,13 +280,48 @@ def admin():
 
 
 @api_bp.route("/report/<application_id>", methods=["GET"])
+@login_required
 def get_report(application_id):
-    """Renders printable, clean PDF-ready credit report view (Phase 11 spec)."""
-    records = db_manager.get_predictions(limit=1000)
-    record = next((r for r in records if r["application_id"] == application_id), None)
-    if not record:
-        flash("Application record not found.", "danger")
+    """Renders printable, clean PDF-ready credit report view (Persisted Reports table)."""
+    # Fetch report directly from SQLite reports table without user_id filter for ownership validation
+    report = db_manager.get_report_by_app_id(application_id)
+    if not report:
+        flash("Application credit report not found.", "danger")
         return redirect(url_for("api.history"))
+
+    # Security: check ownership if user_id is set on the report
+    if report["user_id"] is not None and report["user_id"] != current_user.id:
+        flash("Unauthorized access to this credit report.", "danger")
+        return redirect(url_for("api.history"))
+
+    # Map report schema structure to match what report.html expects
+    record = {
+        "application_id": report["application_id"],
+        "timestamp": report["timestamp"],
+        "gender": report["inputs"].get("code_gender", "Unknown"),
+        "income": report["inputs"].get("amt_income_total", 0.0),
+        "employment": report["inputs"].get("name_income_type", "Unknown"),
+        "experience": report["inputs"].get("years_employed", 0.0),
+        "children": report["inputs"].get("cnt_children", 0),
+        "debt": report["inputs"].get("existing_debt", 0.0),
+        "prediction": report["prediction"],
+        "probability": report["confidence"],
+        "risk_level": "Low" if report["prediction"] == "Approved" else "High",
+        "model": report["model_used"],
+        "recommendation": "Manual review required",
+        "input": report["inputs"],
+        "explanation": report["explanation"],
+    }
+
+    # Retrieve risk_level and recommendations from the prediction_history table to keep it accurate
+    try:
+        hist_rec = db_manager.get_user_predictions(current_user.id, limit=1, search=application_id)
+        if hist_rec:
+            record["risk_level"] = hist_rec[0]["risk_level"]
+            record["recommendation"] = hist_rec[0]["recommendation"]
+    except Exception:
+        pass
+
     return render_template("report.html", record=record)
 
 
@@ -252,12 +351,20 @@ def health():
     else:
         uptime_str = f"{int(uptime_seconds // 3600)}h {int((uptime_seconds % 3600) // 60)}m {int(uptime_seconds % 60)}s"
 
+    # Determine loaded model name dynamically
+    try:
+        model_loaded_name = _predictor.get_model_name().lower().replace(" ", "_")
+        if model_loaded_name == "unknown":
+            model_loaded_name = "logistic_regression"
+    except Exception:
+        model_loaded_name = "logistic_regression"
+
     return (
         jsonify(
             {
                 "status": "healthy",
                 "model": model_status,
-                "model_loaded": "logistic_regression",  # compat
+                "model_loaded": model_loaded_name,
                 "database": database_status,
                 "uptime": uptime_str,
                 "version": "1.0.0",
@@ -291,7 +398,7 @@ def startup_diagnostics():
     """Returns startup diagnostics about system dependencies and file structures."""
     import sys
 
-    from src.models.predict import _predictor
+    from app.services.predict import _predictor
 
     diagnostics = {
         "status": "completed",
@@ -324,6 +431,7 @@ def api_admin_stats():
     risk_bins = {"Low": 0, "Medium-Low": 0, "Medium-High": 0, "High": 0}
     # 3. Monthly/daily trends
     date_trends = {}
+    monthly_trends = {}
 
     for r in records:
         inc = float(r.get("income", 0.0))
@@ -345,11 +453,19 @@ def api_admin_stats():
         day = r.get("timestamp", "").split(" ")[0]
         if day:
             date_trends[day] = date_trends.get(day, 0) + 1
+            if len(day) >= 7:
+                month = day[:7]  # YYYY-MM
+                monthly_trends[month] = monthly_trends.get(month, 0) + 1
 
     # Sort dates
     sorted_dates = sorted(date_trends.items())
     dates_labels = [item[0] for item in sorted_dates[-10:]]
     dates_data = [item[1] for item in sorted_dates[-10:]]
+
+    # Sort months
+    sorted_months = sorted(monthly_trends.items())
+    months_labels = [item[0] for item in sorted_months[-12:]]
+    months_data = [item[1] for item in sorted_months[-12:]]
 
     return (
         jsonify(
@@ -360,6 +476,8 @@ def api_admin_stats():
                 "risk_data": list(risk_bins.values()),
                 "trend_labels": dates_labels,
                 "trend_data": dates_data,
+                "monthly_labels": months_labels,
+                "monthly_data": months_data,
             }
         ),
         200,
@@ -367,6 +485,7 @@ def api_admin_stats():
 
 
 @api_bp.route("/history/export/csv", methods=["GET"])
+@login_required
 @rate_limit(limit_count=10, period_seconds=60)
 def export_history_csv():
     """Exports prediction logs history from SQLite as a CSV attachment."""
@@ -374,8 +493,8 @@ def export_history_csv():
         import csv
         import io
 
-        # Retrieve all history
-        history_records = db_manager.get_predictions(limit=1000)
+        # Retrieve only current user's history
+        history_records = db_manager.get_user_predictions(user_id=current_user.id, limit=1000)
 
         output = io.StringIO()
         writer = csv.writer(output)
@@ -429,11 +548,13 @@ def export_history_csv():
 
 
 @api_bp.route("/history/export/json", methods=["GET"])
+@login_required
 @rate_limit(limit_count=10, period_seconds=60)
 def export_history_json():
     """Exports prediction logs history from SQLite as a JSON attachment."""
     try:
-        history_records = db_manager.get_predictions(limit=1000)
+        # Retrieve only current user's history
+        history_records = db_manager.get_user_predictions(user_id=current_user.id, limit=1000)
         json_data = json.dumps(history_records, indent=2)
 
         return Response(

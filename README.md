@@ -1,4 +1,4 @@
-# CreditGuard AI - Credit Card Approval Prediction System
+# CreditGuard AI — Credit Card Approval Prediction System
 
 ![System Banner](app/static/images/background.jpg)
 
@@ -19,164 +19,87 @@
 This project is configured with automatic multi-environment deployments:
 - 🚀 **Live Application (Flask Web App)**: [credit-card-approval-prediction.onrender.com](https://credit-card-approval-prediction.onrender.com) (Hosted on Render)
 - 🖥️ **Static Portfolio Website (GitHub Pages)**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/) (GitHub Actions Automated Deploy)
-- 📈 **Deployment Badge**: [![GitHub Pages Deployment](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/pages.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/pages.yml)
-- ⚙️ **GitHub Actions Badge**: [![CI pytest](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/main.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions)
-
-### 🛠️ GitHub Pages Activation Instructions
-To host the static portfolio website via GitHub Pages on your repository:
-1. Navigate to your repository on **GitHub**.
-2. Click on **Settings** in the top navigation tab.
-3. In the left sidebar, click on **Pages** under the "Code and automation" section.
-4. Under **Build and deployment** -> **Source**, select **GitHub Actions** from the dropdown menu (instead of "Deploy from a branch").
-5. The deployment will now run automatically on every `git push` to the `main` branch via the [.github/workflows/pages.yml](.github/workflows/pages.yml) workflow.
 
 ---
 
 ## 📋 Project Overview
-**CreditGuard AI** is a production-grade machine learning platform designed to automate retail credit card risk assessment, predicting payment default default probabilities with sub-millisecond scoring latency.
-
-## ⚠️ Problem Statement
-Retail banks face high credit default rates if card applications are not scrutinized. Manual reviews are slow and subjective. However, credit default represents a highly imbalanced class (7.5% defaults vs 92.5% approvals). Estimators easily overfit the majority class, causing severe banking losses from undetected default cases.
-
-## 🎯 Business Objective
-Automate card approvals while minimizing defaults by prioritizing **Recall** (the ratio of high-risk delinquencies detected) without excessive customer friction.
+**CreditGuard AI** is a production-grade retail credit card risk assessment platform. It blends machine learning prediction logic with strict banking business rules (DTI & credit checks), user session security, SQLite persistent logging, and LIME (Local Interpretable Model-agnostic Explanations) to provide explainable credit decisions in sub-milliseconds.
 
 ---
 
-## 🗄️ Dataset Description
-- **Source**: Kaggle Credit Card Approval Prediction Dataset.
-- **Demographics (`application_record.csv`)**: Socio-economic factors (5,000 application rows).
-- **Payment Records (`credit_record.csv`)**: Monthly repayment status history logs (163,037 records). If an applicant displays payments $\ge 60$ days delinquent, they are classified as default risk (Class 1 - Rejected).
+## 🔑 Core Features
 
----
+### 1. Secure Authentication & Session Management
+- **Security**: BCrypt/Scrypt password hashing with session timeouts.
+- **Features**: User registration, login, logout, and password recovery via secure signing tokens.
+- **Audit Trails**: Each authenticated user manages their own prediction history.
 
-## 🛠️ Technology Stack
-- **Languages**: Python 3.10 / 3.13, Javascript, CSS, HTML.
-- **Core ML libraries**: scikit-learn, XGBoost, Pandas, Numpy, joblib.
-- **Backend Frame**: Flask (Application Factory pattern), WTForms.
-- **Containerization**: Docker, Docker Compose, Gunicorn WSGI.
+### 2. Machine Learning & Preprocessing
+- **Features**: SMOTE class balancing and feature engineering (`EMPLOYED_TO_AGE_RATIO`).
+- **Benchmarking**: Compares Logistic Regression, Decision Trees, Random Forests, and XGBoost using Stratified Cross-Validation.
+- **Model Deployed**: Logistic Regression is the active classifier, selected for its balanced F1-score (0.2259) and recall.
+
+### 3. Explainable AI (XAI)
+- **Local Surrogate (LIME)**: Generates risk/support attribution factors using a local Ridge surrogate model fit on applicant data.
+- **Dashboard**: Displays a readable risk analysis dashboard with plain-language recommendation actions.
+
+### 4. SQLite Data Persistence & Logs
+- **Separation**: Persists data into `users`, `predictions`, `prediction_history`, and a dedicated `reports` table.
+- **CRUD Operations**: Support for keyword searching, decision/risk filtering, sorting, individual delete, and bulk clear history.
+- **Secure Exports**: Scoped CSV & JSON exports to the logged-in user.
+
+### 5. Operations Analytics Dashboard
+- **Visualizations**: Interactive Chart.js charts (Decision Split, Income Bins, Risk Levels).
+- **Scale Toggling**: Support for daily/monthly trend line switching.
+- **Mobile Compatibility**: Fully responsive Bootstrap layouts.
 
 ---
 
 ## 📂 Folder Structure
-The repository matches enterprise layouts:
-- `app/`: Flask web application routes, templates, and static stylesheets.
-- `configs/`: dynamic configuration classes (`production.py`, `development.py`, `testing.py`).
-- `data/`: raw and preprocessed split CSV datasets.
-- `diagrams/`: system architecture charts, ER diagrams, and flowcharts.
-- `interview/`: comprehensive interview preparation logs.
-- `models/`: fitted serialization artifacts (`best_model.pkl`, `scaler.pkl`).
-- `reports/`: markdown and metadata reports detailing project steps.
-- `src/`: core preprocessing engines, trainers, selectors, and API endpoints.
+```
+├── app/
+│   ├── database/         # SQLite DB schemas and queries
+│   ├── routes/           # Auth, API, and view controllers
+│   ├── services/         # Predict, LIME explainability, and history services
+│   ├── static/           # stylesheets, icons, charts script
+│   └── templates/        # Glassmorphic layout templates
+├── src/
+│   ├── data/             # data loaders
+│   ├── preprocessing/    # SMOTE pipeline, feature selector
+│   └── models/           # train, evaluation, and registry scripts
+├── tests/                # 108 pytest test suite cases
+└── models/               # serialized pkl pipelines
+```
 
 ---
 
 ## ⚙️ Installation & Local Setup
 
-### 1. Clone the Repository
+### 1. Clone & Set Environment
 ```bash
 git clone https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction.git
 cd Credit-Card-Approval-Prediction
+cp .env.example .env
 ```
 
-### 2. Configure Environment
-1. Copy the environment template:
-   ```bash
-   cp .env.example .env
-   ```
-2. Configure your secret key and port variables.
-
-### 3. Install Package
+### 2. Install Package & Run Pipeline
 ```bash
 pip install -r requirements.txt
 pip install -e .
-```
-
----
-
-## 🚀 Running the Application
-
-### 1. Execute Model Pipeline
-```bash
 python src/main.py
 ```
 
-### 2. Launch Local Web Server
+### 3. Start Local Web Server
 ```bash
-python app/app.py
+$env:FLASK_APP='app.app:create_app'
+python -m flask run
 ```
-*Access the local dashboard at `http://localhost:5000`*
+*Local address: `http://127.0.0.1:5000`*
 
-### 3. Run Pytest Suite
+### 4. Run Pytest Suite
 ```bash
-pytest tests/ -v
+python -m pytest tests/ -v
 ```
-
----
-
-## 🖼️ Screenshots & Diagrams
-All graphics are logged in the project repository:
-- **System Architecture**: [Architecture_Diagram.png](diagrams/Architecture_Diagram.png)
-- **Entity Relationship Layout**: [ER_Diagram.png](diagrams/ER_Diagram.png)
-- **Application Flowchart**: [Flowchart.png](diagrams/Flowchart.png)
-- **Target Count Balance**: [approval_count.png](screenshots/eda/approval_count.png)
-- **ROC Evaluation Curve**: [logistic_regression_roc_curve.png](screenshots/models/logistic_regression_roc_curve.png)
-- **Feature Importance Chart**: [random_forest_feature_importance.png](screenshots/models/random_forest_feature_importance.png)
-
----
-
-## 🧠 Machine Learning Workflow & Algorithms Used
-We evaluated 4 baseline classification algorithms:
-1. **Logistic Regression (Deployed)**: provides high business interpretability.
-2. **Decision Tree Classifier**: captures non-linear splits.
-3. **Random Forest Classifier**: bagging ensemble reducing variance.
-4. **XGBoost Classifier**: gradient boosting framework.
-
-### 📊 Model Performance Comparison Table
-
-| Rank | Model | F1-Score | ROC-AUC | Accuracy | Precision | Recall | Balanced Accuracy |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **1** | **Logistic Regression** | **0.2387** | **0.7409** | 0.6810 | 0.1453 | 0.6667 | 0.6744 |
-| **2** | XGBoost | 0.2047 | 0.7001 | 0.8990 | 0.2500 | 0.1733 | 0.5656 |
-| **3** | Decision Tree | 0.1975 | 0.5683 | 0.8700 | 0.1839 | 0.2133 | 0.5683 |
-| **4** | Random Forest | 0.1930 | 0.7174 | 0.9080 | 0.2821 | 0.1467 | 0.5582 |
-
-### 🔍 Deployed Best Model Selection
-**Logistic Regression** was selected due to its balanced recall of **66.67%**. Tree-based models display majority class overfitting, predicting very few positive defaults (Recalls $\approx 15\%$).
-
----
-
-## 🔌 API & Flask Application
-Flask implements endpoints supporting single row web calls and JSON scoring API requests:
-- `GET /health`: diagnostic endpoint checking model versions.
-- `POST /api/predict`: REST scoring API accepting application JSON.
-
----
-
-## 🐳 Docker Deployment
-Build the optimized image layer:
-```bash
-docker build -t credit-card-approval-prediction:latest .
-```
-Start the service:
-```bash
-docker-compose up -d
-```
-
----
-
-## ☁️ Cloud Deployment (Render & IBM WML)
-- **Render Web Services**: Deploy using `render.yaml` configurations.
-- **IBM Watson Machine Learning**: Publish models to deployment spaces using:
-  ```bash
-  python deploy_ibm.py
-  ```
-
----
-
-## 🔮 Future Scope
-- **Temporal Windows**: incorporate dynamic sequence billing patterns.
-- **Watson WML Integration**: automate retraining hooks.
 
 ---
 

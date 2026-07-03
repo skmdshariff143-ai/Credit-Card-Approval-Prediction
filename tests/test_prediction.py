@@ -2,10 +2,10 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 
-from src.models.predict import InferenceEngine
+from app.services.predict import InferenceEngine
 
 
-@patch("src.models.predict.load_pkl")
+@patch("app.services.predict.load_pkl")
 @patch("os.path.exists")
 def test_inference_engine_scoring(mock_exists, mock_load):
     """

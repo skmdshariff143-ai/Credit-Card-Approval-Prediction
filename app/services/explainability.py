@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import Ridge
 
-from src.utils.logger import get_logger
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

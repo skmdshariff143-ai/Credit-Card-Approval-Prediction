@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from configs.config import config
-from configs.constants import BINARY_COLS, CATEGORICAL_COLS, NUMERICAL_COLS
+from config.config import config
+from config.constants import BINARY_COLS, CATEGORICAL_COLS, NUMERICAL_COLS
 from src.utils.exceptions import DataValidationError
 from src.utils.logger import get_logger
 

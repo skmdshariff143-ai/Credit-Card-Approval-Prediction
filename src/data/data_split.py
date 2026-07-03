@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
-from configs.constants import RANDOM_STATE, TARGET_COL, TEST_SIZE
+from config.constants import RANDOM_STATE, TARGET_COL, TEST_SIZE
 from src.utils.exceptions import DataPreprocessingError
 from src.utils.logger import get_logger
 

@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-import yaml
 from dotenv import load_dotenv
 
 # Load env variables from root directory

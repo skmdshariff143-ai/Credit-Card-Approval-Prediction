@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from configs.config import config
-from configs.constants import TARGET_COL
+from config.config import config
+from config.constants import TARGET_COL
 from src.data.data_split import perform_stratified_split
 from src.data.load_data import DataLoader
 from src.preprocessing.duplicates import DuplicateHandler
@@ -119,6 +119,7 @@ class PreprocessingPipeline:
                 "AGE_YEARS",
                 "YEARS_EMPLOYED",
                 "INCOME_PER_MEMBER",
+                "EMPLOYED_TO_AGE_RATIO",
                 "FINANCIAL_STABILITY_SCORE",
             ]
             # Categorical features include original text categories and new binned categories
@@ -158,18 +159,29 @@ class PreprocessingPipeline:
 
             self.feature_names = list(X_train_scaled.columns)
 
-            # 7. Imbalance Handling - Oversample training class 1 in Pandas
-            # Combine X_train_scaled and y_train
-            train_full = pd.concat([X_train_scaled, y_train], axis=1)
-            class_0 = train_full[train_full[TARGET_COL] == 0]
-            class_1 = train_full[train_full[TARGET_COL] == 1]
+            # 6.5. Feature Selection Diagnostic (Mutual Info / RF Importance)
+            try:
+                from src.features.feature_selection import FeatureSelector
+                selector = FeatureSelector(threshold=0.005)
+                selector.fit_selection(X_train_scaled, y_train)
+                logger.info("Feature selection ranking report generated successfully.")
+            except Exception as fe_err:
+                logger.warning(f"Feature selection ranking diagnostic failed: {str(fe_err)}")
 
-            # Oversample class 1 to match class 0 count
-            class_1_over = class_1.sample(len(class_0), replace=True, random_state=42)
-            train_balanced = pd.concat([class_0, class_1_over], axis=0).sample(frac=1.0, random_state=42)
-
-            X_train_final = train_balanced.drop(columns=[TARGET_COL])
-            y_train_final = train_balanced[TARGET_COL]
+            # 7. Imbalance Handling - SMOTE Oversampling
+            from imblearn.over_sampling import SMOTE
+            logger.info("Applying SMOTE oversampling to balance target classes...")
+            
+            min_class_size = min(y_train.value_counts())
+            if min_class_size > 1:
+                k_neighbors = min(5, min_class_size - 1)
+                smote = SMOTE(k_neighbors=k_neighbors, random_state=42)
+                X_train_final, y_train_final = smote.fit_resample(X_train_scaled, y_train)
+            else:
+                logger.warning("Minority class size too small for SMOTE. Falling back to RandomOverSampler.")
+                from imblearn.over_sampling import RandomOverSampler
+                ros = RandomOverSampler(random_state=42)
+                X_train_final, y_train_final = ros.fit_resample(X_train_scaled, y_train)
 
             # 8. Save final datasets
             X_train_final.to_csv(os.path.join(self.processed_dir, "X_train.csv"), index=False)

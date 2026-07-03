@@ -8,7 +8,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
+COPY setup.py .
+COPY pyproject.toml .
+COPY src/ ./src/
+COPY app/ ./app/
+
 RUN pip install --no-cache-dir --user -r requirements.txt
+RUN pip install --no-cache-dir --user .
 
 # Final production stage
 FROM python:3.10-slim AS runner

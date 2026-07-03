@@ -1,6 +1,11 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, FloatField, IntegerField, SelectField, SubmitField
-from wtforms.validators import DataRequired, NumberRange, Optional
+from wtforms import (
+    BooleanField, FloatField, IntegerField, PasswordField,
+    SelectField, StringField, SubmitField,
+)
+from wtforms.validators import (
+    DataRequired, Email, EqualTo, Length, NumberRange, Optional,
+)
 
 
 class CreditApprovalForm(FlaskForm):
@@ -187,3 +192,87 @@ class CreditApprovalForm(FlaskForm):
     flag_email = BooleanField("Provided Email Address?", default=False)
 
     submit = SubmitField("Submit Credit Evaluation")
+
+
+# ==================================================================
+# Authentication Forms
+# ==================================================================
+
+class RegistrationForm(FlaskForm):
+    """New user registration form."""
+
+    full_name = StringField(
+        "Full Name",
+        validators=[DataRequired(), Length(min=2, max=100)],
+    )
+    username = StringField(
+        "Username",
+        validators=[
+            DataRequired(),
+            Length(min=3, max=30, message="Username must be 3-30 characters."),
+        ],
+    )
+    email = StringField(
+        "Email Address",
+        validators=[DataRequired(), Email(message="Please enter a valid email address.")],
+    )
+    password = PasswordField(
+        "Password",
+        validators=[
+            DataRequired(),
+            Length(min=8, message="Password must be at least 8 characters."),
+        ],
+    )
+    confirm_password = PasswordField(
+        "Confirm Password",
+        validators=[
+            DataRequired(),
+            EqualTo("password", message="Passwords do not match."),
+        ],
+    )
+    submit = SubmitField("Create Account")
+
+
+class LoginForm(FlaskForm):
+    """User login form."""
+
+    email = StringField(
+        "Email Address",
+        validators=[DataRequired(), Email(message="Please enter a valid email address.")],
+    )
+    password = PasswordField(
+        "Password",
+        validators=[DataRequired()],
+    )
+    remember_me = BooleanField("Remember me")
+    submit = SubmitField("Sign In")
+
+
+class ForgotPasswordForm(FlaskForm):
+    """Request a password reset link."""
+
+    email = StringField(
+        "Email Address",
+        validators=[DataRequired(), Email(message="Please enter a valid email address.")],
+    )
+    submit = SubmitField("Send Reset Link")
+
+
+class ResetPasswordForm(FlaskForm):
+    """Reset password using a valid token."""
+
+    password = PasswordField(
+        "New Password",
+        validators=[
+            DataRequired(),
+            Length(min=8, message="Password must be at least 8 characters."),
+        ],
+    )
+    confirm_password = PasswordField(
+        "Confirm New Password",
+        validators=[
+            DataRequired(),
+            EqualTo("password", message="Passwords do not match."),
+        ],
+    )
+    submit = SubmitField("Reset Password")

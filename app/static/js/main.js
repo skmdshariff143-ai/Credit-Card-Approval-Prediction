@@ -8,13 +8,58 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1. Dark/Light Theme Switcher Logic
     // ----------------------------------------------------------------------
     const themeToggleBtn = document.getElementById('theme-toggle');
+    const topLoader = document.querySelector('.top-loader');
+
+    const triggerTopLoader = () => {
+        if (topLoader) {
+            topLoader.style.display = 'block';
+            topLoader.style.width = '0%';
+            topLoader.style.opacity = '1';
+            let width = 0;
+            const interval = setInterval(() => {
+                width += 15;
+                topLoader.style.width = `${width}%`;
+                if (width >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        topLoader.style.opacity = '0';
+                        setTimeout(() => {
+                            topLoader.style.display = 'none';
+                        }, 300);
+                    }, 100);
+                }
+            }, 30);
+        }
+    };
+
     if (themeToggleBtn) {
         themeToggleBtn.addEventListener('click', () => {
+            triggerTopLoader();
             const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             document.documentElement.setAttribute('data-bs-theme', newTheme);
             themeToggleBtn.innerHTML = newTheme === 'light' ? '<i class="bi bi-moon-stars"></i>' : '<i class="bi bi-sun"></i>';
             localStorage.setItem('theme', newTheme);
+            
+            // Refresh charts if they exist to match theme colors
+            setTimeout(() => {
+                if (window.adminCharts) {
+                    window.adminCharts.forEach(chart => {
+                        const textMain = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim();
+                        const textMuted = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+                        if (chart.options.scales && chart.options.scales.x) {
+                            chart.options.scales.x.ticks.color = textMuted;
+                        }
+                        if (chart.options.scales && chart.options.scales.y) {
+                            chart.options.scales.y.ticks.color = textMuted;
+                        }
+                        if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                            chart.options.plugins.legend.labels.color = textMain;
+                        }
+                        chart.update();
+                    });
+                }
+            }, 100);
         });
     }
 
@@ -66,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentStepIdx = 0;
 
     const updateStepUI = () => {
+        triggerTopLoader();
         // Update Step visibility
         wizardSteps.forEach((step, idx) => {
             if (idx === currentStepIdx) {
@@ -144,8 +190,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     updateStepUI();
                 }
             } else {
-                // Trigger toast or message
-                showToast("Please fill all required inputs correctly before proceeding.", "danger");
+                showToast("Please fill all required fields correctly before proceeding.", "danger");
             }
         });
     });
@@ -195,29 +240,29 @@ document.addEventListener('DOMContentLoaded', function () {
             <div class="row g-4 text-start">
                 <div class="col-md-4 border-end border-secondary-subtle">
                     <h5 class="text-primary mb-3"><i class="bi bi-person-fill me-2"></i>Personal Profile</h5>
-                    <p><strong>Gender:</strong> ${gender}</p>
-                    <p><strong>Age:</strong> ${age} Years</p>
-                    <p><strong>Marital Status:</strong> ${marital}</p>
-                    <p><strong>Children:</strong> ${children}</p>
-                    <p><strong>Education:</strong> ${education}</p>
-                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="jumpToStep(0)"><i class="bi bi-pencil-square me-1"></i>Edit Profile</button>
+                    <p class="mb-1"><strong>Gender:</strong> ${gender}</p>
+                    <p class="mb-1"><strong>Age:</strong> ${age} Years</p>
+                    <p class="mb-1"><strong>Marital Status:</strong> ${marital}</p>
+                    <p class="mb-1"><strong>Children:</strong> ${children}</p>
+                    <p class="mb-1"><strong>Education:</strong> ${education}</p>
+                    <button type="button" class="btn btn-xs btn-outline-secondary mt-2 px-3 py-1 rounded-3" onclick="jumpToStep(0)"><i class="bi bi-pencil-square me-1"></i>Edit Profile</button>
                 </div>
                 <div class="col-md-4 border-end border-secondary-subtle">
                     <h5 class="text-primary mb-3"><i class="bi bi-briefcase-fill me-2"></i>Employment Details</h5>
-                    <p><strong>Sector:</strong> ${sector}</p>
-                    <p><strong>Occupation:</strong> ${occupation}</p>
-                    <p><strong>Experience:</strong> ${experience} Years</p>
-                    <p><strong>Income Source:</strong> ${source}</p>
-                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="jumpToStep(1)"><i class="bi bi-pencil-square me-1"></i>Edit Employment</button>
+                    <p class="mb-1"><strong>Sector:</strong> ${sector}</p>
+                    <p class="mb-1"><strong>Occupation:</strong> ${occupation}</p>
+                    <p class="mb-1"><strong>Experience:</strong> ${experience} Years</p>
+                    <p class="mb-1"><strong>Income Source:</strong> ${source}</p>
+                    <button type="button" class="btn btn-xs btn-outline-secondary mt-2 px-3 py-1 rounded-3" onclick="jumpToStep(1)"><i class="bi bi-pencil-square me-1"></i>Edit Employment</button>
                 </div>
                 <div class="col-md-4">
                     <h5 class="text-primary mb-3"><i class="bi bi-cash-coin me-2"></i>Financial Stats</h5>
-                    <p><strong>Gross Income:</strong> $${income}</p>
-                    <p><strong>Outstanding Debt:</strong> $${debt}</p>
-                    <p><strong>Requested Loan:</strong> $${loan}</p>
-                    <p><strong>Credit Bureau Rating:</strong> <span class="badge ${rating === 'Good' ? 'bg-success' : rating === 'Average' ? 'bg-warning text-dark' : 'bg-danger'}">${rating}</span></p>
-                    <p><strong>Owns Asset (Car/Realty):</strong> ${car} / ${property}</p>
-                    <button type="button" class="btn btn-sm btn-outline-secondary mt-2" onclick="jumpToStep(2)"><i class="bi bi-pencil-square me-1"></i>Edit Financials</button>
+                    <p class="mb-1"><strong>Gross Income:</strong> $${income}</p>
+                    <p class="mb-1"><strong>Outstanding Debt:</strong> $${debt}</p>
+                    <p class="mb-1"><strong>Requested Loan:</strong> $${loan}</p>
+                    <p class="mb-1"><strong>Credit Rating:</strong> <span class="badge ${rating === 'Good' ? 'bg-success-subtle text-success border border-success' : rating === 'Average' ? 'bg-warning-subtle text-warning border border-warning' : 'bg-danger-subtle text-danger border border-danger'}">${rating}</span></p>
+                    <p class="mb-1"><strong>Owns Asset (Car/Realty):</strong> ${car} / ${property}</p>
+                    <button type="button" class="btn btn-xs btn-outline-secondary mt-2 px-3 py-1 rounded-3" onclick="jumpToStep(2)"><i class="bi bi-pencil-square me-1"></i>Edit Financials</button>
                 </div>
             </div>
         `;
@@ -228,6 +273,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // ----------------------------------------------------------------------
     const statsContainer = document.getElementById('adminChartApproval');
     if (statsContainer) {
+        window.adminCharts = [];
+        const textMain = getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim();
+        const textMuted = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim();
+
         fetch('/api/v1/admin/stats')
             .then(res => res.json())
             .then(data => {
@@ -235,74 +284,137 @@ document.addEventListener('DOMContentLoaded', function () {
                 const approvedCount = parseInt(document.getElementById('statsApprovedCount')?.textContent || 0);
                 const rejectedCount = parseInt(document.getElementById('statsRejectedCount')?.textContent || 0);
                 
-                new Chart(document.getElementById('adminChartApproval'), {
+                const pieChart = new Chart(document.getElementById('adminChartApproval'), {
                     type: 'doughnut',
                     data: {
                         labels: ['Approved', 'Rejected'],
                         datasets: [{
                             data: [approvedCount, rejectedCount],
-                            backgroundColor: ['#198754', '#dc3545'],
-                            borderWidth: 0
+                            backgroundColor: ['#10b981', '#ef4444'],
+                            borderWidth: 0,
+                            hoverOffset: 4
                         }]
                     },
                     options: {
                         responsive: true,
+                        cutout: '75%',
                         plugins: {
-                            legend: { position: 'bottom', labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-main') } }
+                            legend: { 
+                                position: 'bottom', 
+                                labels: { 
+                                    color: textMain,
+                                    font: { family: 'Poppins', size: 12 }
+                                } 
+                            }
                         }
                     }
                 });
+                window.adminCharts.push(pieChart);
+
+                // Helper to build gradient
+                const buildGradient = (ctx, colorStart, colorEnd) => {
+                    const grad = ctx.createLinearGradient(0, 0, 0, 300);
+                    grad.addColorStop(0, colorStart);
+                    grad.addColorStop(1, colorEnd);
+                    return grad;
+                };
 
                 // 4.2 Bar Chart - Income Distribution
-                new Chart(document.getElementById('adminChartIncome'), {
+                const ctxIncome = document.getElementById('adminChartIncome').getContext('2d');
+                const gradIncome = buildGradient(ctxIncome, 'rgba(37, 99, 235, 0.85)', 'rgba(37, 99, 235, 0.25)');
+                
+                const incomeChart = new Chart(document.getElementById('adminChartIncome'), {
                     type: 'bar',
                     data: {
                         labels: data.income_labels,
                         datasets: [{
                             label: 'Application Count',
                             data: data.income_data,
-                            backgroundColor: '#0d6efd',
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted') } },
-                            x: { grid: { display: false }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted') } }
-                        }
-                    }
-                });
-
-                // 4.3 Line Chart - Daily Predictions Trend
-                new Chart(document.getElementById('adminChartTrend'), {
-                    type: 'line',
-                    data: {
-                        labels: data.trend_labels,
-                        datasets: [{
-                            label: 'Predictions Run',
-                            data: data.trend_data,
-                            borderColor: '#fd7e14',
-                            backgroundColor: 'rgba(253, 126, 20, 0.1)',
-                            fill: true,
-                            tension: 0.3
+                            backgroundColor: gradIncome,
+                            borderColor: '#2563eb',
+                            borderWidth: 1.5,
+                            borderRadius: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: { legend: { display: false } },
                         scales: {
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted') } },
-                            x: { grid: { display: false }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted') } }
+                            y: { 
+                                grid: { color: 'rgba(100,116,139,0.08)' }, 
+                                ticks: { color: textMuted, font: { family: 'Poppins' } } 
+                            },
+                            x: { 
+                                grid: { display: false }, 
+                                ticks: { color: textMuted, font: { family: 'Poppins' } } 
+                            }
                         }
                     }
                 });
+                window.adminCharts.push(incomeChart);
+
+                // 4.3 Line Chart - Daily / Monthly Predictions Trend
+                const ctxTrend = document.getElementById('adminChartTrend').getContext('2d');
+                const gradTrend = buildGradient(ctxTrend, 'rgba(139, 92, 246, 0.4)', 'rgba(139, 92, 246, 0.02)');
+                
+                const trendChart = new Chart(document.getElementById('adminChartTrend'), {
+                    type: 'line',
+                    data: {
+                        labels: data.trend_labels,
+                        datasets: [{
+                            label: 'Predictions Run',
+                            data: data.trend_data,
+                            borderColor: '#8b5cf6',
+                            borderWidth: 3,
+                            backgroundColor: gradTrend,
+                            fill: true,
+                            tension: 0.35,
+                            pointBackgroundColor: '#8b5cf6',
+                            pointRadius: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { 
+                                grid: { color: 'rgba(100,116,139,0.08)' }, 
+                                ticks: { color: textMuted, font: { family: 'Poppins' } } 
+                            },
+                            x: { 
+                                grid: { display: false }, 
+                                ticks: { color: textMuted, font: { family: 'Poppins' } } 
+                            }
+                        }
+                    }
+                });
+                window.adminCharts.push(trendChart);
+
+                // Trend Scale Toggle Listeners
+                const btnDaily = document.getElementById('btnDailyTrend');
+                const btnMonthly = document.getElementById('btnMonthlyTrend');
+                if (btnDaily && btnMonthly) {
+                    btnDaily.addEventListener('click', () => {
+                        btnDaily.classList.add('active');
+                        btnMonthly.classList.remove('active');
+                        trendChart.data.labels = data.trend_labels;
+                        trendChart.data.datasets[0].data = data.trend_data;
+                        trendChart.data.datasets[0].label = 'Predictions Run (Daily)';
+                        trendChart.update();
+                    });
+                    btnMonthly.addEventListener('click', () => {
+                        btnMonthly.classList.add('active');
+                        btnDaily.classList.remove('active');
+                        trendChart.data.labels = data.monthly_labels || [];
+                        trendChart.data.datasets[0].data = data.monthly_data || [];
+                        trendChart.data.datasets[0].label = 'Predictions Run (Monthly)';
+                        trendChart.update();
+                    });
+                }
 
                 // 4.4 Bar Chart - Risk Level Distribution
-                new Chart(document.getElementById('adminChartRisk'), {
+                const riskChart = new Chart(document.getElementById('adminChartRisk'), {
                     type: 'bar',
                     data: {
                         labels: data.risk_labels,
@@ -310,18 +422,25 @@ document.addEventListener('DOMContentLoaded', function () {
                             label: 'Applications',
                             data: data.risk_data,
                             backgroundColor: ['#10b981', '#3b82f6', '#f97316', '#ef4444'],
-                            borderRadius: 6
+                            borderRadius: 8
                         }]
                     },
                     options: {
                         responsive: true,
                         plugins: { legend: { display: false } },
                         scales: {
-                            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted') } },
-                            x: { grid: { display: false }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted') } }
+                            y: { 
+                                grid: { color: 'rgba(100,116,139,0.08)' }, 
+                                ticks: { color: textMuted, font: { family: 'Poppins' } } 
+                            },
+                            x: { 
+                                grid: { display: false }, 
+                                ticks: { color: textMuted, font: { family: 'Poppins' } } 
+                            }
                         }
                     }
                 });
+                window.adminCharts.push(riskChart);
             })
             .catch(err => console.error("Stats fetching failure: ", err));
     }
@@ -334,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!container) return;
 
         const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${category} border-0 show mb-2`;
+        toast.className = `toast align-items-center text-white bg-${category} border-0 show mb-2 card-glass`;
         toast.setAttribute('role', 'alert');
         toast.setAttribute('aria-live', 'assertive');
         toast.setAttribute('aria-atomic', 'true');
@@ -368,7 +487,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     url: shareUrl,
                 }).catch(err => console.log(err));
             } else {
-                // Clipboard fallback
                 navigator.clipboard.writeText(shareUrl).then(() => {
                     showToast("Report URL successfully copied to clipboard!", "success");
                 });
@@ -391,15 +509,14 @@ document.addEventListener('DOMContentLoaded', function () {
         riskForm.addEventListener('submit', function (e) {
             e.preventDefault();
             
-            // 1. Create and inject the loading overlay HTML dynamically if not exists
             let overlay = document.getElementById('loading-overlay');
             if (!overlay) {
                 overlay = document.createElement('div');
                 overlay.id = 'loading-overlay';
                 overlay.className = 'position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center';
-                overlay.style.cssText = 'background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); z-index: 9999; color: #fff; transition: opacity 0.3s ease;';
+                overlay.style.cssText = 'background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(16px); z-index: 9999; color: #fff; transition: opacity 0.3s ease;';
                 overlay.innerHTML = `
-                    <div class="spinner-border text-primary mb-4" role="status" style="width: 4rem; height: 4rem;">
+                    <div class="spinner-border text-primary mb-4" role="status" style="width: 4rem; height: 4rem; border-width: 0.28em;">
                         <span class="visually-hidden">Loading...</span>
                     </div>
                     <h3 id="loading-status-text" class="text-uppercase tracking-wider fw-bold mb-2">Connecting...</h3>
@@ -411,7 +528,6 @@ document.addEventListener('DOMContentLoaded', function () {
             overlay.style.opacity = '1';
             overlay.classList.remove('d-none');
             
-            // 2. Cycle messages
             const statusText = document.getElementById('loading-status-text');
             const statusSubtext = document.getElementById('loading-status-subtext');
             
@@ -430,10 +546,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     statusSubtext.textContent = steps[currentStep].sub;
                 } else {
                     clearInterval(interval);
-                    // Submit the form actually
                     riskForm.submit();
                 }
-            }, 600); // 600ms per stage, total ~2.4s of beautiful premium loading animation
+            }, 600);
         });
     }
 });

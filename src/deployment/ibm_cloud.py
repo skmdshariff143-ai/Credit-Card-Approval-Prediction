@@ -1,7 +1,7 @@
 
 import requests
 
-from configs.config import config
+from config.config import config
 from src.utils.exceptions import CloudDeploymentError
 from src.utils.logger import get_logger
 

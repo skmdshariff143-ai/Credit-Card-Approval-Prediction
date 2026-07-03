@@ -1,7 +1,7 @@
 import os
 from datetime import datetime
 
-from configs.config import config
+from config.config import config
 from src.utils.helper import save_json, save_pkl
 from src.utils.logger import get_logger
 
@@ -15,7 +15,8 @@ class ModelRegistry:
 
     def __init__(self):
         paths = config.get_paths()
-        self.models_dir = paths["models_dir"]
+        self.models_dir = os.path.join(paths["models_dir"], "trained")
+        os.makedirs(self.models_dir, exist_ok=True)
 
     def register_model(self, name: str, model, params: dict, metrics: dict):
         """

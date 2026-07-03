@@ -6,19 +6,38 @@ from unittest.mock import MagicMock, patch
 
 import pandas as pd
 import pytest
+from werkzeug.security import generate_password_hash
 
-from src.api.database import DatabaseManager
-from src.api.history import HistoryManager
-from src.api.prediction import PredictorAPI
-from src.models.explainability import ExplanationEngine
+from app.database.database import DatabaseManager
+from app.database.history import HistoryManager
+from app.services.prediction import PredictorAPI
+from app.services.explainability import ExplanationEngine
 from src.models.hyperparameter_tuning import HyperparameterTuner
 from src.models.metrics import calculate_all_metrics
-from src.models.predict import RiskPredictor
+from app.services.predict import RiskPredictor
 from src.models.train import ModelTrainer
+from app.utils.exceptions import ModelTrainingError as AppModelTrainingError
 from src.utils.exceptions import DataPreprocessingError, ModelTrainingError
-from src.utils.helper import load_pkl, save_json, save_pkl
-from src.utils.tracker import ExperimentTracker
+from app.utils.helper import load_pkl, save_json, save_pkl
+from app.utils.tracker import ExperimentTracker
 from src.visualization.plots import VizPlotter
+
+
+def _login_test_client(app, client):
+    """Creates a test user and logs in via the client session."""
+    with app.app_context():
+        db = DatabaseManager()
+        db.create_user(
+            username="route_test_user",
+            email="routetest@test.com",
+            password_hash=generate_password_hash("testpass123", method="scrypt"),
+            full_name="Route Tester",
+        )
+    client.post("/auth/login", data={
+        "email": "routetest@test.com",
+        "password": "testpass123",
+        "submit": "Sign In",
+    }, follow_redirects=True)
 
 # ----------------------------------------------------
 # 1. app/app.py tests
@@ -95,7 +114,7 @@ def test_history_manager_read_valid_json(tmp_path):
     history_file = os.path.join(tmp_path, "prediction_history.json")
     with open(history_file, "w") as f:
         json.dump([{"test": "data"}], f)
-    with patch("configs.config.config.get_paths") as mock_paths:
+    with patch("config.config.config.get_paths") as mock_paths:
         mock_paths.return_value = {"processed_dir": str(tmp_path)}
         manager = HistoryManager()
         assert len(manager.get_history()) == 1
@@ -107,7 +126,7 @@ def test_history_manager_read_corrupted_json(tmp_path):
     with open(history_file, "w") as f:
         f.write("invalid json contents")
 
-    with patch("configs.config.config.get_paths") as mock_paths:
+    with patch("config.config.config.get_paths") as mock_paths:
         mock_paths.return_value = {"processed_dir": str(tmp_path)}
         manager = HistoryManager()
         assert manager.get_history() == []
@@ -123,7 +142,7 @@ def test_history_manager_save_exception(mock_open):
 
 def test_history_manager_clear(tmp_path):
     """Verifies history clearing method."""
-    with patch("configs.config.config.get_paths") as mock_paths:
+    with patch("config.config.config.get_paths") as mock_paths:
         mock_paths.return_value = {"processed_dir": str(tmp_path)}
         manager = HistoryManager()
         manager.add_entry({"gender": "M"}, "Approved", 90.0)
@@ -137,12 +156,12 @@ def test_history_manager_clear(tmp_path):
 # ----------------------------------------------------
 
 
-@patch("src.models.predict.InferenceEngine.predict")
+@patch("app.services.predict.InferenceEngine.predict")
 def test_predictor_api_exception(mock_predict):
     """Verifies PredictorAPI raises ModelTrainingError on prediction pipeline failures."""
     mock_predict.side_effect = Exception("Pipeline failure")
     api = PredictorAPI()
-    with pytest.raises(ModelTrainingError):
+    with pytest.raises(AppModelTrainingError):
         api.process_and_predict({"code_gender": "M"})
 
 
@@ -158,13 +177,14 @@ def test_routes_dti_rejection(tmp_path):
     app = create_app()
     app.config["WTF_CSRF_ENABLED"] = False
 
-    with patch("src.api.routes.predictor.process_and_predict") as mock_predict:
+    with patch("app.routes.routes.predictor.process_and_predict") as mock_predict:
         mock_predict.return_value = {
             "approval_probability_percent": 90.0,
             "decision": "Approved",
             "explanation": {"risk_factors": [], "support_factors": []},
         }
         with app.test_client() as client:
+            _login_test_client(app, client)
             response = client.post(
                 "/predict",
                 data={
@@ -200,9 +220,10 @@ def test_routes_bad_credit_rejection(tmp_path):
     app = create_app()
     app.config["WTF_CSRF_ENABLED"] = False
 
-    with patch("src.api.routes.predictor.process_and_predict") as mock_predict:
+    with patch("app.routes.routes.predictor.process_and_predict") as mock_predict:
         mock_predict.return_value = {"approval_probability_percent": 90.0, "decision": "Approved"}
         with app.test_client() as client:
+            _login_test_client(app, client)
             response = client.post(
                 "/predict",
                 data={
@@ -238,13 +259,14 @@ def test_routes_short_employment_rejection(tmp_path):
     app = create_app()
     app.config["WTF_CSRF_ENABLED"] = False
 
-    with patch("src.api.routes.predictor.process_and_predict") as mock_predict:
+    with patch("app.routes.routes.predictor.process_and_predict") as mock_predict:
         mock_predict.return_value = {
             "approval_probability_percent": 12.0,
             "decision": "Rejected",
             "explanation": {"risk_factors": [], "support_factors": []},
         }
         with app.test_client() as client:
+            _login_test_client(app, client)
             response = client.post(
                 "/predict",
                 data={
@@ -279,13 +301,14 @@ def test_routes_no_reasons_rejection(tmp_path):
     app = create_app()
     app.config["WTF_CSRF_ENABLED"] = False
 
-    with patch("src.api.routes.predictor.process_and_predict") as mock_predict:
+    with patch("app.routes.routes.predictor.process_and_predict") as mock_predict:
         mock_predict.return_value = {
             "approval_probability_percent": 12.0,
             "decision": "Rejected",
             "explanation": {"risk_factors": [], "support_factors": []},
         }
         with app.test_client() as client:
+            _login_test_client(app, client)
             response = client.post(
                 "/predict",
                 data={
@@ -320,9 +343,10 @@ def test_routes_prediction_pipeline_exception_handling(tmp_path):
     app = create_app()
     app.config["WTF_CSRF_ENABLED"] = False
 
-    with patch("src.api.routes.predictor.process_and_predict") as mock_predict:
+    with patch("app.routes.routes.predictor.process_and_predict") as mock_predict:
         mock_predict.side_effect = Exception("Model prediction failed completely")
         with app.test_client() as client:
+            _login_test_client(app, client)
             response = client.post(
                 "/predict",
                 data={
@@ -357,7 +381,7 @@ def test_routes_health_check_uptime_formatting():
     app = create_app()
 
     # Test case 1: uptime in minutes (< 3600 seconds)
-    with patch("src.api.routes.START_TIME", time.time() - 150):
+    with patch("app.routes.routes.START_TIME", time.time() - 150):
         with app.test_client() as client:
             response = client.get("/api/v1/health")
             assert response.status_code == 200
@@ -365,7 +389,7 @@ def test_routes_health_check_uptime_formatting():
             assert "2m" in data["uptime"]
 
     # Test case 2: uptime in hours (>= 3600 seconds)
-    with patch("src.api.routes.START_TIME", time.time() - 5000):
+    with patch("app.routes.routes.START_TIME", time.time() - 5000):
         with app.test_client() as client:
             response = client.get("/api/v1/health")
             assert response.status_code == 200
@@ -384,7 +408,7 @@ def test_routes_api_predict_empty_payload():
             assert response.status_code == 400
 
 
-@patch("src.api.routes.predictor.process_and_predict")
+@patch("app.routes.routes.predictor.process_and_predict")
 def test_routes_api_predict_exception(mock_predict):
     """Verifies API endpoint returns 400 on prediction failure."""
     from app.app import create_app
@@ -441,7 +465,7 @@ def test_risk_predictor_validate_input_missing():
     assert pred.validate_input({"code_gender": "M"}) is False
 
 
-@patch("src.models.predict.load_pkl")
+@patch("app.services.predict.load_pkl")
 def test_risk_predictor_predict_proba_shapes(mock_load):
     """Verifies that predict handles diverse model prediction probability shapes (covers lines 89-90)."""
     mock_model = MagicMock()
@@ -467,7 +491,7 @@ def test_risk_predictor_predict_proba_shapes(mock_load):
     assert res3["approval_probability_percent"] == 100.0
 
 
-@patch("src.models.predict.load_pkl")
+@patch("app.services.predict.load_pkl")
 def test_risk_predictor_predict_explanation_exception(mock_load):
     """Verifies that explain_instance failures are handled gracefully (covers lines 98-100)."""
     mock_model = MagicMock()
@@ -478,7 +502,7 @@ def test_risk_predictor_predict_explanation_exception(mock_load):
     mock_model.predict.return_value = [0]
     mock_model.predict_proba.return_value = [0.15]
 
-    with patch("src.models.predict.ExplanationEngine.explain_instance") as mock_explain:
+    with patch("app.services.predict.ExplanationEngine.explain_instance") as mock_explain:
         mock_explain.side_effect = Exception("Surrogate failure")
         res = pred.predict(pd.DataFrame([{"code_gender": "M"}]))
         assert res["explanation"] == {"error": "Surrogate failure"}
@@ -511,7 +535,7 @@ def test_risk_predictor_multiple_rows():
     assert isinstance(res, list)
 
 
-@patch("src.models.predict.load_pkl")
+@patch("app.services.predict.load_pkl")
 def test_risk_predictor_predict_no_proba(mock_load):
     """Verifies risk probability fallback logic when predict_proba attribute does not exist."""
     mock_model = MagicMock()
@@ -657,7 +681,7 @@ def test_helper_pkl_exceptions():
         save_pkl(lambda x: x, "/invalid_dir/test.pkl")
 
     with pytest.raises(DataPreprocessingError):
-        load_pkl("configs/config.py")
+        load_pkl("config/config.py")
 
 
 def test_helper_json_exceptions(tmp_path):
@@ -678,7 +702,7 @@ def test_experiment_tracker_corrupted_json(tmp_path):
     with open(runs_file, "w") as f:
         json.dump({"key": "val"}, f)
 
-    with patch("configs.config.config.get_paths") as mock_paths:
+    with patch("config.config.config.get_paths") as mock_paths:
         mock_paths.return_value = {"logs_dir": str(tmp_path)}
         tracker = ExperimentTracker()
         tracker.log_run("LR", {}, {})
@@ -687,7 +711,7 @@ def test_experiment_tracker_corrupted_json(tmp_path):
 
 def test_experiment_tracker_no_file(tmp_path):
     """Verifies get_runs returns empty list when runs file does not exist."""
-    with patch("configs.config.config.get_paths") as mock_paths:
+    with patch("config.config.config.get_paths") as mock_paths:
         mock_paths.return_value = {"logs_dir": str(tmp_path)}
         tracker = ExperimentTracker()
         assert tracker.get_runs() == []

@@ -14,29 +14,31 @@
         <div class="row g-4">
             <!-- 1. Left side: Result Scorecard -->
             <div class="col-md-5">
-                <div class="card card-glass text-center p-5 h-100 border border-secondary-subtle">
+                <div class="card card-glass text-center p-5 h-100 border-0">
                     <h5 class="text-uppercase text-muted small mb-4">Risk Evaluation Decision</h5>
                     
-                    <div class="my-4">
-                        {% if result == 'Approved' %}
-                            <div class="display-1 text-success mb-2"><i class="bi bi-shield-check"></i></div>
-                            <h3 class="text-success fw-bold">Approved</h3>
-                            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill mt-2">Low Default Risk</span>
-                        {% else %}
-                            <div class="display-1 text-danger mb-2"><i class="bi bi-shield-x"></i></div>
-                            <h3 class="text-danger fw-bold">Rejected</h3>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill mt-2">High Default Risk</span>
-                        {% endif %}
+                    <!-- Circular Risk Gauge -->
+                    <div class="radial-score-container my-4">
+                        <svg class="radial-score-ring" width="200" height="200">
+                            <circle class="radial-score-bg" cx="100" cy="100" r="90" />
+                            <circle class="radial-score-bar" 
+                                    cx="100" cy="100" r="90" 
+                                    style="stroke-dashoffset: {{ 565.48 - (probability / 100 * 565.48) }}; stroke: {% if result == 'Approved' %}#10b981{% else %}#ef4444{% endif %};" />
+                        </svg>
+                        <div class="score-text-overlay">
+                            <h2 class="display-6 fw-bold mb-0 {% if result == 'Approved' %}text-success{% else %}text-danger{% endif %}">{{ "%.0f"|format(probability) }}%</h2>
+                            <small class="text-muted text-uppercase tracking-wider" style="font-size: 0.65rem;">Confidence</small>
+                        </div>
                     </div>
 
-                    <div class="mt-5 p-3 bg-secondary-subtle rounded-4">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span class="text-muted small">Approval Probability</span>
-                            <span class="fw-bold">{{ "%.2f"|format(probability) }}%</span>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar {% if result == 'Approved' %}bg-success{% else %}bg-danger{% endif %}" role="progressbar" style="width: {{ probability }}%" aria-valuenow="{{ probability }}" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+                    <div class="my-3">
+                        {% if result == 'Approved' %}
+                            <h3 class="text-success fw-bold m-0">Approved</h3>
+                            <span class="badge bg-success-subtle text-success border border-success border-opacity-20 px-3 py-2 rounded-pill mt-2">Low Default Risk</span>
+                        {% else %}
+                            <h3 class="text-danger fw-bold m-0">Rejected</h3>
+                            <span class="badge bg-danger-subtle text-danger border border-danger border-opacity-20 px-3 py-2 rounded-pill mt-2">High Default Risk</span>
+                        {% endif %}
                     </div>
 
                     <div class="row mt-4 pt-3 border-top border-secondary-subtle g-3 text-start small">
@@ -62,7 +64,7 @@
 
             <!-- 2. Right side: Dynamic Plain-English Explanation & Recommendations -->
             <div class="col-md-7">
-                <div class="card card-glass p-5 h-100 text-start">
+                <div class="card card-glass p-5 h-100 text-start border-0">
                     <h4 class="mb-4 text-primary"><i class="bi bi-chat-left-quote-fill me-2"></i>Decision Factors & Explanations</h4>
                     
                     <h6 class="fw-bold mb-3">Key Reasons:</h6>
@@ -91,7 +93,7 @@
         </div>
 
         <!-- 3. Local surrogate Feature Importance Section -->
-        <div class="card card-glass p-5 mt-4 text-start">
+        <div class="card card-glass p-5 mt-4 text-start border-0">
             <h4 class="mb-4 text-primary"><i class="bi bi-bar-chart-steps me-2"></i>Feature Importance attributions (Local Surrogate)</h4>
             <p class="text-muted small">Visualizes feature-level impacts output by LIME local Ridge regressions. Green values favor credit card approval; red values represent negative default risk indicators.</p>
             

@@ -2,8 +2,8 @@ import json
 import os
 from datetime import datetime
 
-from configs.config import config
-from src.utils.logger import get_logger
+from config.config import config
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 

@@ -2,8 +2,8 @@ import os
 
 import pandas as pd
 
-from configs.config import config
-from configs.constants import TARGET_COL
+from config.config import config
+from config.constants import TARGET_COL
 from src.data.load_data import DataLoader
 from src.utils.helper import save_json
 from src.utils.logger import get_logger
