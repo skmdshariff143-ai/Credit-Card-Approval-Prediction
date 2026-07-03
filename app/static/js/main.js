@@ -1,287 +1,247 @@
-/* ==========================================================================
-   CreditGuard AI | Premium Core Frontend Controller
-   Toggles, Drawer Navigation, Ripples, and 5-Step Form Wizard Engine
-   ========================================================================== */
+/* ═══════════════════════════════════════════════════════════════════════════
+   CreditGuard AI — Application Controller v3.0
+   ═══════════════════════════════════════════════════════════════════════════ */
+'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
+const CG = (() => {
 
-  // 1. PAGE TRANSITION LOADER LIFECYCLE
-  const loaderMask = document.getElementById('pageLoaderMask');
-  if (loaderMask) {
-    setTimeout(() => {
-      loaderMask.classList.add('hidden');
-    }, 250);
-  }
+  /* ── Theme Manager ── */
+  const Theme = {
+    KEY: 'cg-theme',
+    get() { return localStorage.getItem(this.KEY) || 'dark'; },
+    set(t) { localStorage.setItem(this.KEY, t); document.documentElement.setAttribute('data-theme', t); },
+    toggle() { this.set(this.get() === 'dark' ? 'light' : 'dark'); this.updateIcon(); },
+    updateIcon() {
+      const btn = document.getElementById('themeToggle');
+      if (!btn) return;
+      const icon = btn.querySelector('i');
+      if (icon) { icon.className = this.get() === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon'; }
+    },
+    init() { this.set(this.get()); this.updateIcon(); }
+  };
 
-  // 2. INITIALIZE SCROLL ANIMATIONS (AOS) & ICONS (Lucide)
-  if (typeof aos !== 'undefined' || typeof AOS !== 'undefined') {
-    AOS.init({
-      duration: 800,
-      easing: 'ease-out-cubic',
-      once: true
-    });
-  }
-  if (typeof lucide !== 'undefined') {
-    lucide.createIcons();
-  }
-
-  // 3. GSAP INITIAL ANIMATION LOAD
-  if (typeof gsap !== 'undefined') {
-    gsap.from(".workspace-wrapper", {
-      opacity: 0,
-      y: 15,
-      duration: 0.6,
-      ease: "power2.out"
-    });
-  }
-
-  // 4. DARK / LIGHT THEME PREFERENCE CONTROLLER
-  const themeTogglerBtn = document.getElementById('themeTogglerBtn');
-  const storedTheme = localStorage.getItem('theme') || 'dark';
-
-  document.documentElement.setAttribute('data-theme', storedTheme);
-  
-  if (themeTogglerBtn) {
-    const labelSpan = themeTogglerBtn.parentElement.querySelector('.theme-switch-label');
-    if (labelSpan) {
-      labelSpan.textContent = (storedTheme === 'dark') ? 'Dark Mode' : 'Light Mode';
+  /* ── Page Loader ── */
+  const Loader = {
+    hide() {
+      const el = document.getElementById('pageLoader');
+      if (el) { el.classList.add('hidden'); setTimeout(() => el.remove(), 500); }
     }
+  };
 
-    themeTogglerBtn.addEventListener('click', () => {
-      const active = document.documentElement.getAttribute('data-theme');
-      const target = (active === 'dark') ? 'light' : 'dark';
-      
-      document.documentElement.setAttribute('data-theme', target);
-      localStorage.setItem('theme', target);
-      
-      if (labelSpan) {
-        labelSpan.textContent = (target === 'dark') ? 'Dark Mode' : 'Light Mode';
-      }
-    });
-  }
+  /* ── Sidebar ── */
+  const Sidebar = {
+    toggle() {
+      const sb = document.querySelector('.cg-sidebar');
+      const ov = document.querySelector('.cg-overlay');
+      sb?.classList.toggle('open');
+      ov?.classList.toggle('active');
+    },
+    close() {
+      document.querySelector('.cg-sidebar')?.classList.remove('open');
+      document.querySelector('.cg-overlay')?.classList.remove('active');
+    },
+    init() {
+      document.getElementById('menuBtn')?.addEventListener('click', this.toggle);
+      document.querySelector('.cg-overlay')?.addEventListener('click', () => this.close());
+    }
+  };
 
-  // 5. MOBILE DRAWER NAVIGATION MENU
-  const menuOpenBtn = document.getElementById('mobileMenuOpen');
-  const sidebarPanel = document.getElementById('sidebarPanel');
-  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  /* ── Counter Animation ── */
+  const Counter = {
+    animate(el) {
+      const target = parseFloat(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      const prefix = el.dataset.prefix || '';
+      const decimals = (el.dataset.decimals || '0') | 0;
+      const duration = 1800;
+      const start = performance.now();
+      const step = (now) => {
+        const progress = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 4);
+        const current = target * eased;
+        el.textContent = prefix + current.toFixed(decimals) + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    },
+    init() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if (e.isIntersecting) { this.animate(e.target); observer.unobserve(e.target); } });
+      }, { threshold: 0.3 });
+      document.querySelectorAll('[data-count]').forEach(el => observer.observe(el));
+    }
+  };
 
-  if (menuOpenBtn && sidebarPanel && sidebarOverlay) {
-    const toggleMenu = () => {
-      sidebarPanel.classList.toggle('open');
-      sidebarOverlay.classList.toggle('active');
-    };
-
-    menuOpenBtn.addEventListener('click', toggleMenu);
-    sidebarOverlay.addEventListener('click', toggleMenu);
-  }
-
-  // 6. MULTI-STEP WIZARD ENGINE (5 Steps)
-  const wizardForm = document.getElementById('wizardForm');
-  if (wizardForm) {
-    const panels = Array.from(wizardForm.querySelectorAll('.wizard-panel'));
-    const stepNodes = Array.from(document.querySelectorAll('.wizard-step-node'));
-    const fillBar = document.getElementById('wizardProgressFill');
-    
-    const backBtn = document.getElementById('wizardBack');
-    const nextBtn = document.getElementById('wizardNext');
-    const submitBtn = document.getElementById('wizardSubmit');
-    
-    let activeStep = 1;
-    const maxSteps = 5;
-
-    // Validate current panel entries
-    const checkPanelInputs = (step) => {
-      const panel = panels.find(p => parseInt(p.dataset.step) === step);
-      if (!panel) return true;
-
-      const fields = Array.from(panel.querySelectorAll('input, select'));
-      let status = true;
-
-      fields.forEach(field => {
-        // Clear any old validation messages
-        const formGroup = field.closest('.form-floating-premium') || field.closest('.form-group');
-        if (formGroup) {
-          const oldMsg = formGroup.querySelector('.form-error');
-          if (oldMsg) oldMsg.remove();
-        }
-
-        if (field.hasAttribute('required') && !field.value.trim()) {
-          status = false;
-          appendError(field, 'This entry is required.');
-        } else if (field.id === 'age_years' && field.value) {
-          const age = parseFloat(field.value);
-          if (isNaN(age) || age < 18 || age > 99) {
-            status = false;
-            appendError(field, 'Applicant age must be between 18 and 99 years.');
+  /* ── Scroll Reveal ── */
+  const Reveal = {
+    init() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('cg-visible');
+            observer.unobserve(e.target);
           }
-        } else if (field.id === 'amt_income_total' && field.value) {
-          const income = parseFloat(field.value);
-          if (isNaN(income) || income <= 0) {
-            status = false;
-            appendError(field, 'Annual gross income must be a positive value.');
-          }
-        } else if (field.id === 'existing_debt' && field.value) {
-          const debt = parseFloat(field.value);
-          if (isNaN(debt) || debt < 0) {
-            status = false;
-            appendError(field, 'Debt outflow cannot be negative.');
-          }
-        } else if (field.id === 'loan_amount' && field.value) {
-          const limit = parseFloat(field.value);
-          if (isNaN(limit) || limit <= 0) {
-            status = false;
-            appendError(field, 'Requested limit must be a positive value.');
-          }
-        }
-      });
-
-      return status;
-    };
-
-    const appendError = (field, text) => {
-      const formGroup = field.closest('.form-floating-premium') || field.closest('.form-group');
-      if (formGroup) {
-        const errorDiv = document.createElement('div');
-        errorDiv.className = 'form-error animate-slide-up text-danger mt-1 fs-7';
-        errorDiv.textContent = text;
-        formGroup.appendChild(errorDiv);
-      }
-    };
-
-    // Populates Step 4 Review summary blocks
-    const compileSummaryDetails = () => {
-      const summaryBox = document.getElementById('reviewSummary');
-      if (!summaryBox) return;
-
-      summaryBox.innerHTML = '';
-
-      const mapping = [
-        { label: 'Applicant Gender', id: 'code_gender' },
-        { label: 'Applicant Age', id: 'age_years', suffix: ' Years' },
-        { label: 'Marital Status', id: 'name_family_status' },
-        { label: 'Children Count', id: 'cnt_children' },
-        { label: 'Family Size', id: 'cnt_fam_members' },
-        { label: 'Education Level', id: 'name_education_type' },
-        { label: 'Housing Type', id: 'name_housing_type' },
-        { label: 'Income Source', id: 'name_income_type' },
-        { label: 'Occupation Sector', id: 'occupation_type' },
-        { label: 'Experience duration', id: 'years_employed', suffix: ' Yrs' },
-        { label: 'Gross Annual Income', id: 'amt_income_total', prefix: '$' },
-        { label: 'Monthly Liabilities', id: 'existing_debt', prefix: '$' },
-        { label: 'Requested Limit', id: 'loan_amount', prefix: '$' },
-        { label: 'Bureau Repay History', id: 'credit_history' }
-      ];
-
-      mapping.forEach(item => {
-        const field = document.getElementById(item.id);
-        if (field) {
-          let valText = '';
-          if (field.tagName === 'SELECT') {
-            valText = field.options[field.selectedIndex].text;
-          } else {
-            valText = field.value || 'N/A';
-          }
-
-          if (item.prefix && valText !== 'N/A') valText = item.prefix + valText;
-          if (item.suffix && valText !== 'N/A') valText = valText + item.suffix;
-
-          const block = document.createElement('div');
-          block.className = 'col-sm-6 mb-3';
-          block.innerHTML = `
-            <div class="p-3 rounded bg-glass border border-light-subtle">
-              <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">${item.label}</label>
-              <span class="fs-6 fw-semibold text-primary-emphasis">${valText}</span>
-            </div>
-          `;
-          summaryBox.appendChild(block);
-        }
-      });
-    };
-
-    // Transition wizard panels
-    const displayActivePanel = () => {
-      panels.forEach(p => {
-        p.classList.toggle('active', parseInt(p.dataset.step) === activeStep);
-      });
-
-      // Fill bar
-      if (fillBar) {
-        const pct = ((activeStep - 1) / (maxSteps - 1)) * 100;
-        fillBar.style.width = `${pct}%`;
-      }
-
-      // Steps indicator bubbles
-      stepNodes.forEach(node => {
-        const stepNum = parseInt(node.dataset.step);
-        node.classList.toggle('active', stepNum === activeStep);
-        node.classList.toggle('completed', stepNum < activeStep);
-      });
-
-      // Show/Hide navigation controls
-      if (backBtn) {
-        backBtn.style.visibility = (activeStep === 1) ? 'hidden' : 'visible';
-      }
-
-      if (activeStep === maxSteps) {
-        if (nextBtn) nextBtn.style.display = 'none';
-        if (submitBtn) submitBtn.style.display = 'inline-flex';
-      } else {
-        if (nextBtn) nextBtn.style.display = 'inline-flex';
-        if (submitBtn) submitBtn.style.display = 'none';
-      }
-
-      if (activeStep === 4) {
-        compileSummaryDetails();
-      }
-    };
-
-    if (nextBtn) {
-      nextBtn.addEventListener('click', () => {
-        if (checkPanelInputs(activeStep)) {
-          if (activeStep < maxSteps) {
-            activeStep++;
-            displayActivePanel();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('[data-reveal]').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = `opacity 0.6s var(--ease) ${el.dataset.reveal || '0s'}, transform 0.6s var(--ease) ${el.dataset.reveal || '0s'}`;
+        observer.observe(el);
       });
     }
+  };
+  document.head.insertAdjacentHTML('beforeend', '<style>.cg-visible{opacity:1!important;transform:translateY(0)!important;}</style>');
 
-    if (backBtn) {
-      backBtn.addEventListener('click', () => {
-        if (activeStep > 1) {
-          activeStep--;
-          displayActivePanel();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
+  /* ── Wizard (Multi-step Form) ── */
+  const Wizard = {
+    current: 0,
+    panels: [],
+    nodes: [],
+    lines: [],
+
+    init() {
+      this.panels = Array.from(document.querySelectorAll('.cg-wizard-panel'));
+      this.nodes = Array.from(document.querySelectorAll('.cg-step-node'));
+      this.lines = Array.from(document.querySelectorAll('.cg-step-line'));
+      if (!this.panels.length) return;
+
+      this.nodes.forEach((n, i) => n.addEventListener('click', () => { if (i <= this.current) this.goTo(i); }));
+      document.querySelectorAll('[data-wizard-next]').forEach(b => b.addEventListener('click', () => this.next()));
+      document.querySelectorAll('[data-wizard-prev]').forEach(b => b.addEventListener('click', () => this.prev()));
+      this.goTo(0);
+    },
+
+    goTo(step) {
+      this.current = step;
+      this.panels.forEach((p, i) => p.classList.toggle('active', i === step));
+      this.nodes.forEach((n, i) => { n.classList.remove('active', 'done'); if (i < step) n.classList.add('done'); else if (i === step) n.classList.add('active'); });
+      this.lines.forEach((l, i) => l.classList.toggle('done', i < step));
+    },
+    next() { if (this.validate() && this.current < this.panels.length - 1) this.goTo(this.current + 1); },
+    prev() { if (this.current > 0) this.goTo(this.current - 1); },
+
+    validate() {
+      const panel = this.panels[this.current];
+      let valid = true;
+      panel.querySelectorAll('[required]').forEach(field => {
+        if (!field.value || field.value === '') {
+          field.style.borderColor = 'var(--danger)';
+          valid = false;
+          field.addEventListener('input', () => { field.style.borderColor = ''; }, { once: true });
         }
+      });
+      if (!valid) Toast.show('Please fill in all required fields.', 'danger');
+      return valid;
+    }
+  };
+
+  /* ── Toast Notifications ── */
+  const Toast = {
+    init() {
+      if (!document.querySelector('.cg-toast-stack')) {
+        document.body.insertAdjacentHTML('beforeend', '<div class="cg-toast-stack" id="toastStack"></div>');
+      }
+    },
+    show(msg, type = 'info', duration = 4000) {
+      const stack = document.getElementById('toastStack');
+      if (!stack) return;
+      const icons = { success: 'fa-check-circle', danger: 'fa-exclamation-circle', info: 'fa-info-circle', warning: 'fa-exclamation-triangle' };
+      const toast = document.createElement('div');
+      toast.className = `cg-toast ${type}`;
+      toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} cg-toast-icon"></i><div><div style="font-size:13px;font-weight:600;color:var(--text-primary)">${msg}</div></div>`;
+      stack.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(40px)'; setTimeout(() => toast.remove(), 300); }, duration);
+    }
+  };
+
+  /* ── Gauge (Result Page) ── */
+  const Gauge = {
+    init() {
+      const fill = document.querySelector('.cg-gauge-fill');
+      if (!fill) return;
+      const pct = parseFloat(fill.dataset.pct || 0);
+      const circumference = 2 * Math.PI * 85;
+      fill.style.strokeDasharray = circumference;
+      fill.style.strokeDashoffset = circumference;
+      requestAnimationFrame(() => {
+        setTimeout(() => { fill.style.strokeDashoffset = circumference - (circumference * pct / 100); }, 300);
       });
     }
+  };
 
-    // Step indicators clickable navigations
-    stepNodes.forEach(node => {
-      node.addEventListener('click', () => {
-        const targetStep = parseInt(node.dataset.step);
-        if (targetStep < activeStep) {
-          activeStep = targetStep;
-          displayActivePanel();
-        } else if (targetStep > activeStep) {
-          // Validate intermediate steps
-          let canGo = true;
-          for (let s = activeStep; s < targetStep; s++) {
-            if (!checkPanelInputs(s)) {
-              canGo = false;
-              break;
-            }
-          }
-          if (canGo) {
-            activeStep = targetStep;
-            displayActivePanel();
-          }
+  /* ── Chart.js Helpers ── */
+  const Charts = {
+    baseOpts: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(24,24,27,0.95)',
+          borderColor: 'rgba(255,255,255,0.06)',
+          borderWidth: 1,
+          titleFont: { family: "'Inter'", size: 12, weight: 600 },
+          bodyFont: { family: "'Inter'", size: 12 },
+          padding: 12, cornerRadius: 8,
         }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { family: "'Inter'", size: 11 }, color: '#71717a' } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { family: "'Inter'", size: 11 }, color: '#71717a' } }
+      }
+    },
+    doughnutOpts: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '72%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(24,24,27,0.95)',
+          borderColor: 'rgba(255,255,255,0.06)',
+          borderWidth: 1,
+          padding: 12, cornerRadius: 8,
+          titleFont: { family: "'Inter'", size: 12, weight: 600 },
+          bodyFont: { family: "'Inter'", size: 12 },
+        }
+      }
+    }
+  };
+
+  /* ── Flash Message Handler ── */
+  const Flash = {
+    init() {
+      document.querySelectorAll('[data-flash]').forEach(el => {
+        const type = el.dataset.flash || 'info';
+        Toast.show(el.textContent, type);
+        el.remove();
       });
-    });
+    }
+  };
 
-    displayActivePanel();
-  }
+  /* ── Master Init ── */
+  const init = () => {
+    Theme.init();
+    Sidebar.init();
+    Toast.init();
+    Flash.init();
+    Counter.init();
+    Reveal.init();
+    Wizard.init();
+    Gauge.init();
 
-});
+    // Bind theme toggle
+    document.getElementById('themeToggle')?.addEventListener('click', () => Theme.toggle());
+
+    // Remove loader
+    setTimeout(() => Loader.hide(), 400);
+  };
+
+  // Run
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+
+  // Public API
+  return { Theme, Toast, Wizard, Charts, Gauge };
+})();

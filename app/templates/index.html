@@ -1,181 +1,132 @@
-{% extends 'base.html' %}
-{% block title %}CreditGuard AI | Premium Decisioning Suite{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}CreditGuard AI — Enterprise Credit Decisioning{% endblock %}
+{% block page_id %}page-landing{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 px-md-5">
-    
-    <!-- Static Landing Top Header -->
-    <header class="d-flex align-items-center justify-content-between pb-4 mb-4 border-bottom border-light-subtle no-print" data-aos="fade-down">
-        <div class="d-flex align-items-center gap-3">
-            <div class="sidebar-logo"><i class="fa-solid fa-shield-halved"></i></div>
-            <h1 class="h4 fw-bold m-0 letter-spacing-1 text-primary-emphasis">CreditGuard AI</h1>
-        </div>
-        <div class="d-flex align-items-center gap-3">
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('api.admin') }}" class="btn-premium btn-primary py-2 px-4 fs-7"><i class="fa-solid fa-gauge mr-8"></i> Go to Dashboard</a>
-            {% else %}
-                <a href="{{ url_for('auth.login') }}" class="btn-premium btn-secondary py-2 px-3 fs-7">Login</a>
-                <a href="{{ url_for('auth.register') }}" class="btn-premium btn-primary py-2 px-4 fs-7">Get Started</a>
-            {% endif %}
-        </div>
-    </header>
+<div class="cg-hero cg-fade-in">
+  <div class="cg-grid cg-grid-2 cg-gap-lg" style="align-items:center;">
+    <!-- Left Hero content -->
+    <div data-reveal="0s">
+      <div class="cg-hero-eyebrow">
+        <i class="fa-solid fa-brain"></i> Next-Gen Machine Learning
+      </div>
+      <h1 class="cg-hero-title">
+        Intelligent Credit<br>
+        <span class="cg-gradient-text">Risk assessment</span>
+      </h1>
+      <p class="cg-hero-desc">
+        Evaluate credit card applications instantly with institutional-grade accuracy. Powered by ensemble machine learning models, explainable AI analytics, and secure data pipelines.
+      </p>
+      <div class="cg-flex cg-gap-md">
+        <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary cg-btn-lg">
+          <i class="fa-solid fa-bolt"></i> Run Assessment
+        </a>
+        <a href="{{ url_for('api.about') }}" class="cg-btn cg-btn-secondary cg-btn-lg">
+          Explore Model
+        </a>
+      </div>
+    </div>
 
-    <!-- Animated split Hero Section -->
-    <section class="row align-items-center py-5 mb-5 g-5">
-        <div class="col-lg-6" data-aos="fade-right" data-aos-delay="100">
-            <span class="badge-premium primary mb-3"><i class="fa-solid fa-bolt text-primary"></i> Production-Ready AI Risk Scoring</span>
-            <h1 class="display-3 fw-bold mb-3 letter-spacing-1">Intelligent Credit <span class="gradient-text-glow">Decisioning</span></h1>
-            <p class="fs-5 text-secondary mb-4" style="line-height: 1.6;">Evaluate applicant delinquency risks instantly using optimized ensemble learning pipelines, local surrogate explainability weights, and custom Debt-To-Income safety rails.</p>
-            <div class="d-flex gap-3 flex-wrap">
-                <a href="{{ url_for('api.predict_get') }}" class="btn-premium btn-primary btn-lg"><i class="fa-solid fa-play"></i> Run Assessment</a>
-                <a href="{{ url_for('api.about') }}" class="btn-premium btn-secondary btn-lg"><i class="fa-solid fa-circle-nodes"></i> Model Metrics</a>
-            </div>
+    <!-- Right 3D Credit Card -->
+    <div class="cg-flex-center cg-credit-card-wrap cg-float" data-reveal="0.2s" style="perspective:1000px;">
+      <div class="cg-credit-card">
+        <div class="cg-flex-between" style="align-items:flex-start;margin-bottom:32px;">
+          <div>
+            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;">CreditGuard AI</h4>
+            <span style="font-size:10px;color:rgba(255,255,255,0.6);">Enterprise Card</span>
+          </div>
+          <i class="fa-solid fa-sim-card" style="font-size:28px;color:#facc15;transform:rotate(90deg);"></i>
         </div>
+        <div style="font-size:20px;font-weight:600;letter-spacing:2px;margin-bottom:24px;font-family:var(--font-mono);">
+          4892 •••• •••• 7431
+        </div>
+        <div class="cg-flex-between">
+          <div>
+            <span style="font-size:9px;text-transform:uppercase;display:block;opacity:0.6;">Cardholder</span>
+            <span style="font-size:13px;font-weight:500;">Sk Md Shariff</span>
+          </div>
+          <div style="text-align:right;">
+            <span style="font-size:9px;text-transform:uppercase;display:block;opacity:0.6;">Valid Thru</span>
+            <span style="font-size:13px;font-weight:500;">09/28</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        <div class="col-lg-6 d-flex justify-content-center" data-aos="fade-left" data-aos-delay="200">
-            <div class="card-credit-3d-wrapper">
-                <div class="card-credit-3d">
-                    <div style="width: 44px; height: 32px; background: linear-gradient(135deg, #fcd34d, #d97706); border-radius: 6px; position: relative; margin-bottom: 24px;"></div>
-                    <div style="position: absolute; top: 32px; left: 88px; font-size: 16px; color: rgba(255,255,255,0.4);"><i class="fa-solid fa-wifi"></i></div>
-                    <div style="position: absolute; top: 24px; right: 28px; font-size: 26px; color: rgba(255, 255, 255, 0.8);"><i class="fa-solid fa-shield-halved"></i></div>
-                    <div style="font-family: var(--font-mono); font-size: 20px; letter-spacing: 3px; color: rgba(255, 255, 255, 0.9); margin-bottom: 24px;">5412 •••• •••• 9823</div>
-                    <div class="d-flex justify-content-between align-items-end">
-                        <div>
-                            <label style="display:block; font-size:9px; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px; margin-bottom:4px;">Issuer Platform</label>
-                            <span style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.9);">CreditGuard AI</span>
-                        </div>
-                        <div>
-                            <label style="display:block; font-size:9px; text-transform:uppercase; color:rgba(255,255,255,0.4); letter-spacing:1px; margin-bottom:4px;">Valid Thru</label>
-                            <span style="font-size:13px; font-weight:500; color:rgba(255,255,255,0.9);">08/29</span>
-                        </div>
-                    </div>
-                    <div style="position: absolute; right: -40px; bottom: -40px; width: 180px; height: 180px; border-radius: 50%; border: 24px solid rgba(255, 255, 255, 0.025);"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+<!-- Stats Row -->
+<div class="cg-grid cg-grid-4 cg-gap-md cg-mt-xl" style="margin-top: 60px;">
+  <div class="cg-stat" data-reveal="0.1s">
+    <div class="cg-stat-icon primary"><i class="fa-solid fa-bullseye"></i></div>
+    <div class="cg-stat-value" data-count="98.7" data-suffix="%" data-decimals="1">0%</div>
+    <div class="cg-stat-label">Model Precision</div>
+  </div>
+  <div class="cg-stat" data-reveal="0.2s">
+    <div class="cg-stat-icon success"><i class="fa-solid fa-chart-line"></i></div>
+    <div class="cg-stat-value" data-count="50000" data-suffix="+">0</div>
+    <div class="cg-stat-label">Assessments Scored</div>
+  </div>
+  <div class="cg-stat" data-reveal="0.3s">
+    <div class="cg-stat-icon accent"><i class="fa-solid fa-brain"></i></div>
+    <div class="cg-stat-value" data-count="4">0</div>
+    <div class="cg-stat-label">Classifiers Trained</div>
+  </div>
+  <div class="cg-stat" data-reveal="0.4s">
+    <div class="cg-stat-icon warning"><i class="fa-solid fa-bolt"></i></div>
+    <div class="cg-stat-value" data-count="8" data-suffix="ms">0ms</div>
+    <div class="cg-stat-label">Inference Latency</div>
+  </div>
+</div>
 
-    <!-- Statistics Section -->
-    <section class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="100">
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium text-center">
-                <h3 class="display-6 fw-bold gradient-text-glow font-mono">98.7%</h3>
-                <p class="fs-7 text-secondary mb-0">Model Precision</p>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium text-center">
-                <h3 class="display-6 fw-bold gradient-text-glow font-mono">50K+</h3>
-                <p class="fs-7 text-secondary mb-0">Assessments Run</p>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium text-center">
-                <h3 class="display-6 fw-bold gradient-text-glow font-mono">4</h3>
-                <p class="fs-7 text-secondary mb-0">Classifiers Trained</p>
-            </div>
-        </div>
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium text-center">
-                <h3 class="display-6 fw-bold gradient-text-glow font-mono">&lt; 8ms</h3>
-                <p class="fs-7 text-secondary mb-0">Evaluation Latency</p>
-            </div>
-        </div>
-    </section>
+<!-- Features Section -->
+<div class="cg-mt-xl" style="margin-top: 80px;">
+  <div style="text-align:center;margin-bottom:40px;" data-reveal="0s">
+    <h2 style="font-size:28px;font-weight:800;letter-spacing:-0.5px;">Enterprise Capabilities</h2>
+    <p style="color:var(--text-secondary);font-size:15px;margin-top:6px;">Designed for precision, compliance, and real-time decisioning.</p>
+  </div>
 
-    <!-- Features Grid -->
-    <section class="py-5 mb-5 border-top border-light-subtle">
-        <div class="text-center max-w-600 mx-auto mb-5" data-aos="fade-up">
-            <span class="badge-premium primary mb-2">Capabilities</span>
-            <h2 class="fw-bold h2 mb-3">Enterprise-Grade Risk Infrastructure</h2>
-            <p class="text-secondary fs-7">A comprehensive scoring environment combining optimized ML models with persistent database records.</p>
-        </div>
+  <div class="cg-grid cg-grid-3 cg-gap-md">
+    <div class="cg-card" data-reveal="0.1s">
+      <div class="cg-stat-icon primary" style="margin-bottom:16px;"><i class="fa-solid fa-shield-halved"></i></div>
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Production ML Pipeline</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);">Automated data sanitization, missing value imputation, robust scaling, and SMOTE class balancing for unbiased risk classification.</p>
+    </div>
+    <div class="cg-card" data-reveal="0.2s">
+      <div class="cg-stat-icon success" style="margin-bottom:16px;"><i class="fa-solid fa-layer-group"></i></div>
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Multi-Model Ensemble</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);">Underpinned by optimized XGBoost, Random Forest, Decision Tree, and Logistic Regression classifiers to offer high-precision scores.</p>
+    </div>
+    <div class="cg-card" data-reveal="0.3s">
+      <div class="cg-stat-icon accent" style="margin-bottom:16px;"><i class="fa-solid fa-database"></i></div>
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Audit Trail & History</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);">Secure local SQLite database recording every prediction transaction, customer profile data, confidence scores, and business rule logs.</p>
+    </div>
+    <div class="cg-card" data-reveal="0.4s">
+      <div class="cg-stat-icon warning" style="margin-bottom:16px;"><i class="fa-solid fa-gauge-high"></i></div>
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Sub-10ms Inference</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);">Stateless, optimized backend serving pipeline model predictions within milliseconds. Perfect for integration into customer checkout flows.</p>
+    </div>
+    <div class="cg-card" data-reveal="0.5s">
+      <div class="cg-stat-icon primary" style="margin-bottom:16px;"><i class="fa-solid fa-lock"></i></div>
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Secure By Design</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);">Industry-standard security controls including Werkzeug scrypt hashing, CSRF session protection, and client security guards.</p>
+    </div>
+    <div class="cg-card" data-reveal="0.6s">
+      <div class="cg-stat-icon success" style="margin-bottom:16px;"><i class="fa-solid fa-chart-column"></i></div>
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Real-Time Analytics</h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);">Interactive operations dashboards showing approval ratios, customer income spread, and daily prediction volumes using dynamic charts.</p>
+    </div>
+  </div>
+</div>
 
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
-                <div class="card-premium h-100">
-                    <div class="stat-icon-wrapper primary mb-4"><i class="fa-solid fa-brain"></i></div>
-                    <h4 class="h5 fw-bold mb-2">Predictive ML Classifiers</h4>
-                    <p class="fs-7 text-secondary mb-0">Runs applicant parameters through XGBoost, Random Forest, Decision Tree, and Logistic Regression models.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="150">
-                <div class="card-premium h-100">
-                    <div class="stat-icon-wrapper success mb-4"><i class="fa-solid fa-chart-pie"></i></div>
-                    <h4 class="h5 fw-bold mb-2">Explainable AI (XAI)</h4>
-                    <p class="fs-7 text-secondary mb-0">Extracts local surrogate feature weights to explain the specific demographic reasons supporting approval or risk rejection.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
-                <div class="card-premium h-100">
-                    <div class="stat-icon-wrapper info mb-4"><i class="fa-solid fa-bolt"></i></div>
-                    <h4 class="h5 fw-bold mb-2">Instant In-Memory Inference</h4>
-                    <p class="fs-7 text-secondary mb-0">Preloaded pipeline singletons execute calculations during application startup for sub-10ms scoring response times.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="250">
-                <div class="card-premium h-100">
-                    <div class="stat-icon-wrapper warning mb-4"><i class="fa-solid fa-scale-balanced"></i></div>
-                    <h4 class="h5 fw-bold mb-2">DTI & Credit Check Overlays</h4>
-                    <p class="fs-7 text-secondary mb-0">Applies DTI business safety boundaries and Bureau rating rules to override predictions when financial constraints are triggered.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
-                <div class="card-premium h-100">
-                    <div class="stat-icon-wrapper danger mb-4"><i class="fa-solid fa-database"></i></div>
-                    <h4 class="h5 fw-bold mb-2">SQLite Audit Ledger</h4>
-                    <p class="fs-7 text-secondary mb-0">Logs prediction outputs securely, supporting full-text queries, sorted parameters, risk category filter chips, and deletions.</p>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="350">
-                <div class="card-premium h-100">
-                    <div class="stat-icon-wrapper primary style-accent mb-4" style="background-color:rgba(0, 229, 255, 0.1); color:var(--accent);"><i class="fa-solid fa-file-pdf"></i></div>
-                    <h4 class="h5 fw-bold mb-2">Printable Assessment Reports</h4>
-                    <p class="fs-7 text-secondary mb-0">Compiles high-fidelity credit assessment documents containing digital QR code tags and audit signature blocks.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ML Pipeline Flow Section -->
-    <section class="py-5 mb-5 border-top border-light-subtle">
-        <div class="text-center max-w-600 mx-auto mb-5" data-aos="fade-up">
-            <span class="badge-premium primary mb-2">MLOps Workflow</span>
-            <h2 class="fw-bold h2 mb-3">Model Training Pipeline</h2>
-            <p class="text-secondary fs-7">Our pipeline balances targets, caps numerical characteristics, and runs grid optimizations.</p>
-        </div>
-
-        <div class="pipeline-flow-container mt-4" data-aos="fade-up" data-aos-delay="100">
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-filter"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">1. Preprocessing</h5>
-                <p class="fs-8 text-secondary mb-0">Caps outliers via 1.5 IQR bounds, median imputes missing features.</p>
-            </div>
-            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-scale-unbalanced"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">2. Target Balance</h5>
-                <p class="fs-8 text-secondary mb-0">SMOTE oversamples the minority default class target counts.</p>
-            </div>
-            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-sliders"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">3. Grid Selection</h5>
-                <p class="fs-8 text-secondary mb-0">Trains 4 classifiers, prioritizing high recall on risk indicators.</p>
-            </div>
-            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-laptop-code"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">4. API Serving</h5>
-                <p class="fs-8 text-secondary mb-0">Serializes the best estimator and warm-loads it on local app servers.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="text-center pt-5 border-top border-light-subtle no-print">
-        <p class="fs-8 text-muted mb-0">© 2026 CreditGuard AI Risk Suite. Built with Flask, Scikit-Learn, and Bootstrap 5.</p>
-    </footer>
-
+<!-- CTA Section -->
+<div class="cg-card cg-mt-xl cg-text-center" data-reveal="0s" style="margin-top: 80px;padding:48px 32px;background:var(--primary-muted);border-color:rgba(99,102,241,0.15);">
+  <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">Start evaluating applications today</h2>
+  <p style="color:var(--text-secondary);font-size:14.5px;max-width:480px;margin:0 auto 24px;">Experience next-gen credit assessment tools designed for modern financial platforms.</p>
+  <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary cg-btn-lg">
+    Get Started Free
+  </a>
 </div>
 {% endblock %}

@@ -1,140 +1,107 @@
-{% extends 'base.html' %}
-{% block title %}CreditGuard AI | Credit Assessment Report{% endblock %}
+{% extends "base.html" %}
 
-{% block extra_head %}
-<style>
-    @media print {
-        body { background: #fff !important; color: #000 !important; }
-        .printable-report-card { border: none !important; box-shadow: none !important; padding: 0 !important; }
-    }
-</style>
-{% endblock %}
+{% block title %}Report {{ record.application_id }} | CreditGuard AI{% endblock %}
+{% block page_id %}page-report{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 px-md-5">
-    
-    <div class="workspace-page-header mb-4 no-print" data-aos="fade-down">
-        <div class="header-breadcrumbs">
-            <a href="{{ url_for('api.admin') }}">Dashboard</a>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <a href="{{ url_for('api.history') }}">History</a>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="active-crumb">Report: {{ record.application_id }}</span>
-        </div>
-        <h1 class="h3 fw-bold m-0 mt-2">Credit Assessment Report</h1>
-        <p class="text-secondary mb-0">Download, print, or review the secure applicant risk scoring document.</p>
+<div class="cg-page-header no-print">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <a href="{{ url_for('api.history') }}">History</a>
+    <span class="sep">›</span>
+    <span class="current">Report</span>
+  </div>
+  <div class="cg-flex-between">
+    <div>
+      <h1 class="cg-page-title">Credit Assessment Report</h1>
+      <p class="cg-page-desc">Application {{ record.application_id }}</p>
     </div>
+    <button class="cg-btn cg-btn-secondary no-print" onclick="window.print()">
+      <i class="fa-solid fa-print"></i> Print Report
+    </button>
+  </div>
+</div>
 
-    <!-- Print control row -->
-    <div class="d-flex justify-content-center gap-3 mb-4 no-print animate-slide-up stagger-1">
-        <button onclick="window.print()" class="btn-premium btn-primary btn-lg"><i class="fa-solid fa-print"></i> Print / Save PDF</button>
-        <a href="{{ url_for('api.history') }}" class="btn-premium btn-secondary btn-lg"><i class="fa-solid fa-arrow-left"></i> Back to History</a>
+<div class="cg-report" data-reveal>
+  <!-- Report Header -->
+  <div style="text-align:center;margin-bottom:32px;">
+    <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <div class="cg-sidebar-logo" style="width:32px;height:32px;font-size:14px;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <span style="font-size:16px;font-weight:700;">CreditGuard AI</span>
     </div>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:4px;">Credit Assessment Report</h2>
+    <p class="cg-app-id">{{ record.application_id }}</p>
+    <p class="cg-text-sm cg-text-muted" style="margin-top:4px;">Generated on {{ record.timestamp }}</p>
+  </div>
 
-    <!-- Printable layout wrapper -->
-    <div class="printable-report-card animate-scale-in">
-        <!-- Header -->
-        <div class="printable-report-header border-bottom border-light-subtle pb-4 mb-4">
-            <div class="d-flex align-items-center gap-3">
-                <div class="sidebar-logo"><i class="fa-solid fa-shield-halved"></i></div>
-                <div>
-                    <h2 class="h5 fw-bold m-0 text-primary-emphasis">CreditGuard AI</h2>
-                    <span class="fs-9 text-muted text-uppercase letter-spacing-1">Automated Credit Risk Suite</span>
-                </div>
-            </div>
-            <div style="text-align:right;">
-                <span class="fs-7 font-mono fw-bold text-primary">{{ record.application_id }}</span>
-                <div class="fs-9 text-secondary mt-1">{{ record.timestamp }}</div>
-            </div>
-        </div>
+  <hr class="cg-divider">
 
-        <!-- Decision summary indicator -->
-        <div class="text-center py-4 border-bottom border-light-subtle mb-4">
-            <div class="result-status-badge {% if record.prediction == 'Approved' %}approved{% else %}rejected{% endif %} fs-5 py-2 px-4 mb-3">
-                {% if record.prediction == 'Approved' %}
-                    <i class="fa-solid fa-circle-check"></i> APPLICATION APPROVED
-                {% else %}
-                    <i class="fa-solid fa-circle-xmark"></i> APPLICATION REJECTED
-                {% endif %}
-            </div>
-            <h3 class="display-6 fw-bold font-mono m-0 mb-1">{{ record.probability | round(1) }}%</h3>
-            <span class="fs-8 text-muted">Inference Decision Score</span>
-        </div>
-
-        <!-- Grid applicant details -->
-        <h4 class="h6 fw-bold mb-3"><i class="fa-solid fa-circle-user text-primary me-2"></i> Applicant Characteristics Profile</h4>
-        <div class="row g-3 mb-4">
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Gender</label>
-                    <span class="fs-7 fw-semibold">{{ record.gender }}</span>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Annual Income</label>
-                    <span class="fs-7 fw-semibold font-mono">${{ "{:,.0f}".format(record.income) }}</span>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Income Category</label>
-                    <span class="fs-7 fw-semibold">{{ record.employment }}</span>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Experience Duration</label>
-                    <span class="fs-7 fw-semibold">{{ record.experience }} Years</span>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Dependents</label>
-                    <span class="fs-7 fw-semibold">{{ record.children }}</span>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Monthly Liabilities</label>
-                    <span class="fs-7 fw-semibold font-mono">${{ "{:,.0f}".format(record.debt) }}</span>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Risk Rating</label>
-                    <span class="fs-7 fw-semibold">{{ record.risk_level }}</span>
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="p-3 rounded bg-glass border border-light-subtle">
-                    <label class="d-block text-muted text-uppercase fs-9 fw-bold letter-spacing-1 mb-1">Model Classifier</label>
-                    <span class="fs-7 fw-semibold">{{ record.model }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Recommendations -->
-        {% if record.recommendation %}
-            <h4 class="h6 fw-bold mb-3"><i class="fa-solid fa-list-check text-warning me-2"></i> System Action Recommendations</h4>
-            <div class="p-3 rounded bg-glass border border-light-subtle mb-4">
-                <p class="fs-7 text-secondary mb-0" style="line-height: 1.75;">{{ record.recommendation }}</p>
-            </div>
-        {% endif %}
-
-        <!-- Signatures & Footers -->
-        <div class="pt-5 mt-5 border-top border-light-subtle d-flex justify-content-between align-items-end">
-            <div>
-                <div style="width: 140px; height: 1px; background-color: var(--text-muted); margin-bottom: 8px;"></div>
-                <small class="text-muted fs-8">Authorized Officer Signature</small>
-            </div>
-            <div class="text-end">
-                <small class="text-muted fs-9 d-block">This document is computer-generated by CreditGuard AI.</small>
-                <small class="text-muted fs-9 font-mono">{{ record.application_id }} | Sync Complete</small>
-            </div>
-        </div>
-
+  <!-- Decision -->
+  <div style="text-align:center;margin:28px 0;">
+    {% if record.prediction == 'Approved' %}
+      <div style="display:inline-flex;align-items:center;gap:10px;padding:12px 28px;border-radius:var(--r-full);background:var(--success-muted);">
+        <i class="fa-solid fa-circle-check" style="font-size:22px;color:var(--success);"></i>
+        <span style="font-size:20px;font-weight:700;color:var(--success);">APPROVED</span>
+      </div>
+    {% else %}
+      <div style="display:inline-flex;align-items:center;gap:10px;padding:12px 28px;border-radius:var(--r-full);background:var(--danger-muted);">
+        <i class="fa-solid fa-circle-xmark" style="font-size:22px;color:var(--danger);"></i>
+        <span style="font-size:20px;font-weight:700;color:var(--danger);">REJECTED</span>
+      </div>
+    {% endif %}
+    <div style="margin-top:12px;">
+      <span class="cg-text-sm cg-text-muted">Confidence: </span>
+      <span class="cg-mono cg-font-bold">{{ '%.1f'|format(record.probability) }}%</span>
+      <span style="margin:0 8px;color:var(--text-faint);">|</span>
+      <span class="cg-text-sm cg-text-muted">Risk Level: </span>
+      <span class="cg-badge {% if record.risk_level == 'Low' %}success{% elif record.risk_level == 'High' %}danger{% else %}warning{% endif %}">
+        {{ record.risk_level }}
+      </span>
     </div>
+  </div>
 
+  <hr class="cg-divider">
+
+  <!-- Applicant Details -->
+  <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+    <i class="fa-solid fa-user" style="color:var(--primary);margin-right:6px;"></i> Applicant Profile
+  </h3>
+  <div class="cg-grid cg-grid-2" style="margin-bottom:28px;">
+    <div class="cg-text-sm">
+      <div style="margin-bottom:10px;"><span class="cg-text-muted">Gender:</span> <span class="cg-text-primary">{{ record.gender }}</span></div>
+      <div style="margin-bottom:10px;"><span class="cg-text-muted">Annual Income:</span> <span class="cg-text-primary cg-mono">${{ '{:,.0f}'.format(record.income) }}</span></div>
+      <div style="margin-bottom:10px;"><span class="cg-text-muted">Employment:</span> <span class="cg-text-primary">{{ record.employment }}</span></div>
+    </div>
+    <div class="cg-text-sm">
+      <div style="margin-bottom:10px;"><span class="cg-text-muted">Experience:</span> <span class="cg-text-primary">{{ record.experience }} years</span></div>
+      <div style="margin-bottom:10px;"><span class="cg-text-muted">Dependents:</span> <span class="cg-text-primary">{{ record.children }}</span></div>
+      <div style="margin-bottom:10px;"><span class="cg-text-muted">Outstanding Debt:</span> <span class="cg-text-primary cg-mono">${{ '{:,.0f}'.format(record.debt|float) }}</span></div>
+    </div>
+  </div>
+
+  <hr class="cg-divider">
+
+  <!-- Model Information -->
+  <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+    <i class="fa-solid fa-brain" style="color:var(--accent);margin-right:6px;"></i> Model Information
+  </h3>
+  <div class="cg-text-sm" style="margin-bottom:28px;">
+    <div style="margin-bottom:10px;"><span class="cg-text-muted">Model:</span> <span class="cg-text-primary">{{ record.model }}</span></div>
+    <div style="margin-bottom:10px;"><span class="cg-text-muted">Recommendation:</span> <span class="cg-text-primary">{{ record.recommendation }}</span></div>
+  </div>
+
+  <hr class="cg-divider">
+
+  <!-- Disclaimer -->
+  <div style="padding:14px 18px;border-radius:var(--r-md);background:var(--bg-elevated);border:1px solid var(--border);margin-top:20px;">
+    <p class="cg-text-sm cg-text-muted" style="line-height:1.6;">
+      <i class="fa-solid fa-info-circle" style="color:var(--primary);margin-right:4px;"></i>
+      <strong>Disclaimer:</strong> This report is generated by an ML model for informational and educational purposes only.
+      It does not constitute financial advice. Final credit decisions should incorporate human review and additional verification.
+    </p>
+  </div>
 </div>
 {% endblock %}

@@ -1,109 +1,136 @@
-{% extends 'base.html' %}
-{% block title %}CreditGuard AI | Profile Settings{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}User Profile | CreditGuard AI{% endblock %}
+{% block page_id %}page-profile{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 px-md-5">
-    
-    <div class="workspace-page-header mb-4" data-aos="fade-down">
-        <div class="header-breadcrumbs">
-            <a href="{{ url_for('api.admin') }}">Dashboard</a>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="active-crumb">My Profile</span>
-        </div>
-        <h1 class="h3 fw-bold m-0 mt-2">Account Profile Settings</h1>
-        <p class="text-secondary mb-0">Update account credentials, notification configurations, and security passwords.</p>
-    </div>
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <span class="current">User Profile</span>
+  </div>
+  <h1 class="cg-page-title">User Profile</h1>
+  <p class="cg-page-desc">Manage profile credentials, configuration settings, and security credentials.</p>
+</div>
 
-    <div class="row g-4 align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-        
-        <!-- Left: User Details Card -->
-        <div class="col-lg-5">
-            <div class="card-premium h-100 text-center py-5 d-flex flex-column justify-content-between">
-                <div>
-                    <div style="width: 76px; height: 76px; border-radius: var(--radius-md); background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff; font-size: 32px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: var(--shadow-neon);">
-                        {{ current_user.username[:2].upper() }}
-                    </div>
-                    <h3 class="h5 fw-bold mb-1">{{ current_user.full_name or current_user.username }}</h3>
-                    <span class="fs-7 text-secondary">{{ current_user.email or 'No email registered' }}</span>
-                </div>
-                
-                <div class="mt-4 pt-4 border-top border-light-subtle">
-                    <span class="badge-premium primary"><i class="fa-solid fa-shield-halved me-2"></i> Role: Risk Assessor</span>
-                </div>
-            </div>
-        </div>
+<!-- Stats counters -->
+<div class="cg-grid cg-grid-4 cg-mb-lg" data-reveal="0s">
+  <div class="cg-stat">
+    <div class="cg-stat-icon primary"><i class="fa-solid fa-chart-bar"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.total_predictions }}">0</div>
+    <div class="cg-stat-label">Total Predictions</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon success"><i class="fa-solid fa-circle-check"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.total_approved }}">0</div>
+    <div class="cg-stat-label">Approved</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon danger"><i class="fa-solid fa-circle-xmark"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.total_rejected }}">0</div>
+    <div class="cg-stat-label">Rejected</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon accent"><i class="fa-solid fa-gauge-high"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.avg_probability|round(1) }}" data-suffix="%" data-decimals="1">0%</div>
+    <div class="cg-stat-label">Avg Confidence</div>
+  </div>
+</div>
 
-        <!-- Right: Profile Form -->
-        <div class="col-lg-7">
-            <div class="card-premium">
-                <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
-                    <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-user-pen text-primary me-2"></i> Update Profile Information</h3>
-                </div>
-                <form method="POST" action="{{ url_for('auth.profile_edit') }}">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="form_type" value="profile">
+<!-- Two column settings panels -->
+<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.1s">
+  <!-- Edit Profile details -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;">
+      <i class="fa-solid fa-user-gear" style="color:var(--primary);margin-right:8px;"></i> Profile Details
+    </h3>
+    <form method="POST" action="{{ url_for('auth.profile_edit') }}">
+      <input type="hidden" name="form_type" value="profile">
 
-                    <div class="form-group mb-3">
-                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="full_name">Full Name</label>
-                        <div class="form-floating-premium">
-                            <i class="fa-solid fa-id-card form-icon-left"></i>
-                            <input type="text" name="full_name" id="full_name" class="form-control-premium" value="{{ current_user.full_name or '' }}" placeholder="Enter full name">
-                        </div>
-                    </div>
+      <div class="cg-input-group">
+        <label for="full_name">Full Name</label>
+        <input type="text" name="full_name" id="full_name" class="cg-input" value="{{ current_user.full_name or '' }}" required>
+      </div>
 
-                    <div class="form-group mb-4">
-                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="email">Email Address</label>
-                        <div class="form-floating-premium">
-                            <i class="fa-solid fa-envelope form-icon-left"></i>
-                            <input type="email" name="email" id="email" class="form-control-premium" value="{{ current_user.email or '' }}" placeholder="Enter email address">
-                        </div>
-                    </div>
+      <div class="cg-input-group" style="margin-bottom:24px;">
+        <label for="email">Email Address</label>
+        <input type="email" name="email" id="email" class="cg-input" value="{{ current_user.email or '' }}" required>
+      </div>
 
-                    <button type="submit" class="btn-premium btn-primary">
-                        <i class="fa-solid fa-floppy-disk"></i> Save Profile Changes
-                    </button>
-                </form>
-            </div>
-        </div>
+      <button type="submit" class="cg-btn cg-btn-primary cg-w-full">
+        Save Changes
+      </button>
+    </form>
+  </div>
 
-    </div>
+  <!-- Change Password card -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:20px;">
+      <i class="fa-solid fa-shield-halved" style="color:var(--primary);margin-right:8px;"></i> Security Settings
+    </h3>
+    <form method="POST" action="{{ url_for('auth.profile_edit') }}">
+      <input type="hidden" name="form_type" value="password">
 
-    <!-- Password Updates -->
-    <div class="card-premium mt-4 animate-slide-up stagger-1">
-        <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
-            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-key text-warning me-2"></i> Modify Account Password</h3>
-        </div>
-        <form method="POST" action="{{ url_for('auth.profile_edit') }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="form_type" value="password">
+      <div class="cg-input-group">
+        <label for="current_password">Current Password</label>
+        <input type="password" name="current_password" id="current_password" class="cg-input" placeholder="••••••••" required>
+      </div>
 
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="current_password">Current Password</label>
-                        <div class="form-floating-premium">
-                            <i class="fa-solid fa-lock form-icon-left"></i>
-                            <input type="password" name="current_password" id="current_password" class="form-control-premium" required placeholder="Enter current password">
-                        </div>
-                    </div>
-                </div>
+      <div class="cg-input-group" style="margin-bottom:24px;">
+        <label for="new_password">New Password</label>
+        <input type="password" name="new_password" id="new_password" class="cg-input" placeholder="••••••••" required>
+      </div>
 
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="form-label fs-7 text-secondary fw-semibold mb-1" for="new_password">New Password</label>
-                        <div class="form-floating-premium">
-                            <i class="fa-solid fa-shield-halved form-icon-left"></i>
-                            <input type="password" name="new_password" id="new_password" class="form-control-premium" required minlength="8" placeholder="Enter new password">
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <button type="submit" class="cg-btn cg-btn-secondary cg-w-full">
+        Update Password
+      </button>
+    </form>
+  </div>
+</div>
 
-            <button type="submit" class="btn-premium btn-secondary mt-3 text-warning border-warning-subtle">
-                <i class="fa-solid fa-key"></i> Update Password Credentials
-            </button>
-        </form>
-    </div>
-
+<!-- Recent activity log -->
+<div class="cg-mb-lg" data-reveal="0.2s">
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:14px;">Recent Predictions</h3>
+  <div class="cg-table-wrap">
+    <table class="cg-table">
+      <thead>
+        <tr>
+          <th>Application ID</th>
+          <th>Date</th>
+          <th>Annual Income</th>
+          <th>Decision</th>
+          <th>Confidence</th>
+          <th style="text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent %}
+          <tr>
+            <td class="cg-mono cg-font-semibold">{{ r.application_id }}</td>
+            <td class="cg-text-sm">{{ r.timestamp[:10] }}</td>
+            <td class="cg-mono">${{ '{:,.0f}'.format(r.income|float) }}</td>
+            <td>
+              <span class="cg-badge {% if r.prediction == 'Approved' %}success{% else %}danger{% endif %}">
+                {{ r.prediction }}
+              </span>
+            </td>
+            <td class="cg-mono">{{ '%.1f'|format(r.probability) }}%</td>
+            <td style="text-align:right;">
+              <a href="{{ url_for('api.get_report', application_id=r.application_id) }}" class="cg-btn cg-btn-ghost cg-btn-sm">
+                View Report
+              </a>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="6" class="cg-text-center cg-text-muted" style="padding:24px;">
+              No evaluation history available.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

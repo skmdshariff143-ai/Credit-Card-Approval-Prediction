@@ -1,334 +1,265 @@
-{% extends 'base.html' %}
-{% block title %}CreditGuard AI | New Credit Evaluation{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Credit Assessment | CreditGuard AI{% endblock %}
+{% block page_id %}page-predict{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 px-md-5">
-    
-    <div class="workspace-page-header mb-4" data-aos="fade-down">
-        <div class="header-breadcrumbs">
-            <a href="{{ url_for('api.admin') }}">Dashboard</a>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="active-crumb">New Credit Evaluation</span>
-        </div>
-        <h1 class="h3 fw-bold m-0 mt-2">New Credit Evaluation</h1>
-        <p class="text-secondary mb-0">Fill out the questionnaire to generate an instant AI-powered risk scoring report.</p>
-    </div>
-
-    <div class="form-wizard-container mx-auto mt-4" style="max-width: 820px;">
-        
-        <!-- Wizard Progress Bar (5 Steps) -->
-        <div class="wizard-progress-track no-print" data-aos="fade-up" data-aos-delay="50">
-            <div class="wizard-progress-bar-fill" id="wizardProgressFill" style="width: 20%;"></div>
-            
-            <div class="wizard-step-node active" data-step="1">
-                <div class="step-node-circle">1</div>
-                <div class="step-node-label">Personal</div>
-            </div>
-            <div class="wizard-step-node" data-step="2">
-                <div class="step-node-circle">2</div>
-                <div class="step-node-label">Employment</div>
-            </div>
-            <div class="wizard-step-node" data-step="3">
-                <div class="step-node-circle">3</div>
-                <div class="step-node-label">Financials</div>
-            </div>
-            <div class="wizard-step-node" data-step="4">
-                <div class="step-node-circle">4</div>
-                <div class="step-node-label">Review</div>
-            </div>
-            <div class="wizard-step-node" data-step="5">
-                <div class="step-node-circle">5</div>
-                <div class="step-node-label">Predict</div>
-            </div>
-        </div>
-
-        <!-- Form Panels -->
-        <form method="POST" action="{{ url_for('api.predict_post') }}" id="wizardForm" data-aos="fade-up" data-aos-delay="100">
-            {{ form.hidden_tag() }}
-
-            <!-- STEP 1: Personal Information -->
-            <div class="wizard-panel active" data-step="1">
-                <div class="card-premium">
-                    <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center">
-                        <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-circle-user text-primary me-2"></i> Step 1: Personal Information</h3>
-                        <span class="badge-premium primary">Step 1 of 5</span>
-                    </div>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="code_gender">Gender</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-venus-mars form-icon-left"></i>
-                                    {{ form.code_gender(class="form-control-premium", id="code_gender") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="age_years">Applicant Age (Years)</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-calendar-days form-icon-left"></i>
-                                    {{ form.age_years(class="form-control-premium", id="age_years", placeholder="e.g. 35") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="name_family_status">Marital Status</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-heart form-icon-left"></i>
-                                    {{ form.name_family_status(class="form-control-premium", id="name_family_status") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="cnt_children">Number of Children</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-child form-icon-left"></i>
-                                    {{ form.cnt_children(class="form-control-premium", id="cnt_children") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="cnt_fam_members">Total Family Members</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-people-group form-icon-left"></i>
-                                    {{ form.cnt_fam_members(class="form-control-premium", id="cnt_fam_members") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="name_education_type">Education Level</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-graduation-cap form-icon-left"></i>
-                                    {{ form.name_education_type(class="form-control-premium", id="name_education_type") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="name_housing_type">Housing Arrangement</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-house form-icon-left"></i>
-                                    {{ form.name_housing_type(class="form-control-premium", id="name_housing_type") }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 2: Employment Information -->
-            <div class="wizard-panel" data-step="2">
-                <div class="card-premium">
-                    <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center">
-                        <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-briefcase text-accent me-2"></i> Step 2: Employment Information</h3>
-                        <span class="badge-premium primary">Step 2 of 5</span>
-                    </div>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="name_income_type">Income Source Category</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-wallet form-icon-left"></i>
-                                    {{ form.name_income_type(class="form-control-premium", id="name_income_type") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="occupation_type">Occupation Sector</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-user-tie form-icon-left"></i>
-                                    {{ form.occupation_type(class="form-control-premium", id="occupation_type") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="years_employed">Years Employed</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-business-time form-icon-left"></i>
-                                    {{ form.years_employed(class="form-control-premium", id="years_employed", placeholder="e.g. 4.5") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="flag_unemployed">Employment Status</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-user-slash form-icon-left"></i>
-                                    {{ form.flag_unemployed(class="form-control-premium", id="flag_unemployed") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="flag_own_car">Owns Vehicle</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-car form-icon-left"></i>
-                                    {{ form.flag_own_car(class="form-control-premium", id="flag_own_car") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="flag_own_realty">Owns Real Estate Property</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-building form-icon-left"></i>
-                                    {{ form.flag_own_realty(class="form-control-premium", id="flag_own_realty") }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 3: Financial Information -->
-            <div class="wizard-panel" data-step="3">
-                <div class="card-premium">
-                    <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center">
-                        <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-sack-dollar text-success me-2"></i> Step 3: Financial Information</h3>
-                        <span class="badge-premium primary">Step 3 of 5</span>
-                    </div>
-
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="amt_income_total">Total Gross Annual Income ($)</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-money-bill-wave form-icon-left"></i>
-                                    {{ form.amt_income_total(class="form-control-premium", id="amt_income_total", placeholder="e.g. 75000") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="existing_debt">Existing Monthly Debt Payments ($)</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-credit-card form-icon-left"></i>
-                                    {{ form.existing_debt(class="form-control-premium", id="existing_debt", placeholder="e.g. 450") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="loan_amount">Requested Credit Limit ($)</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-hand-holding-dollar form-icon-left"></i>
-                                    {{ form.loan_amount(class="form-control-premium", id="loan_amount", placeholder="e.g. 5000") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="credit_history">Bureau Credit History</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-star form-icon-left"></i>
-                                    {{ form.credit_history(class="form-control-premium", id="credit_history") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="flag_phone">Registered Mobile Number</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-mobile-screen form-icon-left"></i>
-                                    {{ form.flag_phone(class="form-control-premium", id="flag_phone") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="flag_work_phone">Work Telephone Number</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-phone-office form-icon-left"></i>
-                                    {{ form.flag_work_phone(class="form-control-premium", id="flag_work_phone") }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fs-7 text-secondary fw-semibold mb-2" for="flag_email">Email Consent Notification</label>
-                                <div class="form-floating-premium">
-                                    <i class="fa-solid fa-envelope form-icon-left"></i>
-                                    {{ form.flag_email(class="form-control-premium", id="flag_email") }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- STEP 4: Review -->
-            <div class="wizard-panel" data-step="4">
-                <div class="card-premium">
-                    <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center">
-                        <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-clipboard-check text-warning me-2"></i> Step 4: Verification Review</h3>
-                        <span class="badge-premium primary">Step 4 of 5</span>
-                    </div>
-
-                    <div class="toast-glass info mb-4">
-                        <i class="fa-solid fa-circle-info toast-glass-icon"></i>
-                        <div class="fs-7 flex-fill text-secondary">Verify all demographic and financial parameters before initiating the predictive scoring run.</div>
-                    </div>
-
-                    <!-- Review summary target -->
-                    <div class="row g-3" id="reviewSummary"></div>
-                </div>
-            </div>
-
-            <!-- STEP 5: Predict -->
-            <div class="wizard-panel" data-step="5">
-                <div class="card-premium text-center py-5">
-                    <div style="width: 72px; height: 72px; border-radius: var(--radius-sm); background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(0, 229, 255, 0.05)); display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--primary); margin: 0 auto 24px;">
-                        <i class="fa-solid fa-microchip animate-float"></i>
-                    </div>
-                    <h2 class="h4 fw-bold mb-2">Scoring Pipeline Ready</h2>
-                    <p class="text-secondary fs-7 max-w-500 mx-auto mb-4">Click "Run AI Assessment" below to initiate inference on preloaded classification engines.</p>
-                    
-                    <div class="d-flex justify-content-center">
-                        <span class="badge-premium primary"><i class="fa-solid fa-circle-nodes me-2"></i> XGBoost Classification Model</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Wizard Navigation Row -->
-            <div class="no-print d-flex justify-content-between pt-4 mt-4 border-top border-light-subtle">
-                <button type="button" class="btn-premium btn-secondary" id="wizardBack" style="visibility: hidden;">
-                    <i class="fa-solid fa-arrow-left"></i> Back
-                </button>
-                <button type="button" class="btn-premium btn-primary" id="wizardNext">
-                    Next <i class="fa-solid fa-arrow-right"></i>
-                </button>
-                <button type="submit" class="btn-premium btn-primary" id="wizardSubmit" style="display: none; background: linear-gradient(135deg, var(--success), #00A343); box-shadow: 0 4px 16px rgba(0, 200, 83, 0.25);">
-                    <i class="fa-solid fa-paper-plane"></i> Run AI Assessment
-                </button>
-            </div>
-
-        </form>
-    </div>
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <span class="current">New Assessment</span>
+  </div>
+  <h1 class="cg-page-title">Credit Assessment</h1>
+  <p class="cg-page-desc">Complete the form to evaluate the credit card application.</p>
 </div>
+
+<!-- Wizard stepper -->
+<div class="cg-wizard-track" data-reveal="0s">
+  <div class="cg-step-item">
+    <div class="cg-step-node active" id="stepNode1">
+      <div class="cg-step-circle">1</div>
+      <span class="cg-step-label">Personal</span>
+    </div>
+    <div class="cg-step-line" id="stepLine1"></div>
+  </div>
+  <div class="cg-step-item">
+    <div class="cg-step-node" id="stepNode2">
+      <div class="cg-step-circle">2</div>
+      <span class="cg-step-label">Employment</span>
+    </div>
+    <div class="cg-step-line" id="stepLine2"></div>
+  </div>
+  <div class="cg-step-item">
+    <div class="cg-step-node" id="stepNode3">
+      <div class="cg-step-circle">3</div>
+      <span class="cg-step-label">Financial</span>
+    </div>
+    <div class="cg-step-line" id="stepLine3"></div>
+  </div>
+  <div class="cg-step-item">
+    <div class="cg-step-node" id="stepNode4">
+      <div class="cg-step-circle">4</div>
+      <span class="cg-step-label">Review</span>
+    </div>
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('api.predict_post') }}" class="cg-max-w-lg" style="margin:0 auto;" id="wizardForm">
+  {{ form.hidden_tag() }}
+
+  <!-- Step 1: Personal -->
+  <div class="cg-wizard-panel active" id="panel1">
+    <div class="cg-card">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
+        <i class="fa-solid fa-user" style="color:var(--primary);margin-right:8px;"></i> Personal Details
+      </h3>
+      <div class="cg-grid cg-grid-2">
+        <div class="cg-input-group">
+          {{ form.code_gender.label }}
+          {{ form.code_gender(class='cg-select', id='code_gender', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.age_years.label }}
+          {{ form.age_years(class='cg-input', id='age_years', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.name_family_status.label }}
+          {{ form.name_family_status(class='cg-select', id='name_family_status', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.cnt_children.label }}
+          {{ form.cnt_children(class='cg-input', id='cnt_children', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.cnt_fam_members.label }}
+          {{ form.cnt_fam_members(class='cg-input', id='cnt_fam_members', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.name_education_type.label }}
+          {{ form.name_education_type(class='cg-select', id='name_education_type', required=True) }}
+        </div>
+        <div class="cg-input-group" style="grid-column: span 2;">
+          {{ form.name_housing_type.label }}
+          {{ form.name_housing_type(class='cg-select', id='name_housing_type', required=True) }}
+        </div>
+      </div>
+
+      <div class="cg-flex-between cg-mt-lg">
+        <div></div>
+        <button type="button" class="cg-btn cg-btn-primary" data-wizard-next id="btnNext1">
+          Next Step <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Employment -->
+  <div class="cg-wizard-panel" id="panel2">
+    <div class="cg-card">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
+        <i class="fa-solid fa-briefcase" style="color:var(--primary);margin-right:8px;"></i> Employment Profile
+      </h3>
+      <div class="cg-grid cg-grid-2">
+        <div class="cg-input-group">
+          {{ form.name_income_type.label }}
+          {{ form.name_income_type(class='cg-select', id='name_income_type', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.occupation_type.label }}
+          {{ form.occupation_type(class='cg-select', id='occupation_type') }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.employment_type.label }}
+          {{ form.employment_type(class='cg-select', id='employment_type', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.years_employed.label }}
+          {{ form.years_employed(class='cg-input', id='years_employed', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.income_source.label }}
+          {{ form.income_source(class='cg-select', id='income_source', required=True) }}
+        </div>
+        <div class="cg-input-group" style="display:flex;align-items:flex-end;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:14px;user-select:none;">
+            {{ form.flag_unemployed(id='flag_unemployed') }}
+            <span>Is Unemployed / Retired</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="cg-flex-between cg-mt-lg">
+        <button type="button" class="cg-btn cg-btn-secondary" data-wizard-prev id="btnPrev2">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <button type="button" class="cg-btn cg-btn-primary" data-wizard-next id="btnNext2">
+          Next Step <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Financial -->
+  <div class="cg-wizard-panel" id="panel3">
+    <div class="cg-card">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">
+        <i class="fa-solid fa-wallet" style="color:var(--primary);margin-right:8px;"></i> Financial Indicators
+      </h3>
+      <div class="cg-grid cg-grid-2">
+        <div class="cg-input-group">
+          {{ form.amt_income_total.label }}
+          {{ form.amt_income_total(class='cg-input', id='amt_income_total', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.existing_debt.label }}
+          {{ form.existing_debt(class='cg-input', id='existing_debt', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.loan_amount.label }}
+          {{ form.loan_amount(class='cg-input', id='loan_amount', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.credit_history.label }}
+          {{ form.credit_history(class='cg-select', id='credit_history', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.flag_own_car.label }}
+          {{ form.flag_own_car(class='cg-select', id='flag_own_car', required=True) }}
+        </div>
+        <div class="cg-input-group">
+          {{ form.flag_own_realty.label }}
+          {{ form.flag_own_realty(class='cg-select', id='flag_own_realty', required=True) }}
+        </div>
+
+        <div class="cg-input-group" style="grid-column: span 2;margin-bottom:0;">
+          <label style="font-size:12.5px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;display:block;">Verification Checks</label>
+          <div class="cg-flex" style="gap:24px;flex-wrap:wrap;">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
+              {{ form.flag_work_phone(id='flag_work_phone') }}
+              <span class="cg-text-sm">Work Phone</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
+              {{ form.flag_phone(id='flag_phone') }}
+              <span class="cg-text-sm">Landline Phone</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
+              {{ form.flag_email(id='flag_email') }}
+              <span class="cg-text-sm">Email Address</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="cg-flex-between cg-mt-lg">
+        <button type="button" class="cg-btn cg-btn-secondary" data-wizard-prev id="btnPrev3">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        <button type="button" class="cg-btn cg-btn-primary" data-wizard-next id="btnNext3">
+          Next Step <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 4: Review -->
+  <div class="cg-wizard-panel" id="panel4">
+    <div class="cg-card">
+      <h3 style="font-size:16px;font-weight:700;margin-bottom:14px;">
+        <i class="fa-solid fa-clipboard-check" style="color:var(--primary);margin-right:8px;"></i> Review & Submit
+      </h3>
+      <p class="cg-text-sm cg-text-muted" style="margin-bottom:20px;">
+        Review your details below. Once verified, submit for ML credit scoring.
+      </p>
+
+      <div id="reviewSummary" style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-md);padding:18px;margin-bottom:24px;">
+        <!-- Filled dynamically by script -->
+      </div>
+
+      <div class="cg-flex-between">
+        <button type="button" class="cg-btn cg-btn-secondary" data-wizard-prev id="btnPrev4">
+          <i class="fa-solid fa-arrow-left"></i> Back
+        </button>
+        {{ form.submit(class='cg-btn cg-btn-primary cg-btn-lg', id='btnSubmitForm') }}
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Simple summary populator
+  document.getElementById('btnNext3')?.addEventListener('click', () => {
+    const sumEl = document.getElementById('reviewSummary');
+    if (!sumEl) return;
+
+    const fields = [
+      { id: 'code_gender', label: 'Gender' },
+      { id: 'age_years', label: 'Age (Years)' },
+      { id: 'name_family_status', label: 'Marital Status' },
+      { id: 'amt_income_total', label: 'Annual Income', format: true },
+      { id: 'years_employed', label: 'Work Experience (Years)' },
+      { id: 'existing_debt', label: 'Outstanding Debt', format: true },
+      { id: 'loan_amount', label: 'Requested Limit', format: true },
+      { id: 'credit_history', label: 'Credit Rating' }
+    ];
+
+    let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 24px;font-size:13px;">';
+    fields.forEach(f => {
+      const el = document.getElementById(f.id);
+      if (el) {
+        let val = el.value;
+        if (f.id === 'code_gender') val = val === 'M' ? 'Male' : 'Female';
+        if (f.format) {
+          const num = parseFloat(val) || 0;
+          val = '$' + num.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+        html += `<div><span style="color:var(--text-muted);">${f.label}:</span> <strong style="color:var(--text-primary);margin-left:4px;">${val}</strong></div>`;
+      }
+    });
+    html += '</div>';
+    sumEl.innerHTML = html;
+  });
+</script>
 {% endblock %}

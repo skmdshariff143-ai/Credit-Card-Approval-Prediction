@@ -1,361 +1,165 @@
-{% extends 'base.html' %}
-{% block title %}CreditGuard AI | Analytics Dashboard{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Analytics Dashboard | CreditGuard AI{% endblock %}
+{% block page_id %}page-admin{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 px-md-5">
-    
-    <div class="workspace-page-header mb-4" data-aos="fade-down">
-        <div class="header-breadcrumbs">
-            <span class="text-muted">Portal</span>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="active-crumb">Dashboard Analytics</span>
-        </div>
-        <h1 class="h3 fw-bold m-0 mt-2">Admin Analytics Dashboard</h1>
-        <p class="text-secondary mb-0">Evaluate decision ratios, model accuracies, and user submission logs in real-time.</p>
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <span class="current">Analytics Dashboard</span>
+  </div>
+  <h1 class="cg-page-title">Admin Analytics Dashboard</h1>
+  <p class="cg-page-desc">Real-time prediction performance and demographics distribution monitoring.</p>
+</div>
+
+<!-- Stats row -->
+<div class="cg-grid cg-grid-4 cg-mb-lg" data-reveal="0s">
+  <div class="cg-stat">
+    <div class="cg-stat-icon primary"><i class="fa-solid fa-chart-bar"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.total }}">0</div>
+    <div class="cg-stat-label">Total Predictions</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon success"><i class="fa-solid fa-circle-check"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.approved }}">0</div>
+    <div class="cg-stat-label">Approved</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon danger"><i class="fa-solid fa-circle-xmark"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.rejected }}">0</div>
+    <div class="cg-stat-label">Rejected</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon accent"><i class="fa-solid fa-gauge-high"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.approval_rate }}" data-suffix="%" data-decimals="2">0%</div>
+    <div class="cg-stat-label">Approval Rate</div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.1s">
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Decision Distribution</h3>
+    <div style="height:260px;position:relative;">
+      <canvas id="decisionChart"></canvas>
     </div>
-
-    <!-- Stat Tiles -->
-    <div class="row g-4 mb-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium stat-card-glow h-100 d-flex flex-column justify-content-between">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fs-7 text-secondary fw-semibold">Total Applications</span>
-                    <div class="stat-icon-wrapper primary"><i class="fa-solid fa-folder-tree"></i></div>
-                </div>
-                <div>
-                    <h3 class="display-6 fw-bold font-mono m-0 mb-1">{{ stats.total }}</h3>
-                    <span class="fs-8 text-muted">Cumulative ledger logs</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium stat-card-glow h-100 d-flex flex-column justify-content-between">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fs-7 text-secondary fw-semibold">Approvals</span>
-                    <div class="stat-icon-wrapper success"><i class="fa-solid fa-circle-check"></i></div>
-                </div>
-                <div>
-                    <h3 class="display-6 fw-bold font-mono text-success m-0 mb-1">{{ stats.approved }}</h3>
-                    <span class="fs-8 text-muted">Cleared applicant files</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium stat-card-glow h-100 d-flex flex-column justify-content-between">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fs-7 text-secondary fw-semibold">Rejections</span>
-                    <div class="stat-icon-wrapper danger"><i class="fa-solid fa-circle-xmark"></i></div>
-                </div>
-                <div>
-                    <h3 class="display-6 fw-bold font-mono text-danger m-0 mb-1">{{ stats.rejected }}</h3>
-                    <span class="fs-8 text-muted">Flagged high-risk files</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 col-sm-6">
-            <div class="card-premium stat-card-glow h-100 d-flex flex-column justify-content-between">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <span class="fs-7 text-secondary fw-semibold">Accuracy Rating</span>
-                    <div class="stat-icon-wrapper accent"><i class="fa-solid fa-award"></i></div>
-                </div>
-                <div>
-                    <h3 class="display-6 fw-bold font-mono text-accent m-0 mb-1">98.7%</h3>
-                    <span class="fs-8 text-muted">Active Logistic Regression</span>
-                </div>
-            </div>
-        </div>
+  </div>
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Income Distribution</h3>
+    <div style="height:260px;position:relative;">
+      <canvas id="incomeChart"></canvas>
     </div>
+  </div>
+</div>
 
-    <!-- Chart Blocks -->
-    <div class="row g-4 mb-4">
-        <!-- Decision Doughnut -->
-        <div class="col-lg-6" data-aos="fade-right" data-aos-delay="150">
-            <div class="card-premium">
-                <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center bg-transparent">
-                    <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Decision Distributions</h4>
-                    <span class="badge-premium primary">Doughnut</span>
-                </div>
-                <div style="max-height: 260px; display: flex; justify-content: center;">
-                    <canvas id="decisionDoughnutChart" style="max-width: 260px;"></canvas>
-                </div>
-            </div>
-        </div>
+<!-- Prediction trends -->
+<div class="cg-card cg-mb-lg" data-reveal="0.2s">
+  <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">Prediction Trends Over Time</h3>
+  <div style="height:240px;position:relative;">
+    <canvas id="trendsChart"></canvas>
+  </div>
+</div>
 
-        <!-- Income Profile -->
-        <div class="col-lg-6" data-aos="fade-left" data-aos-delay="150">
-            <div class="card-premium">
-                <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center bg-transparent">
-                    <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-chart-bar text-accent me-2"></i> Income Range Profiles</h4>
-                    <span class="badge-premium primary">Frequency</span>
-                </div>
-                <div style="max-height: 260px;">
-                    <canvas id="incomeBarChart" style="max-height: 260px;"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Decision Timeline Curve -->
-    <div class="card-premium mb-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center bg-transparent">
-            <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-chart-line text-primary me-2"></i> Decision Throughput Trend</h4>
-            <div class="d-flex gap-2">
-                <button class="btn-premium btn-secondary py-1 px-3 fs-8 active" id="daySelectBtn">Daily</button>
-                <button class="btn-premium btn-secondary py-1 px-3 fs-8" id="monthSelectBtn">Monthly</button>
-            </div>
-        </div>
-        <div style="max-height: 280px;">
-            <canvas id="timelineTrendChart" style="max-height: 280px;"></canvas>
-        </div>
-    </div>
-
-    <!-- Recent Predictions & Activity Splits -->
-    <div class="row g-4">
-        <!-- Recent Predictions Table -->
-        <div class="col-lg-8" data-aos="fade-right" data-aos-delay="250">
-            <div class="data-table-wrapper">
-                <div class="table-header-toolbar">
-                    <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-clock-history text-secondary me-2"></i> Recent Evaluations</h4>
-                    <a href="{{ url_for('api.history') }}" class="btn-premium btn-secondary py-2 px-3 fs-7">View All Logs</a>
-                </div>
-
-                <div style="overflow-x: auto;">
-                    <table class="table-custom-premium">
-                        <thead>
-                            <tr>
-                                <th>App ID</th>
-                                <th>Date</th>
-                                <th>Income</th>
-                                <th>Decision</th>
-                                <th>Risk Profile</th>
-                                <th>Confidence</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if recent %}
-                                {% for record in recent %}
-                                    <tr>
-                                        <td style="font-family:var(--font-mono); font-weight:600; color:var(--primary);">{{ record.application_id }}</td>
-                                        <td style="font-size:13px; color:var(--text-secondary);">{{ record.timestamp }}</td>
-                                        <td style="font-family:var(--font-mono);">${{ "{:,.0f}".format(record.income) }}</td>
-                                        <td>
-                                            {% if record.prediction == 'Approved' %}
-                                                <span class="badge-premium success"><i class="fa-solid fa-circle-check"></i> Approved</span>
-                                            {% else %}
-                                                <span class="badge-premium danger"><i class="fa-solid fa-circle-xmark"></i> Rejected</span>
-                                            {% endif %}
-                                        </td>
-                                        <td>
-                                            {% if record.risk_level == 'Low' %}
-                                                <span class="badge-premium success">Low</span>
-                                            {% elif record.risk_level == 'Medium-Low' %}
-                                                <span class="badge-premium primary">Med-Low</span>
-                                            {% elif record.risk_level == 'Medium-High' %}
-                                                <span class="badge-premium warning">Med-High</span>
-                                            {% else %}
-                                                <span class="badge-premium danger">High</span>
-                                            {% endif %}
-                                        </td>
-                                        <td style="font-family:var(--font-mono); font-weight:600;">{{ record.probability | round(1) }}%</td>
-                                    </tr>
-                                {% endfor %}
-                            {% else %}
-                                <tr>
-                                    <td colspan="6" class="text-center py-4 text-muted fs-7">No logged transactions found.</td>
-                                </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Activity Timeline -->
-        <div class="col-lg-4" data-aos="fade-left" data-aos-delay="250">
-            <div class="card-premium h-100">
-                <div class="card-header border-bottom border-light-subtle pb-3 mb-4 bg-transparent">
-                    <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-timeline text-primary me-2"></i> System Activity</h4>
-                </div>
-                
-                <div class="d-flex flex-column gap-4">
-                    <div class="d-flex gap-3">
-                        <div style="width:10px; height:10px; border-radius:50%; background-color:var(--success); margin-top:6px; flex-shrink:0; box-shadow: 0 0 8px var(--success);"></div>
-                        <div>
-                            <h5 class="fw-bold fs-7 mb-1">Classifier Preloaded</h5>
-                            <p class="fs-8 text-secondary mb-1">The warm-load singleton successfully cached best_model.pkl estimators.</p>
-                            <small class="text-muted fs-9">Just now</small>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-3">
-                        <div style="width:10px; height:10px; border-radius:50%; background-color:var(--primary); margin-top:6px; flex-shrink:0; box-shadow: 0 0 8px var(--primary);"></div>
-                        <div>
-                            <h5 class="fw-bold fs-7 mb-1">Database Sync Complete</h5>
-                            <p class="fs-8 text-secondary mb-1">Prediction logs synced with SQLite persistent tables.</p>
-                            <small class="text-muted fs-9">12 minutes ago</small>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-3">
-                        <div style="width:10px; height:10px; border-radius:50%; background-color:var(--warning); margin-top:6px; flex-shrink:0; box-shadow: 0 0 8px var(--warning);"></div>
-                        <div>
-                            <h5 class="fw-bold fs-7 mb-1">DTI Overhead Active</h5>
-                            <p class="fs-8 text-secondary mb-1">Verified local DTI boundaries capping prediction weights.</p>
-                            <small class="text-muted fs-9">2 hours ago</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+<!-- Recent assessments -->
+<div class="cg-mb-lg" data-reveal="0.3s">
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:14px;">Recent Predictions</h3>
+  <div class="cg-table-wrap">
+    <table class="cg-table">
+      <thead>
+        <tr>
+          <th>Application ID</th>
+          <th>Timestamp</th>
+          <th>Gender</th>
+          <th>Annual Income</th>
+          <th>Decision</th>
+          <th>Confidence</th>
+          <th>Risk Level</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in recent %}
+          <tr>
+            <td class="cg-mono cg-font-semibold">{{ r.application_id }}</td>
+            <td class="cg-text-sm">{{ r.timestamp[:10] }}</td>
+            <td>{{ r.gender }}</td>
+            <td class="cg-mono">${{ '{:,.0f}'.format(r.income|float) }}</td>
+            <td>
+              <span class="cg-badge {% if r.prediction == 'Approved' %}success{% else %}danger{% endif %}">
+                {{ r.prediction }}
+              </span>
+            </td>
+            <td class="cg-mono">{{ '%.1f'|format(r.probability) }}%</td>
+            <td>
+              <span class="cg-badge {% if r.risk_level == 'Low' %}success{% elif r.risk_level == 'High' %}danger{% else %}warning{% endif %}">
+                {{ r.risk_level }}
+              </span>
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="cg-text-center cg-text-muted" style="padding:24px;">No records available.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Configure Chart.js styling variables
-    const textThemeColor = '#8A96B1';
-    const gridThemeColor = 'rgba(255, 255, 255, 0.03)';
-    
-    Chart.defaults.color = textThemeColor;
-    Chart.defaults.borderColor = gridThemeColor;
-    Chart.defaults.font.family = 'Plus Jakarta Sans';
-
-    // 1. Doughnut Chart
-    const doughnutCtx = document.getElementById('decisionDoughnutChart');
-    if (doughnutCtx) {
-        new Chart(doughnutCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Approved', 'Rejected'],
-                datasets: [{
-                    data: [{{ stats.approved }}, {{ stats.rejected }}],
-                    backgroundColor: ['#00C853', '#FF5252'],
-                    borderWidth: 0,
-                    hoverOffset: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { boxWidth: 10, padding: 14 }
-                    }
-                },
-                cutout: '74%'
-            }
-        });
-    }
-
-    // 2. Bar Chart
-    const barCtx = document.getElementById('incomeBarChart');
-    if (barCtx) {
-        new Chart(barCtx, {
-            type: 'bar',
-            data: {
-                labels: ['< $30k', '$30k-60k', '$60k-90k', '$90k-120k', '$120k+'],
-                datasets: [{
-                    label: 'Applicants',
-                    data: [
-                        Math.round({{ stats.total }} * 0.16),
-                        Math.round({{ stats.total }} * 0.44),
-                        Math.round({{ stats.total }} * 0.24),
-                        Math.round({{ stats.total }} * 0.11),
-                        Math.round({{ stats.total }} * 0.05)
-                    ],
-                    backgroundColor: '#00E5FF',
-                    borderRadius: 5,
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.02)' } },
-                    x: { grid: { display: false } }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-
-    // 3. Line Chart
-    const lineCtx = document.getElementById('timelineTrendChart');
-    if (lineCtx) {
-        const dailyLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const dailyData = [
-            Math.round({{ stats.total }} * 0.10),
-            Math.round({{ stats.total }} * 0.15),
-            Math.round({{ stats.total }} * 0.22),
-            Math.round({{ stats.total }} * 0.18),
-            Math.round({{ stats.total }} * 0.20),
-            Math.round({{ stats.total }} * 0.11),
-            Math.round({{ stats.total }} * 0.04)
-        ];
-
-        const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-        const monthlyData = [
-            Math.round({{ stats.total }} * 0.05),
-            Math.round({{ stats.total }} * 0.12),
-            Math.round({{ stats.total }} * 0.16),
-            Math.round({{ stats.total }} * 0.14),
-            Math.round({{ stats.total }} * 0.20),
-            Math.round({{ stats.total }} * 0.15),
-            Math.round({{ stats.total }} * 0.18)
-        ];
-
-        const lineChartInstance = new Chart(lineCtx, {
-            type: 'line',
-            data: {
-                labels: dailyLabels,
-                datasets: [{
-                    label: 'Predictions Count',
-                    data: dailyData,
-                    borderColor: '#6C63FF',
-                    backgroundColor: 'rgba(108, 99, 255, 0.05)',
-                    fill: true,
-                    tension: 0.35,
-                    borderWidth: 2,
-                    pointBackgroundColor: '#00E5FF',
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.02)' } },
-                    x: { grid: { display: false } }
-                },
-                plugins: { legend: { display: false } }
-            }
+  document.addEventListener('DOMContentLoaded', () => {
+    fetch("{{ url_for('api.api_admin_stats') }}")
+      .then(res => res.json())
+      .then(data => {
+        // 1. Decision Chart (Doughnut)
+        new Chart(document.getElementById('decisionChart'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Approved', 'Rejected'],
+            datasets: [{
+              data: [{{ stats.approved }}, {{ stats.rejected }}],
+              backgroundColor: ['#22c55e', '#ef4444'],
+              borderWidth: 0,
+              borderRadius: 6
+            }]
+          },
+          options: CG.Charts.doughnutOpts
         });
 
-        // Day/Month Toggle Button Controller
-        const dayBtn = document.getElementById('daySelectBtn');
-        const monthBtn = document.getElementById('monthSelectBtn');
+        // 2. Income Chart (Bar)
+        new Chart(document.getElementById('incomeChart'), {
+          type: 'bar',
+          data: {
+            labels: data.income_labels,
+            datasets: [{
+              data: data.income_data,
+              backgroundColor: '#6366f1',
+              borderRadius: 4
+            }]
+          },
+          options: CG.Charts.baseOpts
+        });
 
-        if (dayBtn && monthBtn) {
-            dayBtn.addEventListener('click', () => {
-                dayBtn.classList.add('active');
-                monthBtn.classList.remove('active');
-                lineChartInstance.data.labels = dailyLabels;
-                lineChartInstance.data.datasets[0].data = dailyData;
-                lineChartInstance.update();
-            });
-
-            monthBtn.addEventListener('click', () => {
-                monthBtn.classList.add('active');
-                dayBtn.classList.remove('active');
-                lineChartInstance.data.labels = monthlyLabels;
-                lineChartInstance.data.datasets[0].data = monthlyData;
-                lineChartInstance.update();
-            });
-        }
-    }
-});
+        // 3. Trends Chart (Line)
+        new Chart(document.getElementById('trendsChart'), {
+          type: 'line',
+          data: {
+            labels: data.trend_labels,
+            datasets: [{
+              data: data.trend_data,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99, 102, 241, 0.05)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2
+            }]
+          },
+          options: CG.Charts.baseOpts
+        });
+      });
+  });
 </script>
 {% endblock %}

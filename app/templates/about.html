@@ -1,128 +1,135 @@
-{% extends 'base.html' %}
-{% block title %}CreditGuard AI | System Performance & Architecture{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Model Insights | CreditGuard AI{% endblock %}
+{% block page_id %}page-about{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 px-md-5">
-    
-    <div class="workspace-page-header mb-4" data-aos="fade-down">
-        <div class="header-breadcrumbs">
-            <a href="{{ url_for('api.admin') }}">Dashboard</a>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="active-crumb">System Metrics</span>
-        </div>
-        <h1 class="h3 fw-bold m-0 mt-2">Metrics & Architecture</h1>
-        <p class="text-secondary mb-0">Validation parameters, classifier comparisons, and MLOps training setups.</p>
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <span class="current">Model Insights</span>
+  </div>
+  <h1 class="cg-page-title">Model Insights</h1>
+  <p class="cg-page-desc">Demystifying the machine learning pipeline and core evaluation metrics.</p>
+</div>
+
+<!-- Best model alert -->
+<div class="cg-card cg-mb-lg" data-reveal="0s" style="display:flex;align-items:center;gap:20px;background:var(--success-muted);border-color:rgba(34,197,94,0.15);">
+  <div class="cg-stat-icon success" style="margin-bottom:0;flex-shrink:0;"><i class="fa-solid fa-trophy"></i></div>
+  <div>
+    <h3 style="font-size:12px;text-transform:uppercase;letter-spacing:0.8px;color:var(--success);">Best Performing Model</h3>
+    <p style="font-size:18px;font-weight:800;color:var(--text-primary);">{{ best_model_name }}</p>
+  </div>
+</div>
+
+<!-- Pipeline Node list -->
+<div class="cg-card cg-mb-lg" data-reveal="0.1s">
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:20px;">Machine Learning Pipeline</h3>
+  <div class="cg-pipeline">
+    <div class="cg-pipeline-node">
+      <div class="cg-pipeline-icon"><i class="fa-solid fa-database"></i></div>
+      <div class="cg-text-sm cg-font-semibold">Ingestion</div>
+      <div class="cg-text-xs cg-text-muted cg-mt-xs">Demographics & Credit records</div>
     </div>
-
-    <!-- Overview Card -->
-    <div class="card-premium mb-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
-            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-bullseye text-danger me-2"></i> Problem Statement</h3>
-        </div>
-        <p class="fs-6 text-secondary mb-0" style="line-height: 1.8;">
-            Commercial banks process millions of credit card applications daily. Standard rules engines often fail to capture 
-            complex categorical feature interactions, leading to high default rates, lost revenue from rejecting creditworthy 
-            applicants, and black-box decisions violating regulatory requirements. CreditGuard AI solves this by combining 
-            machine learning pipelines with explainable scoring overlays and persistent ledgers.
-        </p>
+    <div class="cg-pipeline-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+    <div class="cg-pipeline-node">
+      <div class="cg-pipeline-icon"><i class="fa-solid fa-broom"></i></div>
+      <div class="cg-text-sm cg-font-semibold">Preprocessing</div>
+      <div class="cg-text-xs cg-text-muted cg-mt-xs">Ordinal encoding & Scaling</div>
     </div>
-
-    <!-- Comparative Table -->
-    <div class="card-premium mb-4" data-aos="fade-up" data-aos-delay="150">
-        <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center bg-transparent">
-            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-ranking-star text-warning me-2"></i> Model Performance Comparison</h3>
-            <span class="badge-premium primary">Active: {{ best_model_name }}</span>
-        </div>
-
-        {% if model_metrics %}
-        <div style="overflow-x: auto;">
-            <table class="table-custom-premium">
-                <thead>
-                    <tr>
-                        <th>Classifier</th>
-                        <th>Accuracy</th>
-                        <th>Precision</th>
-                        <th>Recall</th>
-                        <th>F1-Score</th>
-                        <th>ROC-AUC</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for m in model_metrics %}
-                    <tr>
-                        <td class="fw-semibold">
-                            {% if m.Model == best_model_name %}
-                                <span class="badge-premium success me-2"><i class="fa-solid fa-circle-check"></i> Active</span>
-                            {% endif %}
-                            {{ m.Model }}
-                        </td>
-                        <td class="font-mono">{{ "%.3f" | format(m.Accuracy) }}</td>
-                        <td class="font-mono">{{ "%.3f" | format(m.Precision) }}</td>
-                        <td class="font-mono">{{ "%.3f" | format(m.Recall) }}</td>
-                        <td class="font-mono">{{ "%.3f" | format(m['F1-Score']) }}</td>
-                        <td class="font-mono">{{ "%.3f" | format(m['ROC-AUC']) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <p class="text-muted p-3 mb-0 fs-7">Model metrics comparison data unavailable. Execute training to sync metrics.</p>
-        {% endif %}
+    <div class="cg-pipeline-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+    <div class="cg-pipeline-node">
+      <div class="cg-pipeline-icon"><i class="fa-solid fa-gears"></i></div>
+      <div class="cg-text-sm cg-font-semibold">Balancing</div>
+      <div class="cg-text-xs cg-text-muted cg-mt-xs">SMOTE class balancing</div>
     </div>
-
-    <!-- Training Pipeline -->
-    <div class="card-premium mb-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
-            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-diagram-project text-accent me-2"></i> Training Pipeline Overview</h3>
-        </div>
-        
-        <div class="pipeline-flow-container mt-4">
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-database"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">Data Loading</h5>
-                <p class="fs-8 text-secondary mb-0">Imports client credit logs and performs verification checks.</p>
-            </div>
-            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-broom"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">Preprocessing</h5>
-                <p class="fs-8 text-secondary mb-0">Imputes outliers, caps IQR bounds, and one-hot encodes labels.</p>
-            </div>
-            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-scale-unbalanced"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">SMOTE Balancing</h5>
-                <p class="fs-8 text-secondary mb-0">Upsamples minority delinquency files to prevent selection biases.</p>
-            </div>
-            <div class="pipeline-connector"><i class="fa-solid fa-chevron-right"></i></div>
-            <div class="pipeline-node flex-fill">
-                <div class="node-icon"><i class="fa-solid fa-award"></i></div>
-                <h5 class="fw-bold fs-7 mb-1">Grid Optimization</h5>
-                <p class="fs-8 text-secondary mb-0">Selects active estimator optimizing test recall parameters.</p>
-            </div>
-        </div>
+    <div class="cg-pipeline-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+    <div class="cg-pipeline-node">
+      <div class="cg-pipeline-icon"><i class="fa-solid fa-brain"></i></div>
+      <div class="cg-text-sm cg-font-semibold">Training</div>
+      <div class="cg-text-xs cg-text-muted cg-mt-xs">Hyperparameter Grid Search</div>
     </div>
-
-    <!-- Tech Badges -->
-    <div class="card-premium" data-aos="fade-up" data-aos-delay="250">
-        <div class="card-header border-bottom border-light-subtle pb-2 mb-3 bg-transparent">
-            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-microchip text-primary me-2"></i> Technology Stack</h3>
-        </div>
-
-        <div class="tech-stack-flex mt-4">
-            <div class="tech-stack-chip"><i class="fab fa-python text-primary"></i> Python 3.12</div>
-            <div class="tech-stack-chip"><i class="fas fa-server text-accent"></i> Flask 3.0</div>
-            <div class="tech-stack-chip"><i class="fas fa-gears text-success"></i> Scikit-Learn</div>
-            <div class="tech-stack-chip"><i class="fas fa-bolt text-warning"></i> XGBoost</div>
-            <div class="tech-stack-chip"><i class="fas fa-database text-danger"></i> SQLite 3</div>
-            <div class="tech-stack-chip"><i class="fas fa-chart-pie text-secondary"></i> Chart.js</div>
-            <div class="tech-stack-chip"><i class="fas fa-lock text-primary"></i> Flask-Login</div>
-            <div class="tech-stack-chip"><i class="fab fa-docker text-accent"></i> Docker</div>
-            <div class="tech-stack-chip"><i class="fab fa-github"></i> GitHub Actions</div>
-            <div class="tech-stack-chip"><i class="fas fa-vial text-success"></i> Pytest</div>
-        </div>
+    <div class="cg-pipeline-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+    <div class="cg-pipeline-node">
+      <div class="cg-pipeline-icon"><i class="fa-solid fa-bullseye"></i></div>
+      <div class="cg-text-sm cg-font-semibold">Inference</div>
+      <div class="cg-text-xs cg-text-muted cg-mt-xs">Real-time endpoint score</div>
     </div>
+  </div>
+</div>
 
+<!-- Comparison Table -->
+<div class="cg-mb-lg" data-reveal="0.2s">
+  <h3 style="font-size:16px;font-weight:700;margin-bottom:16px;">Model Comparison Matrix</h3>
+  {% if model_metrics %}
+    <div class="cg-table-wrap">
+      <table class="cg-table">
+        <thead>
+          <tr>
+            <th>Model Classifier</th>
+            <th>Accuracy</th>
+            <th>Precision</th>
+            <th>Recall</th>
+            <th>F1-Score</th>
+            <th>ROC AUC</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for metric in model_metrics %}
+            <tr>
+              <td class="cg-font-semibold">
+                {{ metric.Model }}
+                {% if metric.Model == best_model_name %}
+                  <span class="cg-badge success cg-text-xs" style="margin-left:6px;padding:2px 6px;">Active</span>
+                {% endif %}
+              </td>
+              <td class="cg-mono cg-text-primary">
+                {% if metric.Accuracy < 1.0 %}{{ '%.2f'|format(metric.Accuracy * 100) }}%{% else %}{{ metric.Accuracy }}%{% endif %}
+              </td>
+              <td class="cg-mono cg-text-primary">
+                {% if metric.Precision < 1.0 %}{{ '%.2f'|format(metric.Precision * 100) }}%{% else %}{{ metric.Precision }}%{% endif %}
+              </td>
+              <td class="cg-mono cg-text-primary">
+                {% if metric.Recall < 1.0 %}{{ '%.2f'|format(metric.Recall * 100) }}%{% else %}{{ metric.Recall }}%{% endif %}
+              </td>
+              <td class="cg-mono cg-text-primary">
+                {% if metric['F1-Score'] < 1.0 %}{{ '%.2f'|format(metric['F1-Score'] * 100) }}%{% else %}{{ metric['F1-Score'] }}%{% endif %}
+              </td>
+              <td class="cg-mono cg-text-primary">
+                {% if metric['ROC-AUC'] < 1.0 %}{{ '%.2f'|format(metric['ROC-AUC'] * 100) }}%{% else %}{{ metric['ROC-AUC'] }}%{% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="cg-card cg-text-center" style="padding:40px;">
+      <i class="fa-solid fa-triangle-exclamation" style="font-size:24px;color:var(--text-muted);margin-bottom:12px;"></i>
+      <p style="color:var(--text-secondary);">Model evaluation metrics are not available. Train models to populate comparison matrix.</p>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Details columns -->
+<div class="cg-grid cg-grid-2 cg-gap-md" data-reveal="0.3s">
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">Problem Formulation</h3>
+    <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;">
+      Credit risk assessment is formulated as a supervised binary classification problem. Using applicant demographic features, socioeconomic characteristics, and financial indicators, the pipeline predicts the probability of an applicant exhibiting good or bad credit standing.
+    </p>
+  </div>
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">Pipeline Technology Stack</h3>
+    <div class="cg-tech-grid cg-mt-sm">
+      <span class="cg-tech-tag"><i class="fa-brands fa-python"></i> Python 3.13</span>
+      <span class="cg-tech-tag"><i class="fa-solid fa-code"></i> Flask 3.0</span>
+      <span class="cg-tech-tag"><i class="fa-solid fa-network-wired"></i> scikit-learn</span>
+      <span class="cg-tech-tag"><i class="fa-solid fa-bolt"></i> XGBoost</span>
+      <span class="cg-tech-tag"><i class="fa-solid fa-database"></i> SQLite</span>
+      <span class="cg-tech-tag"><i class="fa-solid fa-chart-line"></i> Chart.js</span>
+    </div>
+  </div>
 </div>
 {% endblock %}

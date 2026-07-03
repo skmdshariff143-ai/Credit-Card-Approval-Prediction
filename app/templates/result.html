@@ -1,195 +1,152 @@
-{% extends 'base.html' %}
-{% block title %}CreditGuard AI | Evaluation Result{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Assessment Result | CreditGuard AI{% endblock %}
+{% block page_id %}page-result{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4 px-md-5">
-    
-    <div class="workspace-page-header mb-4" data-aos="fade-down">
-        <div class="header-breadcrumbs">
-            <a href="{{ url_for('api.admin') }}">Dashboard</a>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <a href="{{ url_for('api.predict_get') }}">Evaluation</a>
-            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="active-crumb">Result</span>
-        </div>
-        <h1 class="h3 fw-bold m-0 mt-2">Evaluation Risk Result</h1>
-        <p class="text-secondary mb-0">Local surrogate attribution values and decision outcome logs.</p>
-    </div>
-
-    <!-- Results Split Layout -->
-    <div class="row g-4 align-items-stretch" data-aos="fade-up" data-aos-delay="100">
-        
-        <!-- Left: Status Ring Card -->
-        <div class="col-lg-5">
-            <div class="results-banner-card h-100 {% if result == 'Approved' %}approved{% else %}rejected{% endif %} d-flex flex-column align-items-center justify-content-center">
-                <span class="card-app-id mb-4">{{ application_id }}</span>
-                
-                <!-- Circular SVG Progress -->
-                <div class="circular-gauge-box mb-4">
-                    <svg class="gauge-svg-ring" width="180" height="180">
-                        <circle stroke="rgba(255, 255, 255, 0.05)" stroke-width="12" fill="transparent" r="76" cx="90" cy="90"/>
-                        <circle class="gauge-circle-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" id="gaugeFill" stroke-width="12" fill="transparent" r="76" cx="90" cy="90"
-                                stroke-dasharray="477.52" stroke-dashoffset="477.52"/>
-                    </svg>
-                    <div class="gauge-text-score" id="gaugeValue">0%</div>
-                </div>
-
-                <div class="fs-7 text-secondary mb-4">Inference Decision Score</div>
-
-                <div class="result-status-badge {% if result == 'Approved' %}approved{% else %}rejected{% endif %} mb-4">
-                    {% if result == 'Approved' %}
-                        <i class="fa-solid fa-circle-check"></i> Approved
-                    {% else %}
-                        <i class="fa-solid fa-circle-xmark"></i> Rejected
-                    {% endif %}
-                </div>
-
-                <div class="risk-profile-meta mt-3 fs-7 text-muted">
-                    <span>Risk Profile: <strong class="text-primary-emphasis">{{ risk_level }}</strong></span>
-                    <span class="mx-2">•</span>
-                    <span>Scoring Latency: <strong class="text-primary-emphasis">{{ prediction_time }}ms</strong></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right: AI Explanation & Recommendations -->
-        <div class="col-lg-7">
-            <div class="d-flex flex-column gap-4 h-100">
-                <!-- AI Explanation -->
-                <div class="card-premium flex-fill">
-                    <div class="card-header border-bottom border-light-subtle pb-2 mb-3">
-                        <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-brain text-accent me-2"></i> AI Explanation</h4>
-                    </div>
-                    <p class="fs-6 text-secondary mb-4" style="line-height:1.7;">
-                        {% if result == 'Approved' %}
-                            <strong>delinquency cleared:</strong> Machine learning algorithms validated applicant socio-demographic values. Strong asset counts and balanced annual liabilities classify profile as low-risk issuer guidelines.
-                        {% else %}
-                            <strong>delinquency risk detected:</strong> Predictor estimators registered risk indicators on applicant characteristics. Short employment history or high debt ratios exceed default classification boundaries.
-                        {% endif %}
-                    </p>
-
-                    <h5 class="fs-9 text-muted text-uppercase fw-bold letter-spacing-1 mb-3">Primary Risk Attributions</h5>
-                    <div class="d-flex flex-column gap-2">
-                        {% for reason in reasons %}
-                            <div class="d-flex align-items-start gap-2 fs-7 text-secondary">
-                                <i class="fa-solid {% if result == 'Approved' %}fa-circle-plus text-success{% else %}fa-circle-exclamation text-danger{% endif %} mt-1"></i>
-                                <span>{{ reason }}</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Recommendations -->
-                <div class="card-premium">
-                    <div class="card-header border-bottom border-light-subtle pb-2 mb-3">
-                        <h4 class="h6 fw-bold m-0"><i class="fa-solid fa-list-check text-warning me-2"></i> Officer Recommendations</h4>
-                    </div>
-                    <div class="d-flex flex-column gap-2">
-                        {% for rec in recommendations %}
-                            <div class="d-flex align-items-start gap-2 fs-7 text-secondary">
-                                <i class="fa-solid fa-circle-check text-accent mt-1"></i>
-                                <span>{{ rec }}</span>
-                            </div>
-                        {% endfor %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- LIME Attribution Chart -->
-    <div class="card-premium mt-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="card-header border-bottom border-light-subtle pb-3 mb-4 d-flex justify-content-between align-items-center">
-            <h3 class="h6 fw-bold m-0"><i class="fa-solid fa-chart-column text-primary me-2"></i> Local Surrogate Feature Attributions</h3>
-            <span class="badge-premium primary">Model: {{ model_used }}</span>
-        </div>
-
-        <div class="row g-4">
-            <!-- Supporting factors -->
-            <div class="col-md-6">
-                <div class="card-premium bg-transparent">
-                    <h4 class="h6 fw-bold text-success mb-3"><i class="fa-solid fa-circle-chevron-up"></i> Supporting Elements</h4>
-                    <div class="d-flex flex-column gap-2">
-                        {% if support_factors %}
-                            {% for factor in support_factors %}
-                                <div class="contribution-row-bar positive">
-                                    <span class="fs-7 fw-semibold text-secondary-emphasis">{{ factor.feature }}</span>
-                                    <span class="fs-7 fw-bold font-mono text-success">+{{ factor.impact | round(3) }}</span>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="fs-7 text-muted mb-0">No significant positive feature weights identified.</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Risk factors -->
-            <div class="col-md-6">
-                <div class="card-premium bg-transparent">
-                    <h4 class="h6 fw-bold text-danger mb-3"><i class="fa-solid fa-circle-chevron-down"></i> Risk Flags</h4>
-                    <div class="d-flex flex-column gap-2">
-                        {% if risk_factors %}
-                            {% for factor in risk_factors %}
-                                <div class="contribution-row-bar negative">
-                                    <span class="fs-7 fw-semibold text-secondary-emphasis">{{ factor.feature }}</span>
-                                    <span class="fs-7 fw-bold font-mono text-danger">{{ factor.impact | round(3) }}</span>
-                                </div>
-                            {% endfor %}
-                        {% else %}
-                            <p class="fs-7 text-muted mb-0">No significant negative feature weights identified.</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Actions Control Row -->
-    <div class="no-print d-flex justify-content-center gap-3 pt-4 mt-4 border-top border-light-subtle" data-aos="fade-up" data-aos-delay="250">
-        <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="btn-premium btn-primary btn-lg">
-            <i class="fa-solid fa-file-pdf"></i> Download PDF Report
-        </a>
-        <button onclick="alert('Prediction log successfully saved to database.')" class="btn-premium btn-secondary btn-lg">
-            <i class="fa-solid fa-floppy-disk"></i> Save Result
-        </button>
-        <a href="{{ url_for('api.predict_get') }}" class="btn-premium btn-secondary btn-lg">
-            <i class="fa-solid fa-rotate"></i> New Prediction
-        </a>
-    </div>
-
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <a href="{{ url_for('api.predict_get') }}">New Assessment</a>
+    <span class="sep">›</span>
+    <span class="current">Result</span>
+  </div>
+  <h1 class="cg-page-title">Assessment Result</h1>
+  <p class="cg-page-desc">AI-powered decision score and risk breakdown.</p>
 </div>
-{% endblock %}
 
-{% block scripts %}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const scoreVal = parseFloat("{{ probability }}");
-    const fillRing = document.getElementById('gaugeFill');
-    const valueText = document.getElementById('gaugeValue');
+<!-- Main score banner card -->
+<div class="cg-card cg-text-center cg-mb-lg" data-reveal="0s" style="padding:40px 24px;">
+  <p class="cg-app-id" style="margin-bottom:12px;">Application: {{ application_id }}</p>
 
-    if (fillRing && valueText) {
-        const circumference = 2 * Math.PI * 76; // r=76 -> 477.52
-        
-        setTimeout(() => {
-            const offsetOffset = circumference - (scoreVal / 100) * circumference;
-            fillRing.style.strokeDashoffset = offsetOffset;
-            
-            // Score countup animation
-            let activeScore = 0;
-            const animateScore = () => {
-                if (activeScore >= scoreVal) {
-                    valueText.textContent = scoreVal.toFixed(1) + '%';
-                } else {
-                    activeScore += Math.max(0.4, (scoreVal - activeScore) / 12);
-                    valueText.textContent = activeScore.toFixed(1) + '%';
-                    requestAnimationFrame(animateScore);
-                }
-            };
-            requestAnimationFrame(animateScore);
-        }, 300);
-    }
-});
-</script>
+  <!-- Big Decision text -->
+  <div style="margin-bottom:28px;">
+    {% if result == 'Approved' %}
+      <div style="display:inline-flex;align-items:center;gap:12px;color:var(--success);">
+        <i class="fa-solid fa-circle-check" style="font-size:48px;"></i>
+        <span style="font-size:40px;font-weight:900;letter-spacing:-1px;">APPROVED</span>
+        <!-- Approved -->
+      </div>
+    {% else %}
+      <div style="display:inline-flex;align-items:center;gap:12px;color:var(--danger);">
+        <i class="fa-solid fa-circle-xmark" style="font-size:48px;"></i>
+        <span style="font-size:40px;font-weight:900;letter-spacing:-1px;">REJECTED</span>
+        <!-- Rejected -->
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Radial gauge -->
+  <div class="cg-gauge-wrap" style="margin-bottom:28px;">
+    <svg class="cg-gauge-svg" width="200" height="200">
+      <circle class="cg-gauge-bg" cx="100" cy="100" r="85"/>
+      <circle class="cg-gauge-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" cx="100" cy="100" r="85" data-pct="{{ probability }}"/>
+    </svg>
+    <div class="cg-gauge-label">
+      <span class="cg-gauge-pct">{{ '%.1f'|format(probability) }}%</span>
+      <span class="cg-gauge-sub">Approval Index</span>
+    </div>
+  </div>
+
+  <!-- Details row -->
+  <div class="cg-flex cg-flex-center cg-gap-lg" style="flex-wrap:wrap;border-top:1px solid var(--border);padding-top:24px;">
+    <div>
+      <span class="cg-text-xs cg-text-muted" style="display:block;">Risk Category</span>
+      <span class="cg-badge {% if risk_level == 'Low' %}success{% elif risk_level == 'High' %}danger{% else %}warning{% endif %}" style="margin-top:4px;">
+        {{ risk_level }}
+      </span>
+    </div>
+    <div style="width:1px;height:24px;background:var(--border);"></div>
+    <div>
+      <span class="cg-text-xs cg-text-muted" style="display:block;">Evaluation Model</span>
+      <span class="cg-text-sm cg-text-primary cg-font-semibold" style="display:block;margin-top:4px;">{{ model_used }}</span>
+    </div>
+    <div style="width:1px;height:24px;background:var(--border);"></div>
+    <div>
+      <span class="cg-text-xs cg-text-muted" style="display:block;">Inference Latency</span>
+      <span class="cg-text-sm cg-text-primary cg-font-semibold" style="display:block;margin-top:4px;">{{ prediction_time }} ms</span>
+    </div>
+  </div>
+</div>
+
+<!-- Explainability section -->
+<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.1s">
+  <!-- Key factors -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+      <i class="fa-solid fa-list-check" style="color:var(--primary);margin-right:8px;"></i> Key Factors
+    </h3>
+    <ul style="list-style:none;padding:0;margin:0;">
+      {% for reason in reasons %}
+        <li class="cg-flex" style="gap:10px;font-size:13.5px;margin-bottom:12px;align-items:flex-start;">
+          {% if result == 'Approved' %}
+            <i class="fa-solid fa-circle-check cg-text-success" style="margin-top:3px;flex-shrink:0;"></i>
+          {% else %}
+            <i class="fa-solid fa-triangle-exclamation cg-text-danger" style="margin-top:3px;flex-shrink:0;"></i>
+          {% endif %}
+          <span style="color:var(--text-secondary);">{{ reason }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Recommendations -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+      <i class="fa-solid fa-lightbulb" style="color:var(--warning);margin-right:8px;"></i> Recommendations
+    </h3>
+    <ul style="list-style:none;padding:0;margin:0;">
+      {% for rec in recommendations %}
+        <li class="cg-flex" style="gap:10px;font-size:13.5px;margin-bottom:12px;align-items:flex-start;">
+          <i class="fa-solid fa-arrow-right-long" style="color:var(--primary);margin-top:4px;flex-shrink:0;font-size:12px;"></i>
+          <span style="color:var(--text-secondary);">{{ rec }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<!-- LIME explanation cards -->
+{% if support_factors or risk_factors %}
+<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.2s">
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--success);">
+      <i class="fa-solid fa-plus-circle" style="margin-right:6px;"></i> Supporting Features
+    </h3>
+    <div class="cg-flex" style="flex-wrap:wrap;gap:8px;">
+      {% for f in support_factors %}
+        <span class="cg-badge success cg-mono" style="font-size:12px;padding:6px 12px;">
+          {{ f.feature }}: +{{ '%.1f'|format(f.contribution * 100) }}%
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--danger);">
+      <i class="fa-solid fa-minus-circle" style="margin-right:6px;"></i> Counter-indicative Features
+    </h3>
+    <div class="cg-flex" style="flex-wrap:wrap;gap:8px;">
+      {% for f in risk_factors %}
+        <span class="cg-badge danger cg-mono" style="font-size:12px;padding:6px 12px;">
+          {{ f.feature }}: -{{ '%.1f'|format(f.contribution * 100) }}%
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Action buttons -->
+<div class="cg-flex cg-gap-md" data-reveal="0.3s">
+  <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary">
+    <i class="fa-solid fa-rotate-right"></i> Run Another Assessment
+  </a>
+  <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="cg-btn cg-btn-secondary">
+    <i class="fa-solid fa-file-invoice"></i> View Report
+  </a>
+  <a href="{{ url_for('api.history') }}" class="cg-btn cg-btn-ghost">
+    Prediction History
+  </a>
+</div>
 {% endblock %}
