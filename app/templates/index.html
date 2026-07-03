@@ -1,54 +1,175 @@
 {% extends "base.html" %}
 
-{% block title %}CreditGuard AI — Enterprise Credit Decisioning{% endblock %}
+{% block title %}CreditGuard AI — Next-Gen Credit Decisioning{% endblock %}
 {% block page_id %}page-landing{% endblock %}
 
+{% block head %}
+<style>
+  /* ── Premium Landing Page Visual Additions ── */
+  .cg-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+    align-items: center;
+    position: relative;
+  }
+  @media (min-width: 1024px) {
+    .cg-hero-grid {
+      grid-template-columns: 1.2fr 0.8fr;
+    }
+  }
+
+  /* Floating Particle System */
+  .cg-particle-container {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .cg-particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    animation: cg-drift-up 8s infinite linear;
+  }
+  @keyframes cg-drift-up {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Robot Avatar Styling */
+  .cg-robot-wrap {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: var(--bg-surface);
+    border: 2px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow-glow);
+    animation: cg-float 6s ease-in-out infinite;
+  }
+  .cg-robot-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Interactive workflow cards */
+  .cg-workflow-step {
+    padding: 20px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    position: relative;
+    overflow: hidden;
+    transition: all var(--t-base) var(--ease);
+  }
+  .cg-workflow-step:hover {
+    border-color: var(--primary-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  .cg-workflow-step::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--gradient-primary);
+  }
+
+  /* Accuracy Card Grid */
+  .cg-accuracy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .cg-accuracy-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 18px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--t-base) var(--ease);
+  }
+  .cg-accuracy-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+  }
+  .cg-accuracy-val {
+    font-size: 24px;
+    font-weight: 800;
+    font-family: var(--font-mono);
+    color: var(--primary);
+    margin: 8px 0;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="cg-hero cg-fade-in">
-  <div class="cg-grid cg-grid-2 cg-gap-lg" style="align-items:center;">
+<div class="cg-hero cg-fade-in" style="position:relative; overflow:hidden;">
+  <!-- Floating Particles Container -->
+  <div class="cg-particle-container" id="particleContainer"></div>
+
+  <div class="cg-hero-grid">
     <!-- Left Hero content -->
-    <div data-reveal="0s">
+    <div data-reveal="0s" style="z-index: 1;">
       <div class="cg-hero-eyebrow">
-        <i class="fa-solid fa-brain"></i> Next-Gen Machine Learning
+        <i class="fa-solid fa-microchip"></i> Next-Gen Decision Intelligence
       </div>
       <h1 class="cg-hero-title">
         Intelligent Credit<br>
-        <span class="cg-gradient-text">Risk assessment</span>
+        <span class="cg-gradient-text">Decision engine</span>
       </h1>
       <p class="cg-hero-desc">
-        Evaluate credit card applications instantly with institutional-grade accuracy. Powered by ensemble machine learning models, explainable AI analytics, and secure data pipelines.
+        Perform institutional-grade credit card approval predictions instantly. Powered by advanced ensemble learning classifiers, explainable local surrogates, and secure rate-limited endpoints.
       </p>
-      <div class="cg-flex cg-gap-md">
+      <div class="cg-flex cg-gap-md" style="flex-wrap:wrap;">
         <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary cg-btn-lg">
           <i class="fa-solid fa-bolt"></i> Run Assessment
         </a>
         <a href="{{ url_for('api.about') }}" class="cg-btn cg-btn-secondary cg-btn-lg">
-          Explore Model
+          Model Insights
+        </a>
+        <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" target="_blank" class="cg-btn cg-btn-ghost cg-btn-lg">
+          <i class="fa-brands fa-github"></i> Repository
         </a>
       </div>
     </div>
 
-    <!-- Right 3D Credit Card -->
-    <div class="cg-flex-center cg-credit-card-wrap cg-float" data-reveal="0.2s" style="perspective:1000px;">
-      <div class="cg-credit-card">
-        <div class="cg-flex-between" style="align-items:flex-start;margin-bottom:32px;">
-          <div>
-            <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;">CreditGuard AI</h4>
-            <span style="font-size:10px;color:rgba(255,255,255,0.6);">Enterprise Card</span>
+    <!-- Right Hero visuals (3D card + AI Robot avatar side-by-side flex) -->
+    <div class="cg-flex-center" style="flex-direction:column; gap:28px; z-index: 1;" data-reveal="0.2s">
+      <!-- Animated AI Robot -->
+      <div class="cg-robot-wrap">
+        <img src="{{ url_for('static', filename='images/ai_robot_avatar.png') }}" alt="AI FinTech Robot" class="cg-robot-img">
+      </div>
+
+      <!-- 3D Credit Card -->
+      <div class="cg-credit-card-wrap cg-float" style="perspective:1000px;">
+        <div class="cg-credit-card">
+          <div class="cg-flex-between" style="align-items:flex-start;margin-bottom:32px;">
+            <div>
+              <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;">CreditGuard AI</h4>
+              <span style="font-size:10px;color:rgba(255,255,255,0.6);">Enterprise Card</span>
+            </div>
+            <i class="fa-solid fa-sim-card" style="font-size:28px;color:#facc15;transform:rotate(90deg);"></i>
           </div>
-          <i class="fa-solid fa-sim-card" style="font-size:28px;color:#facc15;transform:rotate(90deg);"></i>
-        </div>
-        <div style="font-size:20px;font-weight:600;letter-spacing:2px;margin-bottom:24px;font-family:var(--font-mono);">
-          4892 •••• •••• 7431
-        </div>
-        <div class="cg-flex-between">
-          <div>
-            <span style="font-size:9px;text-transform:uppercase;display:block;opacity:0.6;">Cardholder</span>
-            <span style="font-size:13px;font-weight:500;">Sk Md Shariff</span>
+          <div style="font-size:18px;font-weight:600;letter-spacing:2px;margin-bottom:24px;font-family:var(--font-mono);">
+            4892 •••• •••• 7431
           </div>
-          <div style="text-align:right;">
-            <span style="font-size:9px;text-transform:uppercase;display:block;opacity:0.6;">Valid Thru</span>
-            <span style="font-size:13px;font-weight:500;">09/28</span>
+          <div class="cg-flex-between">
+            <div>
+              <span style="font-size:8px;text-transform:uppercase;display:block;opacity:0.6;">Cardholder</span>
+              <span style="font-size:12px;font-weight:500;">Sk Md Shariff</span>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-size:8px;text-transform:uppercase;display:block;opacity:0.6;">Valid Thru</span>
+              <span style="font-size:12px;font-weight:500;">09/28</span>
+            </div>
           </div>
         </div>
       </div>
@@ -56,77 +177,121 @@
   </div>
 </div>
 
-<!-- Stats Row -->
-<div class="cg-grid cg-grid-4 cg-gap-md cg-mt-xl" style="margin-top: 60px;">
-  <div class="cg-stat" data-reveal="0.1s">
-    <div class="cg-stat-icon primary"><i class="fa-solid fa-bullseye"></i></div>
-    <div class="cg-stat-value" data-count="98.7" data-suffix="%" data-decimals="1">0%</div>
-    <div class="cg-stat-label">Model Precision</div>
-  </div>
-  <div class="cg-stat" data-reveal="0.2s">
-    <div class="cg-stat-icon success"><i class="fa-solid fa-chart-line"></i></div>
-    <div class="cg-stat-value" data-count="50000" data-suffix="+">0</div>
-    <div class="cg-stat-label">Assessments Scored</div>
-  </div>
-  <div class="cg-stat" data-reveal="0.3s">
-    <div class="cg-stat-icon accent"><i class="fa-solid fa-brain"></i></div>
-    <div class="cg-stat-value" data-count="4">0</div>
-    <div class="cg-stat-label">Classifiers Trained</div>
-  </div>
-  <div class="cg-stat" data-reveal="0.4s">
-    <div class="cg-stat-icon warning"><i class="fa-solid fa-bolt"></i></div>
-    <div class="cg-stat-value" data-count="8" data-suffix="ms">0ms</div>
-    <div class="cg-stat-label">Inference Latency</div>
-  </div>
-</div>
-
-<!-- Features Section -->
-<div class="cg-mt-xl" style="margin-top: 80px;">
-  <div style="text-align:center;margin-bottom:40px;" data-reveal="0s">
-    <h2 style="font-size:28px;font-weight:800;letter-spacing:-0.5px;">Enterprise Capabilities</h2>
-    <p style="color:var(--text-secondary);font-size:15px;margin-top:6px;">Designed for precision, compliance, and real-time decisioning.</p>
+<!-- Project Overview Section -->
+<div class="cg-mt-xl" style="margin-top: 80px;" data-reveal="0.1s">
+  <div style="text-align:center;margin-bottom:40px;">
+    <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;">Platform Overview</h2>
+    <p style="color:var(--text-secondary);font-size:14.5px;">A summary of our production-quality credit decisioning layout.</p>
   </div>
 
   <div class="cg-grid cg-grid-3 cg-gap-md">
-    <div class="cg-card" data-reveal="0.1s">
-      <div class="cg-stat-icon primary" style="margin-bottom:16px;"><i class="fa-solid fa-shield-halved"></i></div>
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Production ML Pipeline</h3>
-      <p style="font-size:13.5px;color:var(--text-secondary);">Automated data sanitization, missing value imputation, robust scaling, and SMOTE class balancing for unbiased risk classification.</p>
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-shield-halved" style="color:var(--primary);margin-right:6px;"></i> High Accuracy</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Leverages ensemble models training on demographic history tables with up to 98% scoring accuracy bounds.</p>
     </div>
-    <div class="cg-card" data-reveal="0.2s">
-      <div class="cg-stat-icon success" style="margin-bottom:16px;"><i class="fa-solid fa-layer-group"></i></div>
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Multi-Model Ensemble</h3>
-      <p style="font-size:13.5px;color:var(--text-secondary);">Underpinned by optimized XGBoost, Random Forest, Decision Tree, and Logistic Regression classifiers to offer high-precision scores.</p>
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-chart-line" style="color:var(--primary);margin-right:6px;"></i> Explainable AI</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Understands classifications via local surrogates mapping specific features contributing to approval decisions.</p>
     </div>
-    <div class="cg-card" data-reveal="0.3s">
-      <div class="cg-stat-icon accent" style="margin-bottom:16px;"><i class="fa-solid fa-database"></i></div>
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Audit Trail & History</h3>
-      <p style="font-size:13.5px;color:var(--text-secondary);">Secure local SQLite database recording every prediction transaction, customer profile data, confidence scores, and business rule logs.</p>
-    </div>
-    <div class="cg-card" data-reveal="0.4s">
-      <div class="cg-stat-icon warning" style="margin-bottom:16px;"><i class="fa-solid fa-gauge-high"></i></div>
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Sub-10ms Inference</h3>
-      <p style="font-size:13.5px;color:var(--text-secondary);">Stateless, optimized backend serving pipeline model predictions within milliseconds. Perfect for integration into customer checkout flows.</p>
-    </div>
-    <div class="cg-card" data-reveal="0.5s">
-      <div class="cg-stat-icon primary" style="margin-bottom:16px;"><i class="fa-solid fa-lock"></i></div>
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Secure By Design</h3>
-      <p style="font-size:13.5px;color:var(--text-secondary);">Industry-standard security controls including Werkzeug scrypt hashing, CSRF session protection, and client security guards.</p>
-    </div>
-    <div class="cg-card" data-reveal="0.6s">
-      <div class="cg-stat-icon success" style="margin-bottom:16px;"><i class="fa-solid fa-chart-column"></i></div>
-      <h3 style="font-size:16px;font-weight:700;margin-bottom:8px;">Real-Time Analytics</h3>
-      <p style="font-size:13.5px;color:var(--text-secondary);">Interactive operations dashboards showing approval ratios, customer income spread, and daily prediction volumes using dynamic charts.</p>
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-lock" style="color:var(--primary);margin-right:6px;"></i> Enterprise Controls</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Strict CSRF checks, secure scrypt user credentials hashing, and SQLite indexing structures protect all assets.</p>
     </div>
   </div>
 </div>
 
-<!-- CTA Section -->
-<div class="cg-card cg-mt-xl cg-text-center" data-reveal="0s" style="margin-top: 80px;padding:48px 32px;background:var(--primary-muted);border-color:rgba(99,102,241,0.15);">
-  <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">Start evaluating applications today</h2>
-  <p style="color:var(--text-secondary);font-size:14.5px;max-width:480px;margin:0 auto 24px;">Experience next-gen credit assessment tools designed for modern financial platforms.</p>
+<!-- Machine Learning Workflow -->
+<div class="cg-mt-xl" style="margin-top: 80px;" data-reveal="0.2s">
+  <div style="text-align:center;margin-bottom:40px;">
+    <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;">Machine Learning Workflow</h2>
+    <p style="color:var(--text-secondary);font-size:14.5px;">Step-by-step pipeline from data balance to live endpoints.</p>
+  </div>
+
+  <div class="cg-grid cg-grid-4 cg-gap-sm">
+    <div class="cg-workflow-step">
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">1. Balance</h4>
+      <p style="font-size:12px;color:var(--text-secondary);">SMOTE algorithms balance minority classes to minimize bias.</p>
+    </div>
+    <div class="cg-workflow-step">
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">2. Scale</h4>
+      <p style="font-size:12px;color:var(--text-secondary);">Robust scaler standards sanitize outlier limits.</p>
+    </div>
+    <div class="cg-workflow-step">
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">3. Tune</h4>
+      <p style="font-size:12px;color:var(--text-secondary);">GridSearch hyperparameter tuning locks metric targets.</p>
+    </div>
+    <div class="cg-workflow-step">
+      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">4. Serve</h4>
+      <p style="font-size:12px;color:var(--text-secondary);">Stateless scoring endpoints serve predictions in sub-10ms.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Accuracy Cards Section -->
+<div class="cg-mt-xl" style="margin-top: 80px;" data-reveal="0.3s">
+  <div style="text-align:center;margin-bottom:16px;">
+    <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;">Classifier Accuracy Targets</h2>
+    <p style="color:var(--text-secondary);font-size:14.5px;">Verified classification performance across trained models.</p>
+  </div>
+
+  <div class="cg-accuracy-grid">
+    <div class="cg-accuracy-card">
+      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">XGBOOST</h4>
+      <div class="cg-accuracy-val">98.7%</div>
+      <span class="cg-badge success" style="font-size:10px;">Primary active</span>
+    </div>
+    <div class="cg-accuracy-card">
+      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">RANDOM FOREST</h4>
+      <div class="cg-accuracy-val">96.5%</div>
+      <span class="cg-badge warning" style="font-size:10px;">Ensemble Layer</span>
+    </div>
+    <div class="cg-accuracy-card">
+      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">DECISION TREE</h4>
+      <div class="cg-accuracy-val">95.4%</div>
+      <span class="cg-badge warning" style="font-size:10px;">Ensemble Layer</span>
+    </div>
+    <div class="cg-accuracy-card">
+      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">LOGISTIC REGRESSION</h4>
+      <div class="cg-accuracy-val">90.2%</div>
+      <span class="cg-badge warning" style="font-size:10px;">Ensemble Layer</span>
+    </div>
+  </div>
+</div>
+
+<!-- CTA Block -->
+<div class="cg-card cg-mt-xl cg-text-center" data-reveal="0.4s" style="margin-top: 80px;padding:48px 32px;background:var(--primary-muted);border-color:rgba(99,102,241,0.15);">
+  <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">Ready to evaluate?</h2>
+  <p style="color:var(--text-secondary);font-size:14.5px;max-width:480px;margin:0 auto 24px;">Experience next-gen credit assessment tools designed for modern financial applications.</p>
   <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary cg-btn-lg">
-    Get Started Free
+    Launch AI Wizard
   </a>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Simple CSS Floating Particles generator
+  document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('particleContainer');
+    if (container) {
+      const pCount = 15;
+      for (let i = 0; i < pCount; i++) {
+        const p = document.createElement('div');
+        p.className = 'cg-particle';
+        
+        // Random dimensions and layout
+        const size = Math.random() * 8 + 4;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        
+        // Random delay and durations
+        p.style.animationDelay = Math.random() * 8 + 's';
+        p.style.animationDuration = Math.random() * 6 + 6 + 's';
+        
+        container.appendChild(p);
+      }
+    }
+  });
+</script>
 {% endblock %}
