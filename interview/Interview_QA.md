@@ -748,9 +748,9 @@ This guide contains key technical interview questions and answers mapping Machin
 ### Q48: What is the purpose of a health check endpoint `/health`?
 *Category*: Production Deployment
 
-*Answer*: It provides a simple API to return application status, allowing orchestrators (Kubernetes, Render) to verify app availability.
+*Answer*: It provides a simple API to return application status, allowing orchestrators (Kubernetes, Vercel) to verify app availability.
 
-### Q49: Explain how you deploy a Flask application to Render.
+### Q49: Explain how you deploy a Flask application to Vercel.
 *Category*: Production Deployment
 
 *Answer*: We define a `render.yaml` blueprint mapping build commands (`pip install`) and start commands (`gunicorn app.app:app`), binding it to GitHub.

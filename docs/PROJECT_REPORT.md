@@ -22,7 +22,7 @@ Credit card approval skew features a high volume of low-risk approvals (Class 0:
 - **Data Partitioning**: Stratified 80/20 train/test split.
 - **Imbalance Strategy**: Balanced Random Oversampling inside training splits.
 - **Python Runtime**: Python 3.10 / 3.13.
-- **Deployment Platform**: Render and Docker container engines.
+- **Deployment Platform**: Vercel and Docker container engines.
 
 ---
 

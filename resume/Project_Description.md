@@ -11,7 +11,7 @@ Developed and deployed a production-grade machine learning platform (**CreditGua
 - **Languages**: Python 3.10 / 3.13, HTML, CSS, Javascript.
 - **Machine Learning**: scikit-learn, XGBoost, Pandas, Numpy.
 - **Backend & Serving**: Flask, WTForms, Gunicorn.
-- **Deployment & DevOps**: Docker, Docker Compose, GitHub Actions CI/CD, Render, IBM Watson Studio.
+- **Deployment & DevOps**: Docker, Docker Compose, GitHub Actions CI/CD, Vercel, IBM Watson Studio.
 
 ---
 

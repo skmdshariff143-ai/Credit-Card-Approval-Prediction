@@ -7,7 +7,7 @@ This report documents the containerization settings, GitHub Actions CI/CD workfl
 ## 1. Deployment Summary
 - **Hosting Targets**:
   - **Docker Engine / Compose**: Containerized local/on-premise orchestration.
-  - **Render Cloud Service**: Production web hosting with Blue-Green zero-downtime updates.
+  - **Vercel Cloud Platform**: Production web hosting with Blue-Green zero-downtime updates.
   - **IBM Watson Machine Learning**: Serverless cloud API hosting for predictive models.
 - **WSGI Production Server**: Gunicorn (Green Unicorn) running 3 worker threads on Python 3.10-slim.
 
@@ -25,4 +25,4 @@ Our automated pipeline checks code quality and builds images:
 The production runtime requires configuring the following values:
 - `FLASK_ENV`: Set to `production` to secure cookies and disable debug routes.
 - `SECRET_KEY`: High-entropy string to secure sessions and Flask forms CSRF tokens.
-- `PORT`: Set to `10000` (Render default) or custom port (e.g. `5000` for Docker).
+- `PORT`: Set to `10000` (Vercel default) or custom port (e.g. `5000` for Docker).

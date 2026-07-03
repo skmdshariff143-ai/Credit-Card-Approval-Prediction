@@ -49,4 +49,4 @@ This document provides the slides structure and content outline for presenting t
 ## Slide 6: DevOps & Cloud Architecture
 - **Dockerization:** Optimized multi-stage Docker builds with native Python health checks.
 - **CI/CD Pipelines:** GitHub Actions running auto-linters, code security audits, pytest coverage checks, and GitHub Pages deployments.
-- **Multi-Cloud Deployments:** Render Web Services and IBM Watson Machine Learning setup.
+- **Multi-Cloud Deployments:** Vercel Serverless Platform and IBM Watson Machine Learning setup.

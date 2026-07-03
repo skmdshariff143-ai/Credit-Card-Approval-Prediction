@@ -50,7 +50,7 @@ graph TD
     subgraph "DevOps & Deployment"
         T["GitHub Repo Commit"] --> U["GitHub Actions CI (Tests, Coverage, Linters)"]
         U --> V["Docker Production Build"]
-        V --> W["Render Web Service Deploy"]
+        V --> W["Vercel Serverless Deploy"]
         U --> X["GitHub Pages Static Portfolio Deploy"]
     end
 ```
@@ -105,7 +105,7 @@ graph TD
 ---
 
 ## 9. Deployment Assessment
-*   **Render Web Service:** Healthy, connected to automated GitHub pipelines.
+*   **Vercel Serverless App:** Healthy, connected to automated GitHub pipelines.
 *   **GitHub Pages:** Deployed statically via actions to host project specifications.
 
 ---

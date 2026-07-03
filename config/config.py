@@ -20,7 +20,10 @@ class ProjectConfig:
 
         # Logging settings
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
-        self.LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", str(root_dir / "logs" / "app.log"))
+        if os.getenv("VERCEL") == "1":
+            self.LOG_FILE_PATH = "/tmp/app.log"
+        else:
+            self.LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", str(root_dir / "logs" / "app.log"))
 
         # IBM Watson Machine Learning Credentials
         self.IBM_API_KEY = os.getenv("IBM_API_KEY")
@@ -36,6 +39,7 @@ class ProjectConfig:
         """
         Returns absolute paths to all major data, models, and reports directories.
         """
+        logs_dir = Path("/tmp") if os.getenv("VERCEL") == "1" else self.BASE_DIR / "logs"
         return {
             "raw_dir": self.BASE_DIR / "data" / "raw",
             "processed_dir": self.BASE_DIR / "data" / "processed",
@@ -44,7 +48,7 @@ class ProjectConfig:
             "models_dir": self.BASE_DIR / "models",
             "reports_dir": self.BASE_DIR / "reports",
             "diagrams_dir": self.BASE_DIR / "diagrams",
-            "logs_dir": self.BASE_DIR / "logs",
+            "logs_dir": logs_dir,
         }
 
 
