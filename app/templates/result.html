@@ -393,14 +393,14 @@
       <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="cg-btn cg-btn-primary">
         <i class="fa-solid fa-file-pdf"></i> Download PDF
       </a>
-      <button type="button" class="cg-btn cg-btn-secondary" onclick="saveToHistoryLocal()">
-        <i class="fa-solid fa-floppy-disk"></i> Save Result
+      <button type="button" class="cg-btn cg-btn-secondary" onclick="shareDecisionLocal()">
+        <i class="fa-solid fa-share-nodes"></i> Share
       </button>
       <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-secondary">
         <i class="fa-solid fa-rotate-right"></i> Predict Again
       </a>
       <a href="{{ url_for('api.history') }}" class="cg-btn cg-btn-ghost">
-        History Ledger
+        Dashboard
       </a>
     </div>
   </div>
@@ -425,9 +425,13 @@
     }
   });
 
-  function saveToHistoryLocal() {
-    // Simple micro-interaction confirmation toast
-    CG.Toast.show("Decision record saved to secure history database.", "success");
+  function shareDecisionLocal() {
+    const shareUrl = window.location.origin + "{{ url_for('api.get_report', application_id=application_id) }}";
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      CG.Toast.show("Report share link copied to clipboard!", "success");
+    }).catch(() => {
+      CG.Toast.show("Failed to copy share link.", "danger");
+    });
   }
 </script>
 {% endblock %}
