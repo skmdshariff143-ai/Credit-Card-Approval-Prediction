@@ -266,6 +266,20 @@
     Launch AI Wizard
   </a>
 </div>
+
+<!-- Apple-Style Premium Footer -->
+<footer style="margin-top:100px;border-top:1px solid var(--border);padding:32px 0 64px;" data-reveal="0.1s">
+  <div class="cg-flex-between" style="flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--text-muted);">
+    <div>
+      <span>&copy; 2026 CreditGuard AI. All rights reserved.</span>
+    </div>
+    <div class="cg-flex" style="gap:20px;flex-wrap:wrap;">
+      <a href="{{ url_for('api.about') }}" style="color:var(--text-muted);transition:color var(--t-fast) var(--ease);">Model Insights</a>
+      <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" target="_blank" style="color:var(--text-muted);transition:color var(--t-fast) var(--ease);">GitHub Repository</a>
+      <a href="{{ url_for('api.index') }}" style="color:var(--text-muted);transition:color var(--t-fast) var(--ease);">Terms of Service</a>
+    </div>
+  </div>
+</footer>
 {% endblock %}
 
 {% block scripts %}
