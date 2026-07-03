@@ -32,7 +32,7 @@
 - 🎬 **Demo Package**: Complete demo recording scripts, voiceover narrations, and checklist in `demo/`.
 
 ## 🌐 Live Deployments & Presentation Links
-- 🚀 **Live Production Application**: [credit-card-approval-prediction.onrender.com](https://credit-card-approval-prediction.onrender.com) (Hosted on Render)
+- 🚀 **Live Production Application**: [credit-card-approval-prediction.vercel.app](https://credit-card-approval-prediction.vercel.app) (Hosted on Vercel)
 - 🖥️ **Static Portfolio Website**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/) (Hosted on GitHub Pages)
 - 🎥 **Product Demonstration Video**: [https://youtu.be/creditguard-demo-placeholder](https://youtu.be/creditguard-demo-placeholder) *(Placeholder Link)*
 
