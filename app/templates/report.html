@@ -25,16 +25,24 @@
 
 <div class="cg-report" data-reveal>
   <!-- Report Header -->
-  <div style="text-align:center;margin-bottom:32px;">
-    <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <div class="cg-sidebar-logo" style="width:32px;height:32px;font-size:14px;">
-        <i class="fa-solid fa-shield-halved"></i>
+  <div class="cg-flex-between" style="align-items:center;margin-bottom:32px;flex-wrap:wrap;gap:20px;">
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div class="cg-sidebar-logo" style="width:32px;height:32px;font-size:14px;background:var(--gradient-primary);">
+          <i class="fa-solid fa-shield-halved" style="color:#fff;"></i>
+        </div>
+        <span style="font-size:16px;font-weight:700;">CreditGuard AI</span>
       </div>
-      <span style="font-size:16px;font-weight:700;">CreditGuard AI</span>
+      <h2 style="font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px;">Credit Assessment Report</h2>
+      <p class="cg-app-id">{{ record.application_id }}</p>
+      <p class="cg-text-sm cg-text-muted" style="margin-top:4px;">Generated on {{ record.timestamp }}</p>
     </div>
-    <h2 style="font-size:20px;font-weight:700;margin-bottom:4px;">Credit Assessment Report</h2>
-    <p class="cg-app-id">{{ record.application_id }}</p>
-    <p class="cg-text-sm cg-text-muted" style="margin-top:4px;">Generated on {{ record.timestamp }}</p>
+    
+    <!-- Dynamic Verification QR Code -->
+    <div style="text-align:center;" class="cg-flex" style="flex-direction:column;align-items:center;gap:6px;">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={{ request.url_root }}report/{{ record.application_id }}" alt="Verification QR Code" style="width:100px;height:100px;border: 1px solid var(--border);border-radius:var(--r-sm);padding:4px;background:#fff;" id="reportQrCode">
+      <span style="font-size:10px;color:var(--text-muted);display:block;margin-top:4px;">Verify Authenticity</span>
+    </div>
   </div>
 
   <hr class="cg-divider">
