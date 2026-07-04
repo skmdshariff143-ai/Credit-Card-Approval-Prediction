@@ -5,7 +5,7 @@
       "src": "index.py",
       "use": "@vercel/python",
       "config": {
-        "excludeFiles": "{data,notebooks,logs,diagrams,tests,docs,demo,interview,reports,resume,screenshots,credit_card_approval_prediction.egg-info,.pytest_cache,__pycache__,.github,.git,models/artifacts,models/trained}/**"
+        "excludeFiles": "{data/**,notebooks/**,logs/**,diagrams/**,tests/**,docs/**,demo/**,interview/**,reports/**,resume/**,screenshots/**,credit_card_approval_prediction.egg-info/**,models/artifacts/**,models/trained/**}"
       }
     }
   ],

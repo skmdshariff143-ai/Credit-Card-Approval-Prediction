@@ -1,18 +1,18 @@
-# Exclude large non-essential directories from Vercel bundle
-data/
-notebooks/
-logs/
-diagrams/
-tests/
-docs/
-demo/
-interview/
-reports/
-resume/
-screenshots/
-credit_card_approval_prediction.egg-info/
-models/artifacts/
-models/trained/
+# Exclude large non-essential directories from Vercel bundle (root-level only)
+/data/
+/notebooks/
+/logs/
+/diagrams/
+/tests/
+/docs/
+/demo/
+/interview/
+/reports/
+/resume/
+/screenshots/
+/credit_card_approval_prediction.egg-info/
+/models/artifacts/
+/models/trained/
 
 # Build/cache artifacts
 venv/
@@ -50,5 +50,4 @@ Procfile
 environment.yml
 
 # Keep the old root-level app.py out of bundle (index.py is the entrypoint now)
-# Must use /app.py to avoid matching app/app.py inside the package
 /app.py
