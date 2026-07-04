@@ -2,8 +2,10 @@
 
 &nbsp;
 
+## 📐 System Architecture Diagram
+
 <p align="center">
-  <img src="docs/images/Architecture_Diagram.png" alt="System Architecture Diagram" width="800">
+  <img src="3_Project_Design_Phase/System_Architecture.png" width="900" alt="System Architecture">
 </p>
 
 &nbsp;
@@ -39,13 +41,13 @@
 
 ## 🎥 Product Demonstration Video
 
-[![CreditGuard AI Demonstration Video](docs/demo/Thumbnail.png)](https://credit-card-approval-prediction-lac.vercel.app)
+[![CreditGuard AI Demonstration Video](8_Project_Demonstration/Screenshots/Home.png)](https://credit-card-approval-prediction-lac.vercel.app)
 
-*Click the image above to visit the live deployment. The complete video asset package is available in the [docs/demo/](docs/demo/) directory:*
-- 📝 **Video Storyboard**: [Storyboard.md](docs/demo/Storyboard.md)
-- 🎙️ **Voiceover Narration Script**: [VoiceOver.md](docs/demo/VoiceOver.md)
-- 📋 **Step-by-Step Recording Checklist**: [Recording_Checklist.md](docs/demo/Recording_Checklist.md)
-- 💬 **Subtitles & Captions SRT File**: [Captions.srt](docs/demo/Captions.srt)
+*Click the image above to visit the live deployment. The complete video asset package is available in the [8_Project_Demonstration/](8_Project_Demonstration/) and [5_Project_Development_Phase/docs/demo/](5_Project_Development_Phase/docs/demo/) directories:*
+- 📝 **Video Storyboard**: [Storyboard.md](5_Project_Development_Phase/docs/demo/Storyboard.md)
+- 🎙️ **Voiceover Narration Script**: [VoiceOver.md](5_Project_Development_Phase/docs/demo/VoiceOver.md)
+- 📋 **Step-by-Step Recording Checklist**: [Recording_Checklist.md](5_Project_Development_Phase/docs/demo/Recording_Checklist.md)
+- 💬 **Subtitles & Captions SRT File**: [Captions.srt](5_Project_Development_Phase/docs/demo/Captions.srt)
 
 ---
 
@@ -249,27 +251,27 @@ pytest tests/ -v
 
 ### 1. Premium Landing Page (Dark Futuristic Theme)
 <p align="center">
-  <img src="docs/images/landing_page_v2.png" alt="CreditGuard AI Landing Page v2.0" width="700">
+  <img src="3_Project_Design_Phase/UI_UX_Design/Landing_Page.png" alt="CreditGuard AI Landing Page" width="700">
 </p>
 
 ### 2. Operations Analytics Dashboard (Chart.js)
 <p align="center">
-  <img src="docs/images/dashboard_v2.png" alt="Analytics Dashboard View" width="700">
+  <img src="3_Project_Design_Phase/UI_UX_Design/Dashboard.png" alt="Analytics Dashboard View" width="700">
 </p>
 
 ### 3. Multi-Step Credit Application Wizard
 <p align="center">
-  <img src="docs/images/prediction_form_v2.png" alt="5-Step Prediction Form Wizard" width="700">
+  <img src="3_Project_Design_Phase/UI_UX_Design/Prediction_Page.png" alt="5-Step Prediction Form Wizard" width="700">
 </p>
 
 ### 4. AI Prediction Result (Confidence Gauge)
 <p align="center">
-  <img src="docs/images/result_v2.png" alt="Prediction Result with SVG Gauge" width="700">
+  <img src="3_Project_Design_Phase/UI_UX_Design/Result_Page.png" alt="Prediction Result with SVG Gauge" width="700">
 </p>
 
 ### 5. Prediction History Ledger
 <p align="center">
-  <img src="docs/images/history_v2.png" alt="Prediction History Data Table" width="700">
+  <img src="8_Project_Demonstration/Screenshots/Dashboard.png" alt="Prediction History Data Table" width="700">
 </p>
 
 ---
