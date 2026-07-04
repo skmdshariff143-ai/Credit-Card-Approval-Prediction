@@ -7,7 +7,7 @@ name = "credit_card_approval_prediction"
 version = "1.0.0"
 description = "Enterprise Machine Learning project for predicting credit card approval status."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.13"
 authors = [
     { name = "Mahammad Shariff Shaik", email = "sk.md.shariff143@gmail.com" }
 ]
