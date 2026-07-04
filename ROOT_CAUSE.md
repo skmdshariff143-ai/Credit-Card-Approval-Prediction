@@ -30,4 +30,4 @@ This document provides a detailed technical breakdown of the routing, naming col
 
 ## 🔍 5. Vercel Bundle Size Limit Exceeded (> 250MB)
 * **Symptom**: The deployment process failed during the build phase.
-* **Root Cause**: The initial bundle size was **315.65 MB**, which exceeded the maximum allowable Python serverless function bundle size of 250 MB. This was caused by uploading heavy ML training datasets, notebooks, logs, and development files.
+* **Root Cause**: The initial bundle size was **849.31 MB**, which exceeded the maximum allowable Python serverless function bundle size of 250 MB. This was caused by uploading heavy ML training datasets, notebooks, logs, and development files.
