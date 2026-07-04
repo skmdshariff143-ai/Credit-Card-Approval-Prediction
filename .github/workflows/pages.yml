@@ -29,11 +29,11 @@ jobs:
 
       - name: Verify Docs Subdirectory Structure
         run: |
-          if [ ! -d "./docs" ]; then
+          if [ ! -d "./5_Project_Development_Phase/docs" ]; then
             echo "Error: docs/ folder not found!"
             exit 1
           fi
-          if [ ! -f "./docs/index.html" ]; then
+          if [ ! -f "./5_Project_Development_Phase/docs/index.html" ]; then
             echo "Error: docs/index.html not found!"
             exit 1
           fi
@@ -41,7 +41,7 @@ jobs:
       - name: Package and Upload Site Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./docs
+          path: ./5_Project_Development_Phase/docs
 
   deploy:
     name: Deploy to GitHub Pages Environments

@@ -19,7 +19,7 @@ jobs:
       - name: Verify Docker Build
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./5_Project_Development_Phase
+          file: ./5_Project_Development_Phase/Dockerfile
           push: false
           tags: credit-card-approval-prediction:latest
