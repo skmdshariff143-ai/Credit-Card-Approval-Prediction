@@ -89,7 +89,7 @@ All generated guides contain extensive, professional documentation:
 We verified all project linkages:
 - **GitHub Repository**: [skmdshariff143-ai/Credit-Card-Approval-Prediction](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction) (Valid)
 - **GitHub Pages Static URL**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/) (Valid)
-- **Vercel Live App URL**: [credit-card-approval-prediction.vercel.app](https://credit-card-approval-prediction.vercel.app) (Valid)
+- **Vercel Live App URL**: [credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app) (Valid)
 - **Visual Assets paths**: Checked (All markdown file references point to valid paths inside `docs/images/`).
 
 ---
