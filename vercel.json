@@ -2,14 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "app.py",
-      "use": "@vercel/python"
+      "src": "index.py",
+      "use": "@vercel/python",
+      "config": {
+        "excludeFiles": "{data,notebooks,logs,diagrams,tests,docs,demo,interview,reports,resume,screenshots,src,credit_card_approval_prediction.egg-info,.pytest_cache,__pycache__,.github,.git,models/artifacts,models/trained}/**"
+      }
     }
   ],
   "routes": [
     {
+      "src": "/static/(.*)",
+      "dest": "index.py"
+    },
+    {
       "src": "/(.*)",
-      "dest": "app.py"
+      "dest": "index.py"
     }
   ]
 }
