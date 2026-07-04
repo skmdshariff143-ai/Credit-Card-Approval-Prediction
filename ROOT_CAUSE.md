@@ -22,12 +22,20 @@ This document provides a detailed technical breakdown of the routing, naming col
 
 ---
 
-## 🔍 4. ModuleNotFoundError: No module named 'src' (500 Error)
+## 🔍 4. ModuleNotFoundError: No module named 'src' & 'src.data' (500 Error)
 * **Symptom**: Page requests returned `500 FUNCTION_INVOCATION_FAILED`.
-* **Root Cause**: To keep the serverless bundle size under Vercel's strict 250MB limit, the heavy `src/` directory (containing raw datasets, models, training notebooks, and dev files) was excluded from the deployment. However, utility modules inside the `app/` package (`app/utils/helper.py` and `app/utils/metrics.py`) still imported dependencies from `src.utils`, leading to a crash.
+* **Root Cause**: 
+  - To meet Vercel's 250MB limit, the `src/` directory was originally excluded. However, utility modules in `app/` and serialized model metadata import from the `src` package, resulting in import crashes.
+  - After including `src/` in the build, the over-broad wildcard `data/` pattern in `.vercelignore` matched and excluded the subfolder `src/data/`, which contains essential dataset loaders needed for deserialization.
 
 ---
 
-## 🔍 5. Vercel Bundle Size Limit Exceeded (> 250MB)
+## 🔍 5. Deserialization Failure: cannot instantiate 'WindowsPath' on your system (500 Error)
+* **Symptom**: Page requests returned `500 FUNCTION_INVOCATION_FAILED` during model loading.
+* **Root Cause**: The serialized preprocessing pipeline was created on a Windows development system. Since the pipeline object saved path references as `pathlib.WindowsPath` instances, the standard library `pathlib` block raised an exception when attempting to load it on Vercel's Linux-based runtime environment (which only supports `PosixPath`).
+
+---
+
+## 🔍 6. Vercel Bundle Size Limit Exceeded (> 250MB)
 * **Symptom**: The deployment process failed during the build phase.
 * **Root Cause**: The initial bundle size was **849.31 MB**, which exceeded the maximum allowable Python serverless function bundle size of 250 MB. This was caused by uploading heavy ML training datasets, notebooks, logs, and development files.
