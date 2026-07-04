@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import tempfile
 
 from dotenv import load_dotenv
 
@@ -21,7 +22,7 @@ class ProjectConfig:
         # Logging settings
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
         if os.getenv("VERCEL") == "1":
-            self.LOG_FILE_PATH = "/tmp/app.log"  # nosec B108
+            self.LOG_FILE_PATH = os.path.join(tempfile.gettempdir(), "app.log")
         else:
             self.LOG_FILE_PATH = os.getenv("LOG_FILE_PATH", str(root_dir / "logs" / "app.log"))
 
@@ -39,7 +40,7 @@ class ProjectConfig:
         """
         Returns absolute paths to all major data, models, and reports directories.
         """
-        logs_dir = Path("/tmp") if os.getenv("VERCEL") == "1" else self.BASE_DIR / "logs"  # nosec B108
+        logs_dir = Path(tempfile.gettempdir()) if os.getenv("VERCEL") == "1" else self.BASE_DIR / "logs"
         return {
             "raw_dir": self.BASE_DIR / "data" / "raw",
             "processed_dir": self.BASE_DIR / "data" / "processed",

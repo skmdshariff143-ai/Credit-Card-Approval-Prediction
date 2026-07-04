@@ -1,6 +1,7 @@
 import logging.config
 import os
 from pathlib import Path
+import tempfile
 
 import yaml
 
@@ -10,7 +11,7 @@ yaml_path = config_dir / "logging.yaml"
 
 # On Vercel, the filesystem is read-only except /tmp
 if os.getenv("VERCEL") == "1":
-    logs_dir = Path("/tmp")  # nosec B108
+    logs_dir = Path(tempfile.gettempdir())
 else:
     logs_dir = Path(__file__).resolve().parent.parent.parent / "logs"
 
