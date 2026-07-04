@@ -33,6 +33,19 @@
 - 🖨️ **Professional Reports**: Printable PDF-ready credit assessment reports with QR code validation blocks.
 - 🎬 **Demo Package**: Complete demo recording scripts, voiceover narrations, and checklist in `demo/`.
 
+## 🔑 Demo Credentials
+
+To test the application's secure user session management and role-based access control, use these pre-seeded demo accounts:
+
+| Role | Email | Password | Access Rights |
+| :--- | :--- | :--- | :--- |
+| **Administrator** | `admin@example.com` | `Admin@123` | Full access to console, telemetry logs, configuration |
+| **Administrator** | `admin@creditguard.ai` | `Admin@123` | Full access to console, telemetry logs, configuration |
+| **Loan Officer** | `officer@creditguard.ai` | `Officer@123` | Assess predictions, view history logs |
+| **User** | `demo@creditguard.ai` | `Demo@123` | Run basic application predictions, view personal history |
+
+---
+
 ## 🌐 Live Deployments & Presentation Links
 - 🚀 **Live Production Application**: [credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app) (Hosted on Vercel)
 - 🖥️ **Static Portfolio Website**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/) (Hosted on GitHub Pages)

@@ -14,6 +14,32 @@
   <p class="cg-page-desc">Real-time telemetry metrics, accuracy indexes, database settings, and system activity logs.</p>
 </div>
 
+<!-- Welcome Header Card -->
+<div class="cg-card cg-mb-lg" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(0, 229, 255, 0.05)); border: 1px solid rgba(99, 102, 241, 0.3); padding: 24px; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+  <div style="position: absolute; top: -50px; right: -50px; width: 150px; height: 150px; background: radial-gradient(circle, rgba(0, 229, 255, 0.2) 0%, transparent 70%); pointer-events: none;"></div>
+  
+  <div style="display: flex; align-items: center; gap: 16px;">
+    <div style="background: linear-gradient(135deg, #6C63FF, #00E5FF); width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,229,255,0.3);">
+      <i class="fa-solid fa-user-shield" style="font-size: 22px; color: #fff;"></i>
+    </div>
+    <div>
+      <h2 style="font-size: 18px; font-weight: 700; margin: 0; color: #fff;">Welcome, {{ current_user.name or current_user.full_name or current_user.username }}!</h2>
+      <p style="font-size: 13px; color: #9ca3af; margin: 4px 0 0 0;">
+        Role: <span style="color: #00E5FF; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; background: rgba(0, 229, 255, 0.1); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(0, 229, 255, 0.2);">{{ current_user.role or 'User' }}</span>
+        {% if current_user.last_login %}
+          <span style="margin-left: 12px;">Last Login: <span style="color: #e5e7eb; font-weight: 500;">{{ current_user.last_login }}</span></span>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+  
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('auth.logout') }}" class="cg-btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; display: flex; align-items: center; gap: 6px; transition: all 0.2s; text-decoration: none;">
+      <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+    </a>
+  </div>
+</div>
+
 <!-- Stat Cards Grid -->
 <div class="cg-grid cg-grid-4 cg-mb-lg" data-reveal="0s">
   <div class="cg-stat">

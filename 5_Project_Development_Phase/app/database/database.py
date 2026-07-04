@@ -72,13 +72,49 @@ class DatabaseManager:
                     username TEXT UNIQUE NOT NULL,
                     email TEXT UNIQUE NOT NULL,
                     password_hash TEXT NOT NULL,
+                    name TEXT,
                     full_name TEXT,
+                    role TEXT NOT NULL DEFAULT 'User',
                     created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    last_login TEXT,
+                    status TEXT NOT NULL DEFAULT 'Active',
                     is_admin INTEGER DEFAULT 0
                 )
             """)
             conn.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);")
+
+            # Add columns to users (safe migration for existing db)
+            for col_name, col_type in [
+                ("name", "TEXT"),
+                ("full_name", "TEXT"),
+                ("role", "TEXT NOT NULL DEFAULT 'User'"),
+                ("last_login", "TEXT"),
+                ("status", "TEXT NOT NULL DEFAULT 'Active'")
+            ]:
+                try:
+                    conn.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
+                except sqlite3.OperationalError:
+                    pass
+
+            # Seed default users
+            from werkzeug.security import generate_password_hash
+            default_users = [
+                ("admin", "admin@example.com", "Admin@123", "Admin", "Administrator"),
+                ("admin_cg", "admin@creditguard.ai", "Admin@123", "Admin CG", "Administrator"),
+                ("demo", "demo@creditguard.ai", "Demo@123", "Demo User", "User"),
+                ("officer", "officer@creditguard.ai", "Officer@123", "Loan Officer", "Officer")
+            ]
+            for username, email, pwd, name, role in default_users:
+                cursor = conn.cursor()
+                cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+                if not cursor.fetchone():
+                    pwd_hash = generate_password_hash(pwd, method="scrypt")
+                    cursor.execute(
+                        """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                        (username, email, pwd_hash, name, name, role, "Active", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                    )
 
             # Add user_id column to prediction_history (safe migration)
             try:
@@ -133,15 +169,25 @@ class DatabaseManager:
     # User Management Methods (Authentication)
     # ==================================================================
 
-    def create_user(self, username, email, password_hash, full_name=None):
+    def update_last_login(self, user_id):
+        """Updates the last login timestamp for a user."""
+        with self._get_connection() as conn:
+            conn.execute(
+                "UPDATE users SET last_login = ? WHERE id = ?",
+                (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user_id),
+            )
+            conn.commit()
+
+    def create_user(self, username, email, password_hash, name=None, role='User', status='Active', full_name=None):
         """Creates a new user account. Returns user id or None on conflict."""
         with self._get_connection() as conn:
             try:
                 cursor = conn.cursor()
+                display_name = name or full_name or username
                 cursor.execute(
-                    """INSERT INTO users (username, email, password_hash, full_name, created_at)
-                       VALUES (?, ?, ?, ?, ?)""",
-                    (username, email, password_hash, full_name, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                    """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (username, email, password_hash, display_name, display_name, role, status, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                 )
                 conn.commit()
                 return cursor.lastrowid

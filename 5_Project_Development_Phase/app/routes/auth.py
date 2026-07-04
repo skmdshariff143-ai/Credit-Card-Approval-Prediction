@@ -101,8 +101,12 @@ def login():
         row = db_manager.get_user_by_email(form.email.data.strip().lower())
 
         if row and check_password_hash(row["password_hash"], form.password.data):
+            if row.get("status", "Active") != "Active":
+                flash("Your account has been deactivated. Please contact support.", "danger")
+                return render_template("auth/login.html", form=form)
             user = User.from_db_row(row)
             login_user(user, remember=form.remember_me.data)
+            db_manager.update_last_login(user.id)
             logger.info(f"User logged in: {user.username} (id={user.id})")
 
             # Redirect to the page they were trying to access
