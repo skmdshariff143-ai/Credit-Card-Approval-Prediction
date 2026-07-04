@@ -141,8 +141,7 @@ class DatabaseManager:
                 cursor.execute(
                     """INSERT INTO users (username, email, password_hash, full_name, created_at)
                        VALUES (?, ?, ?, ?, ?)""",
-                    (username, email, password_hash, full_name,
-                     datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                    (username, email, password_hash, full_name, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
                 )
                 conn.commit()
                 return cursor.lastrowid
@@ -199,7 +198,9 @@ class DatabaseManager:
     # Per-User Prediction Methods
     # ==================================================================
 
-    def get_user_predictions(self, user_id, limit=50, search=None, sort_by="id", order="DESC", decision=None, risk_level=None):
+    def get_user_predictions(
+        self, user_id, limit=50, search=None, sort_by="id", order="DESC", decision=None, risk_level=None
+    ):
         """Retrieves prediction history filtered by user_id, with searching and filters."""
         query = "SELECT * FROM prediction_history WHERE user_id = ?"
         params = [user_id]
@@ -271,10 +272,14 @@ class DatabaseManager:
             cursor.execute("SELECT COUNT(*) FROM prediction_history WHERE user_id = ?", (user_id,))
             total = cursor.fetchone()[0] or 0
 
-            cursor.execute("SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Approved'", (user_id,))
+            cursor.execute(
+                "SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Approved'", (user_id,)
+            )
             approved = cursor.fetchone()[0] or 0
 
-            cursor.execute("SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Rejected'", (user_id,))
+            cursor.execute(
+                "SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Rejected'", (user_id,)
+            )
             rejected = cursor.fetchone()[0] or 0
 
             approval_rate = (approved / total * 100.0) if total > 0 else 0.0
@@ -404,7 +409,15 @@ class DatabaseManager:
             conn.commit()
             return cursor.lastrowid
 
-    def get_predictions(self, limit: int = 50, search: str = None, sort_by: str = "id", order: str = "DESC", decision=None, risk_level=None) -> list:
+    def get_predictions(
+        self,
+        limit: int = 50,
+        search: str = None,
+        sort_by: str = "id",
+        order: str = "DESC",
+        decision=None,
+        risk_level=None,
+    ) -> list:
         """Retrieves history from database supporting filter, search, sorting."""
         query = "SELECT * FROM prediction_history"
         params = []
@@ -566,4 +579,3 @@ class DatabaseManager:
                     "user_id": row_dict["user_id"],
                 }
             return None
-

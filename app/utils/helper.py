@@ -14,9 +14,10 @@ def load_pkl(file_path):
     Safely loads a serialized pickle/joblib file.
     """
     import pathlib
-    if os.name != 'nt':
+
+    if os.name != "nt":
         pathlib.WindowsPath = pathlib.PosixPath
-        
+
     if not os.path.exists(file_path):
         logger.error(f"Pickle file not found at: {file_path}")
         raise FileNotFoundError(f"Pickle file not found: {file_path}")

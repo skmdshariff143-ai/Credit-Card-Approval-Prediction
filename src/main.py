@@ -98,6 +98,7 @@ def run_model_pipeline():
         # Register model in registry
         try:
             from src.models.model_registry import ModelRegistry
+
             registry = ModelRegistry()
             params = tuned_model.get_params() if hasattr(tuned_model, "get_params") else {}
             registry.register_model(name, tuned_model, params, metrics)

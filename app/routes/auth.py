@@ -26,6 +26,7 @@ db_manager = DatabaseManager()
 # Token Utilities
 # ==================================================================
 
+
 def _generate_reset_token(email):
     """Creates a timed token for password reset (30 min expiry)."""
     s = URLSafeTimedSerializer(current_app.config["SECRET_KEY"])
@@ -45,6 +46,7 @@ def _verify_reset_token(token, max_age=1800):
 # ==================================================================
 # Registration
 # ==================================================================
+
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
@@ -87,6 +89,7 @@ def register():
 # Login
 # ==================================================================
 
+
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     """User login page and handler."""
@@ -117,6 +120,7 @@ def login():
 # Logout
 # ==================================================================
 
+
 @auth_bp.route("/logout")
 def logout():
     """Logs out the current user and clears the session."""
@@ -130,6 +134,7 @@ def logout():
 # ==================================================================
 # Forgot Password
 # ==================================================================
+
 
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
@@ -166,6 +171,7 @@ def forgot_password():
 # Reset Password
 # ==================================================================
 
+
 @auth_bp.route("/reset-password/<token>", methods=["GET", "POST"])
 def reset_password(token):
     """Reset password using a valid timed token."""
@@ -196,6 +202,7 @@ def reset_password(token):
 # ==================================================================
 # Profile
 # ==================================================================
+
 
 @auth_bp.route("/profile")
 @login_required

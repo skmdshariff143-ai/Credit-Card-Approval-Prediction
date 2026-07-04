@@ -1,4 +1,3 @@
-
 from app.utils.exceptions import ValidationError
 from app.utils.logger import get_logger
 

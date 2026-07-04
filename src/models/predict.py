@@ -118,7 +118,6 @@ class RiskPredictor:
             probs = [1.0 if p == 1 else 0.0 for p in preds]
         return list(probs)
 
-
     def get_model_name(self) -> str:
         """Returns the human-friendly name of the loaded classifier."""
         model = self.load_model()

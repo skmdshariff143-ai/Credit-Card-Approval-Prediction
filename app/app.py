@@ -66,6 +66,7 @@ def create_app() -> Flask:
 
     # Exempt REST API endpoints from CSRF (they use JSON, not form submissions)
     from app.routes.routes import api_predict
+
     csrf.exempt(api_predict)
 
     # Error Handlers

@@ -162,6 +162,7 @@ class PreprocessingPipeline:
             # 6.5. Feature Selection Diagnostic (Mutual Info / RF Importance)
             try:
                 from src.features.feature_selection import FeatureSelector
+
                 selector = FeatureSelector(threshold=0.005)
                 selector.fit_selection(X_train_scaled, y_train)
                 logger.info("Feature selection ranking report generated successfully.")
@@ -170,8 +171,9 @@ class PreprocessingPipeline:
 
             # 7. Imbalance Handling - SMOTE Oversampling
             from imblearn.over_sampling import SMOTE
+
             logger.info("Applying SMOTE oversampling to balance target classes...")
-            
+
             min_class_size = min(y_train.value_counts())
             if min_class_size > 1:
                 k_neighbors = min(5, min_class_size - 1)
@@ -180,6 +182,7 @@ class PreprocessingPipeline:
             else:
                 logger.warning("Minority class size too small for SMOTE. Falling back to RandomOverSampler.")
                 from imblearn.over_sampling import RandomOverSampler
+
                 ros = RandomOverSampler(random_state=42)
                 X_train_final, y_train_final = ros.fit_resample(X_train_scaled, y_train)
 

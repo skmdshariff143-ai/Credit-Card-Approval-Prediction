@@ -1,10 +1,20 @@
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, FloatField, IntegerField, PasswordField,
-    SelectField, StringField, SubmitField,
+    BooleanField,
+    FloatField,
+    IntegerField,
+    PasswordField,
+    SelectField,
+    StringField,
+    SubmitField,
 )
 from wtforms.validators import (
-    DataRequired, Email, EqualTo, Length, NumberRange, Optional,
+    DataRequired,
+    Email,
+    EqualTo,
+    Length,
+    NumberRange,
+    Optional,
 )
 
 
@@ -197,6 +207,7 @@ class CreditApprovalForm(FlaskForm):
 # ==================================================================
 # Authentication Forms
 # ==================================================================
+
 
 class RegistrationForm(FlaskForm):
     """New user registration form."""

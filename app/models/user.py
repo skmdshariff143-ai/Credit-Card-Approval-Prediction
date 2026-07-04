@@ -9,8 +9,7 @@ class User(UserMixin):
     into a Flask-Login compatible object with session persistence.
     """
 
-    def __init__(self, id, username, email, password_hash, full_name=None,
-                 created_at=None, is_admin=0):
+    def __init__(self, id, username, email, password_hash, full_name=None, created_at=None, is_admin=0):
         self.id = id
         self.username = username
         self.email = email

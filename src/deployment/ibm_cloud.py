@@ -1,4 +1,3 @@
-
 import requests
 
 from config.config import config

@@ -37,6 +37,7 @@ def about():
     best_model_name = "Unknown"
     try:
         from config.config import config
+
         metrics_path = os.path.join(config.get_paths()["models_dir"], "model_metrics.json")
         if os.path.exists(metrics_path):
             with open(metrics_path, "r") as f:
