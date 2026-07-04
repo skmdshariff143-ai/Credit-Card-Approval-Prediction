@@ -1,0 +1,111 @@
+1
+00:00:00,000 --> 00:00:05,000
+Hello, and welcome to the presentation of CreditGuard AI—
+
+2
+00:00:05,100 --> 00:00:11,000
+an enterprise-grade, end-to-end Machine Learning solution designed to automate credit card issuing
+
+3
+00:00:11,100 --> 00:00:15,000
+while ensuring complete transparency and compliance.
+
+4
+00:00:15,100 --> 00:00:20,000
+Powered by a sleek, modern, glassmorphic UI,
+
+5
+00:00:20,100 --> 00:00:25,000
+CreditGuard AI delivers sub-ten-millisecond credit evaluations.
+
+6
+00:00:25,100 --> 00:00:30,000
+In commercial banking, traditional credit decisions are slow,
+
+7
+00:00:30,100 --> 00:00:34,000
+labor-intensive, and prone to human bias.
+
+8
+00:00:34,100 --> 00:00:38,000
+CreditGuard AI solves this by embedding robust ML models
+
+9
+00:00:38,100 --> 00:00:41,000
+directly into the decision workflow.
+
+10
+00:00:41,100 --> 00:00:45,000
+Our technology stack leverages Python's Flask framework for server routing,
+
+11
+00:00:45,100 --> 00:00:50,000
+Scikit-Learn and XGBoost for models, and SQLite for auditing.
+
+12
+00:00:50,100 --> 00:00:55,000
+Let's log in to the User Portal to access the predictive dashboard.
+
+13
+00:00:55,100 --> 00:01:00,000
+Security is critical. The platform features secure multi-user session management
+
+14
+00:01:00,100 --> 00:01:05,000
+handled by Flask-Login, with credentials hashed using scrypt.
+
+15
+00:01:05,100 --> 00:01:10,000
+Once authenticated, the banker is greeted with a real-time analytics console.
+
+16
+00:01:10,100 --> 00:01:15,000
+Powered by Chart.js, this dashboard aggregates key metrics,
+
+17
+00:01:15,100 --> 00:01:20,000
+giving credit officers immediate business visibility.
+
+18
+00:01:20,100 --> 00:01:25,000
+Now, let's process a new application. We navigate to the Prediction Wizard.
+
+19
+00:01:25,100 --> 00:01:30,000
+This frictionless conversational form takes the applicant through logical steps,
+
+20
+00:01:30,100 --> 00:01:35,000
+capturing demographics, income, employment, and debt details.
+
+21
+00:01:35,100 --> 00:01:40,000
+Upon submission, CreditGuard AI processes the inputs in milliseconds.
+
+22
+00:01:40,100 --> 00:01:45,000
+The applicant is presented with a clear decision and a probability gauge.
+
+23
+00:01:45,100 --> 00:01:50,000
+Using local surrogate explanations, CreditGuard AI decomposes the decision
+
+24
+00:01:50,100 --> 00:01:55,000
+into contributing support and risk factors.
+
+25
+00:01:55,100 --> 00:02:00,000
+All decisions are written into indexed SQLite logs for complete auditability.
+
+26
+00:02:00,100 --> 00:02:05,000
+Users can search historical logs, review results, and export reports.
+
+27
+00:02:05,100 --> 00:02:10,000
+Each report includes an automated QR code verification block for authentication.
+
+28
+00:02:10,100 --> 00:02:15,000
+Try out the live application at the link on your screen. Thank you!

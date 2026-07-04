@@ -34,7 +34,18 @@
 ## 🌐 Live Deployments & Presentation Links
 - 🚀 **Live Production Application**: [credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app) (Hosted on Vercel)
 - 🖥️ **Static Portfolio Website**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/) (Hosted on GitHub Pages)
-- 🎥 **Product Demonstration Video**: [https://youtu.be/creditguard-demo-placeholder](https://youtu.be/creditguard-demo-placeholder) *(Placeholder Link)*
+
+---
+
+## 🎥 Product Demonstration Video
+
+[![CreditGuard AI Demonstration Video](docs/demo/Thumbnail.png)](https://credit-card-approval-prediction-lac.vercel.app)
+
+*Click the image above to visit the live deployment. The complete video asset package is available in the [docs/demo/](docs/demo/) directory:*
+- 📝 **Video Storyboard**: [Storyboard.md](docs/demo/Storyboard.md)
+- 🎙️ **Voiceover Narration Script**: [VoiceOver.md](docs/demo/VoiceOver.md)
+- 📋 **Step-by-Step Recording Checklist**: [Recording_Checklist.md](docs/demo/Recording_Checklist.md)
+- 💬 **Subtitles & Captions SRT File**: [Captions.srt](docs/demo/Captions.srt)
 
 ---
 
