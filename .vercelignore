@@ -50,5 +50,6 @@ docker-compose.yml
 Procfile
 environment.yml
 
-# Keep the old app.py out of bundle (index.py is the entrypoint now)
-app.py
+# Keep the old root-level app.py out of bundle (index.py is the entrypoint now)
+# Must use /app.py to avoid matching app/app.py inside the package
+/app.py
