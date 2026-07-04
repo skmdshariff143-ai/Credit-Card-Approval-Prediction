@@ -7,7 +7,12 @@ import yaml
 # Load config path
 config_dir = Path(__file__).resolve().parent.parent.parent / "config"
 yaml_path = config_dir / "logging.yaml"
-logs_dir = Path(__file__).resolve().parent.parent.parent / "logs"
+
+# On Vercel, the filesystem is read-only except /tmp
+if os.getenv("VERCEL") == "1":
+    logs_dir = Path("/tmp")
+else:
+    logs_dir = Path(__file__).resolve().parent.parent.parent / "logs"
 
 # Ensure logs dir exists
 os.makedirs(logs_dir, exist_ok=True)
