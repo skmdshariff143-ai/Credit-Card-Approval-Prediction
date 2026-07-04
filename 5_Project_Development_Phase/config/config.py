@@ -40,14 +40,18 @@ class ProjectConfig:
         """
         Returns absolute paths to all major data, models, and reports directories.
         """
-        logs_dir = Path(tempfile.gettempdir()) if os.getenv("VERCEL") == "1" else self.BASE_DIR / "logs"
+        is_vercel = os.getenv("VERCEL") == "1"
+        logs_dir = Path(tempfile.gettempdir()) if is_vercel else self.BASE_DIR / "logs"
+        processed_dir = Path(tempfile.gettempdir()) if is_vercel else self.BASE_DIR / "data" / "processed"
+        reports_dir = Path(tempfile.gettempdir()) if is_vercel else self.BASE_DIR / "reports"
+        
         return {
             "raw_dir": self.BASE_DIR / "data" / "raw",
-            "processed_dir": self.BASE_DIR / "data" / "processed",
+            "processed_dir": processed_dir,
             "interim_dir": self.BASE_DIR / "data" / "interim",
             "external_dir": self.BASE_DIR / "data" / "external",
             "models_dir": self.BASE_DIR / "models",
-            "reports_dir": self.BASE_DIR / "reports",
+            "reports_dir": reports_dir,
             "diagrams_dir": self.BASE_DIR / "diagrams",
             "logs_dir": logs_dir,
         }

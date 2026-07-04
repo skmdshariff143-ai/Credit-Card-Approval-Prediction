@@ -33,7 +33,7 @@
   </div>
   <div class="cg-stat">
     <div class="cg-stat-icon accent"><i class="fa-solid fa-gauge-high"></i></div>
-    <div class="cg-stat-value" data-count="{{ stats.avg_probability|round(1) }}" data-suffix="%" data-decimals="1">0%</div>
+    <div class="cg-stat-value" data-count="{{ (stats.avg_probability or 0.0)|round(1) }}" data-suffix="%" data-decimals="1">0%</div>
     <div class="cg-stat-label">Avg Confidence</div>
   </div>
 </div>

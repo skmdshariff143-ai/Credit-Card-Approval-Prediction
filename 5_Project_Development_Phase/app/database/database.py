@@ -14,8 +14,13 @@ class DatabaseManager:
     def __init__(self):
         paths = config.get_paths()
         self.db_path = os.path.join(paths["logs_dir"], "prediction_history.db")
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-        self.init_db()
+        try:
+            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+            self.init_db()
+        except Exception as e:
+            # Under read-only environments (like Vercel build stages), ignore write failure
+            import logging
+            logging.getLogger(__name__).warning(f"Database initialization deferred/ignored: {str(e)}")
 
     def _get_connection(self):
         conn = sqlite3.connect(self.db_path)
@@ -328,6 +333,12 @@ class DatabaseManager:
             )
             rejected = cursor.fetchone()[0] or 0
 
+            cursor.execute(
+                "SELECT AVG(probability) FROM prediction_history WHERE user_id = ?", (user_id,)
+            )
+            avg_prob = cursor.fetchone()[0]
+            avg_prob = avg_prob if avg_prob is not None else 0.0
+
             approval_rate = (approved / total * 100.0) if total > 0 else 0.0
 
             return {
@@ -335,6 +346,10 @@ class DatabaseManager:
                 "approved": approved,
                 "rejected": rejected,
                 "approval_rate": round(approval_rate, 2),
+                "total_predictions": total,
+                "total_approved": approved,
+                "total_rejected": rejected,
+                "avg_probability": avg_prob,
             }
 
     # ==================================================================
