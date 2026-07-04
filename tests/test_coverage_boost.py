@@ -677,10 +677,11 @@ def test_model_trainer_train_exception():
 
 def test_helper_pkl_exceptions():
     """Verifies helper pkl methods handle dump/load failures cleanly."""
-    with pytest.raises(DataPreprocessingError):
+    from app.utils.exceptions import DataPreprocessingError as AppDataPreprocessingError
+    with pytest.raises(AppDataPreprocessingError):
         save_pkl(lambda x: x, "/invalid_dir/test.pkl")
 
-    with pytest.raises(DataPreprocessingError):
+    with pytest.raises(AppDataPreprocessingError):
         load_pkl("config/config.py")
 
 

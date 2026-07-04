@@ -842,7 +842,8 @@ def test_helpers_exceptions(tmp_path):
     invalid_pkl = os.path.join(tmp_path, "invalid.pkl")
     with open(invalid_pkl, "w") as f:
         f.write("invalid data")
-    with pytest.raises(DataPreprocessingError):
+    from app.utils.exceptions import DataPreprocessingError as AppDataPreprocessingError
+    with pytest.raises(AppDataPreprocessingError):
         load_pkl(invalid_pkl)
 
     with pytest.raises(FileNotFoundError):
