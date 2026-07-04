@@ -3,8 +3,8 @@ import os
 
 import joblib
 
-from src.utils.exceptions import DataPreprocessingError
-from src.utils.logger import get_logger
+from app.utils.exceptions import DataPreprocessingError
+from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
