@@ -47,7 +47,6 @@ Use these pre-seeded demo credentials to explore role-based dashboard telemetrie
 ## 🌐 Live Deployments & Presentation Links
 - 🚀 **Live Production Application**: [credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app)
 - 🖥️ **Static Portfolio Website**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/)
-- 🎥 **Demonstration Video**: [Demo_Video.mp4](8_Project_Demonstration/Demo_Video.mp4)
 
 ---
 
