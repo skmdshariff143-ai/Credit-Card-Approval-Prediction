@@ -209,3 +209,18 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 - **Author**: **Mahammad Shariff Shaik** - [skmdshariff143-ai](https://github.com/skmdshariff143-ai)
 - **Data Source**: Kaggle Credit Card Approval dataset.
 - **Reference**: Scikit-Learn, LIME, and XGBoost documentation suites.
+
+---
+
+## 📚 SmartBridge Project Documentation
+
+This repository contains structured documentation files compiled according to the SmartBridge Internship Submission guidelines:
+
+1. 💡 [1. Brainstorming & Ideation](Project%20Documentation/1.%20Brainstorming%20&%20Ideation/README.md) — Problems research, use cases, and empathy mapping.
+2. 🚶 [2. Requirement Analysis](Project%20Documentation/2.%20Requirement%20Analysis/README.md) — Journey mapping, functional specifications, and technology stack.
+3. 📐 [3. Project Design Phase](Project%20Documentation/3.%20Project%20Design%20Phase/README.md) — High-level MVC architectures, ER models, database designs.
+4. 📅 [4. Project Planning Phase](Project%20Documentation/4.%20Project%20Planning%20Phase/README.md) — Sprint plans, milestone matrix, and WBS outline.
+5. 📂 [5. Project Development Phase](Project%20Documentation/5.%20Project%20Development%20Phase/README.md) — Folder layouts, preprocessing pipelines, UI widgets.
+6. 🧪 [6. Project Testing](Project%20Documentation/6.%20Project%20Testing/README.md) — Pytest metrics, coverages, test scripts.
+7. 📚 [7. Project Documentation](Project%20Documentation/7.%20Project%20Documentation/README.md) — REST API references, deployment logs.
+8. 🎥 [8. Project Demonstration](Project%20Documentation/8.%20Project%20Demonstration/README.md) — Product checklist, script storyboards, future scope.
