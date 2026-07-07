@@ -22,7 +22,7 @@ An audit was performed to evaluate the codebase and reports against the standard
 | **Containerization** | **100% COMPLETE** | `Dockerfile`, `docker-compose.yml` | None | Lightweight, non-root builder stage configuration. |
 | **CI/CD Workflows** | **100% COMPLETE** | `.github/workflows/` | None | Runs linters, pytest, Docker validation, Pages site. |
 
-*Conclusion*: **No gaps found.** The codebase is 100% compliant with the Skill Wallet criteria.
+*Conclusion*: **No gaps found.** The codebase is compliant with the Skill Wallet criteria, though some design limitations exist (e.g. SQLite database transactions run in serverless read-only `/tmp` storage, and `SECRET_KEY` is configured to fail-closed/raise `RuntimeError` rather than fall back to insecure defaults in production mode).
 
 ---
 
@@ -34,7 +34,7 @@ Before submitting, verify that all requested deliverables are pushed to the GitH
 - [x] **Documentation Files**: README, Final Project Report, User Manual, Architecture Guide, Developer Guide, Deployment Guide, Demo Script, and Interview Q&A.
 - [x] **Diagram Files**: ERD, Flowchart, and Architecture Diagrams under `diagrams/`.
 - [x] **Model Objects**: Pre-trained artifacts (`best_model.pkl`, `preprocessing_pipeline.pkl`) committed in `models/`.
-- [x] **Jupyter Notebooks**: Step-by-step workflow notebook records under `notebooks/`.
+- [x] **Model Reports**: Detailed preprocessing, training, and evaluation performance documents under `reports/`.
 
 ---
 
@@ -43,21 +43,21 @@ Before submitting, verify that all requested deliverables are pushed to the GitH
 Verify local evidence of each component using the links below:
 
 ### Architecture & Workflows
-- **MVC Architecture & Server Factory**: [app.py](file:///e:/Credit-Card-Approval-Prediction/app/app.py)
-- **Database Migrations & SQLite Schema**: [routes.py](file:///e:/Credit-Card-Approval-Prediction/app/routes/routes.py#L1-L100)
-- **CI/CD Automation Pipelines**: [.github/workflows/ci.yml](file:///e:/Credit-Card-Approval-Prediction/.github/workflows/ci.yml)
+- **MVC Architecture & Server Factory**: [app.py](5_Project_Development_Phase/app/app.py)
+- **Database Migrations & SQLite Schema**: [routes.py](5_Project_Development_Phase/app/routes/routes.py#L1-L100)
+- **CI/CD Automation Pipelines**: [.github/workflows/ci.yml](.github/workflows/ci.yml)
 
 ### Preprocessing & Machine Learning
-- **Preprocessing Pipeline**: [pipeline.py](file:///e:/Credit-Card-Approval-Prediction/src/preprocessing/pipeline.py)
-- **Model Training**: [train.py](file:///e:/Credit-Card-Approval-Prediction/src/models/train.py)
-- **Candidate Tuning & Evaluation**: [compare_models.py](file:///e:/Credit-Card-Approval-Prediction/src/models/compare_models.py)
+- **Preprocessing Pipeline**: [pipeline.py](5_Project_Development_Phase/src/preprocessing/pipeline.py)
+- **Model Training**: [train.py](5_Project_Development_Phase/src/models/train.py)
+- **Candidate Tuning & Evaluation**: [compare_models.py](5_Project_Development_Phase/src/models/compare_models.py)
 
 ### Reports & Guides
-- **EDA & Outliers Report**: [EDA_Report.md](file:///e:/Credit-Card-Approval-Prediction/reports/EDA_Report.md)
-- **Model Comparison Metrics**: [Model_Comparison.md](file:///e:/Credit-Card-Approval-Prediction/reports/Model_Comparison.md)
-- **Comprehensive Project Report**: [Final_Project_Report.md](file:///e:/Credit-Card-Approval-Prediction/reports/Final_Project_Report.md)
-- **System Architecture Guide**: [architecture_guide.md](file:///C:/Users/Lenovo/.gemini/antigravity/brain/d57c6e98-483b-4598-961b-50e59907b0b1/architecture_guide.md)
-- **User Instruction Manual**: [user_manual.md](file:///C:/Users/Lenovo/.gemini/antigravity/brain/d57c6e98-483b-4598-961b-50e59907b0b1/user_manual.md)
+- **EDA & Outliers Report**: [EDA_Report.md](reports/EDA_Report.md)
+- **Model Comparison Metrics**: [Model_Comparison.md](reports/Model_Comparison.md)
+- **Comprehensive Project Report**: [Final_Project_Report.md](reports/Final_Project_Report.md)
+- **System Architecture Guide**: [architecture_guide.md](7_Project_Documentation/Architecture_Guide.md)
+- **User Instruction Manual**: [user_manual.md](7_Project_Documentation/User_Guide.md)
 
 ---
 
@@ -66,26 +66,26 @@ Verify local evidence of each component using the links below:
 All interface and analysis screenshots are stored in the repository. Refer to the directory links or embedded assets:
 
 ### Web Application Screenshots
-- **Dashboard Home**: [screenshots/flask/home_page.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/flask/home_page.png)
-- **Interactive Predict Form**: [screenshots/flask/prediction_form.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/flask/prediction_form.png)
-- **Approved Scorecard Panel**: [screenshots/flask/approved_result.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/flask/approved_result.png)
-- **Rejected Scorecard Panel**: [screenshots/flask/rejected_result.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/flask/rejected_result.png)
-- **History Logs & Export Controls**: [screenshots/flask/prediction_history.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/flask/prediction_history.png)
+- **Dashboard Home**: [screenshots/flask/home_page.png](screenshots/flask/home_page.png)
+- **Interactive Predict Form**: [screenshots/flask/prediction_form.png](screenshots/flask/prediction_form.png)
+- **Approved Scorecard Panel**: [screenshots/flask/approved_result.png](screenshots/flask/approved_result.png)
+- **Rejected Scorecard Panel**: [screenshots/flask/rejected_result.png](screenshots/flask/rejected_result.png)
+- **History Logs & Export Controls**: [screenshots/flask/prediction_history.png](screenshots/flask/prediction_history.png)
 
 ### Exploratory Data Analysis (EDA) Plots
-- **Imbalance Split**: [screenshots/eda/approval_count.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/eda/approval_count.png)
-- **Correlation Heatmap**: [screenshots/eda/correlation_heatmap.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/eda/correlation_heatmap.png)
-- **Income Skew Boxplot**: [screenshots/eda/outlier_boxplot_income.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/eda/outlier_boxplot_income.png)
-- **Applicant Age Boxplot**: [screenshots/eda/outlier_boxplot_age.png](file:///e:/Credit-Card-Approval-Prediction/screenshots/eda/outlier_boxplot_age.png)
+- **Imbalance Split**: [screenshots/eda/approval_count.png](screenshots/eda/approval_count.png)
+- **Correlation Heatmap**: [screenshots/eda/correlation_heatmap.png](screenshots/eda/correlation_heatmap.png)
+- **Income Skew Boxplot**: [screenshots/eda/outlier_boxplot_income.png](screenshots/eda/outlier_boxplot_income.png)
+- **Applicant Age Boxplot**: [screenshots/eda/outlier_boxplot_age.png](screenshots/eda/outlier_boxplot_age.png)
 
 ---
 
 ## 5. Demo & Validation Assets
 
 To support live reviews and presentation scoring, use these pre-packaged demo assets:
-- **Presentation Slide Deck Outline**: [Presentation_Content.md](file:///e:/Credit-Card-Approval-Prediction/docs/Presentation_Content.md)
-- **Demo Walkthrough Script (5-8 min)**: [Demo_Script.md](file:///e:/Credit-Card-Approval-Prediction/demo/Demo_Script.md)
-- **Interview Q&A Prep Guide**: [Interview_QA.md](file:///e:/Credit-Card-Approval-Prediction/interview/Interview_QA.md)
+- **Presentation Slide Deck Outline**: [Presentation_Content.md](7_Project_Documentation/Presentation_Content.md)
+- **Demo Walkthrough Script (5-8 min)**: [Demo_Video_Script.md](7_Project_Documentation/Demo_Video_Script.md)
+- **Interview Q&A Prep Guide**: [Interview_QA.md](7_Project_Documentation/Interview_QA.md)
 - **Test JSON Payload for REST API Testing (`POST /api/predict`)**:
   ```json
   {
@@ -118,8 +118,8 @@ You will need to manually upload the following items to the Skill Wallet dashboa
 2. **Static Portfolio Website URL**:
    Provide the URL for your GitHub Pages deploy (e.g. `https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction`).
 3. **Demo Video URL**:
-   Record a screen capture of the application running locally or in staging using the [Demo_Script.md](file:///e:/Credit-Card-Approval-Prediction/demo/Demo_Script.md) guide, publish it (e.g. YouTube or Loom), and submit the URL.
+   Record a screen capture of the application running locally or in staging using the [Demo_Video_Script.md](7_Project_Documentation/Demo_Video_Script.md) guide, publish it (e.g. YouTube or Loom), and submit the URL.
 4. **Final PDF Project Report**:
-   Export [Final_Project_Report.md](file:///e:/Credit-Card-Approval-Prediction/reports/Final_Project_Report.md) as a PDF file, rename it to `CreditGuard_AI_Final_Report.pdf`, and upload it under the "Project Report" field.
+   Export [Final_Project_Report.md](reports/Final_Project_Report.md) as a PDF file, rename it to `CreditGuard_AI_Final_Report.pdf`, and upload it under the "Project Report" field.
 5. **System Diagram Assets**:
    Download and upload `diagrams/ER_Diagram.png` and `diagrams/Flowchart.png` to the visual architecture section.
