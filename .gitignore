@@ -86,3 +86,4 @@ Thumbs.db
 
 
 .vercel
+!.env.example
