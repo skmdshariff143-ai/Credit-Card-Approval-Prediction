@@ -1,6 +1,6 @@
 {
     "model_name": "decision_tree",
-    "registration_date": "2026-07-03 09:22:31",
+    "registration_date": "2026-07-07 20:38:52",
     "parameters": {
         "ccp_alpha": "0.0",
         "class_weight": "balanced",

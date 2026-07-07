@@ -1,6 +1,6 @@
 {
     "model_name": "random_forest",
-    "registration_date": "2026-07-03 09:22:40",
+    "registration_date": "2026-07-07 20:39:01",
     "parameters": {
         "bootstrap": "True",
         "ccp_alpha": "0.0",

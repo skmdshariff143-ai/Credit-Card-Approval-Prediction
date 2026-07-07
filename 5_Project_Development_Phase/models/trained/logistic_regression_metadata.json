@@ -1,6 +1,6 @@
 {
     "model_name": "logistic_regression",
-    "registration_date": "2026-07-03 09:22:29",
+    "registration_date": "2026-07-07 20:38:49",
     "parameters": {
         "C": "1.0",
         "class_weight": "balanced",

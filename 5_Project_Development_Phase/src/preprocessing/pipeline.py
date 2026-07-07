@@ -17,8 +17,6 @@ from src.utils.helper import save_pkl
 from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
-
-
 class PreprocessingPipeline:
     """
     Unified pipeline orchestrating data ingestion, duplicates removal, invalid data cleansing,
@@ -27,8 +25,8 @@ class PreprocessingPipeline:
 
     def __init__(self):
         paths = config.get_paths()
-        self.processed_dir = paths["processed_dir"]
-        self.models_dir = paths["models_dir"]
+        self.processed_dir = str(paths["processed_dir"])
+        self.models_dir = str(paths["models_dir"])
 
         self.dup_handler = DuplicateHandler()
         self.engineer = FeatureEngineer()
