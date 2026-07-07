@@ -18,6 +18,19 @@ def calculate_all_metrics(y_true, y_pred, y_prob=None) -> dict:
     """
     Computes a comprehensive suite of classification metrics.
     """
+    if len(y_true) == 0 or len(y_pred) == 0:
+        logger.warning("Empty ground truth or prediction array passed to metrics calculation. Returning zeroed metrics.")
+        return {
+            "Accuracy": 0.0,
+            "Precision": 0.0,
+            "Recall": 0.0,
+            "F1-Score": 0.0,
+            "Balanced_Accuracy": 0.0,
+            "Matthews_Correlation_Coefficient": 0.0,
+            "ROC-AUC": 0.5,
+            "Log_Loss": 0.0,
+        }
+
     accuracy = accuracy_score(y_true, y_pred)
     precision = precision_score(y_true, y_pred, zero_division=0)
     recall = recall_score(y_true, y_pred, zero_division=0)
