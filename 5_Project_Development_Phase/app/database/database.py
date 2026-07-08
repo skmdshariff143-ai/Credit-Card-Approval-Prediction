@@ -102,14 +102,24 @@ class DatabaseManager:
                 except sqlite3.OperationalError:
                     pass
 
-            # Seed default users
+            # Seed default users from environment variables if present
             from werkzeug.security import generate_password_hash
-            default_users = [
-                ("admin", "admin@example.com", "Admin@123", "Admin", "Administrator"),
-                ("admin_cg", "admin@creditguard.ai", "Admin@123", "Admin CG", "Administrator"),
-                ("demo", "demo@creditguard.ai", "Demo@123", "Demo User", "User"),
-                ("officer", "officer@creditguard.ai", "Officer@123", "Loan Officer", "Officer")
-            ]
+            
+            admin_email = os.getenv("ADMIN_EMAIL")
+            admin_pwd = os.getenv("ADMIN_PASSWORD")
+            officer_email = os.getenv("OFFICER_EMAIL")
+            officer_pwd = os.getenv("OFFICER_PASSWORD")
+            demo_email = os.getenv("DEMO_EMAIL")
+            demo_pwd = os.getenv("DEMO_PASSWORD")
+            
+            default_users = []
+            if admin_email and admin_pwd:
+                default_users.append((os.getenv("ADMIN_USERNAME", "admin"), admin_email, admin_pwd, "Admin", "Administrator"))
+            if officer_email and officer_pwd:
+                default_users.append((os.getenv("OFFICER_USERNAME", "officer"), officer_email, officer_pwd, "Loan Officer", "Officer"))
+            if demo_email and demo_pwd:
+                default_users.append((os.getenv("DEMO_USERNAME", "demo"), demo_email, demo_pwd, "Demo User", "User"))
+
             for username, email, pwd, name, role in default_users:
                 cursor = conn.cursor()
                 cursor.execute("SELECT id FROM users WHERE email = ?", (email,))

@@ -279,16 +279,16 @@ def test_input_validator_exceptions():
         InputValidator.validate_predict_json(data)
 
 
-def test_admin_dashboard(client):
+def test_admin_dashboard(admin_client):
     """Test admin portal renders successfully."""
-    response = client.get("/admin")
+    response = admin_client.get("/admin")
     assert response.status_code == 200
     assert b"Operations Analytics" in response.data or b"Admin" in response.data
 
 
-def test_api_admin_stats(client):
+def test_api_admin_stats(admin_client):
     """Test admin stats JSON API endpoint."""
-    response = client.get("/api/v1/admin/stats")
+    response = admin_client.get("/api/v1/admin/stats")
     assert response.status_code == 200
     data = json.loads(response.data)
     assert "income_labels" in data
@@ -374,11 +374,11 @@ def test_history_page_filters(client):
     assert b"History" in response.data or b"Log" in response.data
 
 
-def test_500_error_page_request(client):
+def test_500_error_page_request(admin_client):
     """Test 500 error page renders successfully when an error is raised by a route."""
-    client.application.config["PROPAGATE_EXCEPTIONS"] = False
+    admin_client.application.config["PROPAGATE_EXCEPTIONS"] = False
     with patch("app.routes.routes.db_manager.get_predictions", side_effect=Exception("Database crash")):
-        response = client.get("/admin")
+        response = admin_client.get("/admin")
         assert response.status_code == 500
         assert b"500" in response.data or b"Error" in response.data
 
@@ -400,3 +400,72 @@ def test_startup_diagnostics(client):
     assert data["status"] == "completed"
     assert "database" in data
     assert "model_files" in data
+
+
+def test_rbac_user_denied(client):
+    """Verify that a regular user (role='User') is denied access to admin console and stats API."""
+    response = client.get("/admin", follow_redirects=True)
+    assert b"permission" in response.data or b"permission to access" in response.data or response.status_code == 403
+    
+    response_stats = client.get("/api/v1/admin/stats")
+    assert response_stats.status_code == 403
+
+
+def test_rbac_admin_allowed(app):
+    """Verify that an Administrator (role='Administrator') is allowed access to admin console and stats API."""
+    from app.database.database import DatabaseManager
+    from werkzeug.security import generate_password_hash
+    
+    with app.test_client() as test_client:
+        with app.app_context():
+            db = DatabaseManager()
+            pwd_hash = generate_password_hash("adminpass123", method="scrypt")
+            db.create_user(
+                username="admintest",
+                email="admintest@test.com",
+                password_hash=pwd_hash,
+                role="Administrator"
+            )
+            
+        # Log in
+        test_client.post("/auth/login", data={
+            "email": "admintest@test.com",
+            "password": "adminpass123",
+            "submit": "Sign In"
+        }, follow_redirects=True)
+        
+        response = test_client.get("/admin")
+        assert response.status_code == 200
+        
+        response_stats = test_client.get("/api/v1/admin/stats")
+        assert response_stats.status_code == 200
+
+
+def test_rbac_officer_allowed(app):
+    """Verify that an Officer (role='Officer') is allowed access to admin console and stats API."""
+    from app.database.database import DatabaseManager
+    from werkzeug.security import generate_password_hash
+    
+    with app.test_client() as test_client:
+        with app.app_context():
+            db = DatabaseManager()
+            pwd_hash = generate_password_hash("officerpass123", method="scrypt")
+            db.create_user(
+                username="officertest",
+                email="officertest@test.com",
+                password_hash=pwd_hash,
+                role="Officer"
+            )
+            
+        # Log in
+        test_client.post("/auth/login", data={
+            "email": "officertest@test.com",
+            "password": "officerpass123",
+            "submit": "Sign In"
+        }, follow_redirects=True)
+        
+        response = test_client.get("/admin")
+        assert response.status_code == 200
+        
+        response_stats = test_client.get("/api/v1/admin/stats")
+        assert response_stats.status_code == 200

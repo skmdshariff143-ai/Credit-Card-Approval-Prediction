@@ -172,17 +172,22 @@ class PreprocessingPipeline:
 
             logger.info("Applying SMOTE oversampling to balance target classes...")
 
-            min_class_size = min(y_train.value_counts())
-            if min_class_size > 1:
-                k_neighbors = min(5, min_class_size - 1)
-                smote = SMOTE(k_neighbors=k_neighbors, random_state=42)
-                X_train_final, y_train_final = smote.fit_resample(X_train_scaled, y_train)
-            else:
-                logger.warning("Minority class size too small for SMOTE. Falling back to RandomOverSampler.")
-                from imblearn.over_sampling import RandomOverSampler
+            classes_count = y_train.value_counts()
+            if len(classes_count) > 1:
+                min_class_size = min(classes_count)
+                if min_class_size > 1:
+                    k_neighbors = min(5, min_class_size - 1)
+                    smote = SMOTE(k_neighbors=k_neighbors, random_state=42)
+                    X_train_final, y_train_final = smote.fit_resample(X_train_scaled, y_train)
+                else:
+                    logger.warning("Minority class size too small for SMOTE. Falling back to RandomOverSampler.")
+                    from imblearn.over_sampling import RandomOverSampler
 
-                ros = RandomOverSampler(random_state=42)
-                X_train_final, y_train_final = ros.fit_resample(X_train_scaled, y_train)
+                    ros = RandomOverSampler(random_state=42)
+                    X_train_final, y_train_final = ros.fit_resample(X_train_scaled, y_train)
+            else:
+                logger.warning("Only 1 class present in training labels. Skipping resampling.")
+                X_train_final, y_train_final = X_train_scaled, y_train
 
             # 8. Save final datasets
             X_train_final.to_csv(os.path.join(self.processed_dir, "X_train.csv"), index=False)

@@ -275,6 +275,10 @@ def clear_user_history():
 @login_required
 def admin():
     """Renders Admin Dashboard statistics panels (Phase 11 spec)."""
+    # RBAC check: Only Administrator and Officer can access
+    if current_user.role not in ["Administrator", "Officer"]:
+        flash("You do not have permission to access the admin console.", "danger")
+        return redirect(url_for("api.index"))
     stats = db_manager.get_admin_stats()
     recent = db_manager.get_predictions(limit=6)
     return render_template("admin.html", stats=stats, recent=recent)
@@ -290,10 +294,11 @@ def get_report(application_id):
         flash("Application credit report not found.", "danger")
         return redirect(url_for("api.history"))
 
-    # Security: check ownership if user_id is set on the report
+    # Security: check ownership if user_id is set on the report, but allow Administrator and Officer access
     if report["user_id"] is not None and report["user_id"] != current_user.id:
-        flash("Unauthorized access to this credit report.", "danger")
-        return redirect(url_for("api.history"))
+        if current_user.role not in ["Administrator", "Officer"]:
+            flash("Unauthorized access to this credit report.", "danger")
+            return redirect(url_for("api.history"))
 
     # Map report schema structure to match what report.html expects
     record = {
@@ -421,9 +426,13 @@ def startup_diagnostics():
 
 
 @api_bp.route("/api/v1/admin/stats", methods=["GET"])
+@login_required
 @rate_limit(limit_count=30, period_seconds=60)
 def api_admin_stats():
     """Returns aggregated stats formatted for Chart.js dashboards."""
+    # RBAC check: Only Administrator and Officer can access
+    if current_user.role not in ["Administrator", "Officer"]:
+        return jsonify({"error": "Unauthorized"}), 403
     records = db_manager.get_predictions(limit=1000)
 
     # 1. Income distribution bins

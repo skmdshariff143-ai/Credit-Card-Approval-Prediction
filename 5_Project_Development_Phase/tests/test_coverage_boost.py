@@ -27,11 +27,16 @@ def _login_test_client(app, client):
     """Creates a test user and logs in via the client session."""
     with app.app_context():
         db = DatabaseManager()
+        # Delete user if exists to guarantee clean slate
+        with db._get_connection() as conn:
+            conn.execute("DELETE FROM users WHERE username = ? OR email = ?", ("route_test_user", "routetest@test.com"))
+            conn.commit()
         db.create_user(
             username="route_test_user",
             email="routetest@test.com",
             password_hash=generate_password_hash("testpass123", method="scrypt"),
             full_name="Route Tester",
+            role="Administrator"
         )
     client.post("/auth/login", data={
         "email": "routetest@test.com",

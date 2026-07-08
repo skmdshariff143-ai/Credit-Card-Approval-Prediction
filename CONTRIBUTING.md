@@ -25,3 +25,9 @@ We welcome contributions to CreditGuard AI. Please review the following workflow
    pytest tests/ -v
    ```
 4. Push and submit a Pull Request (PR) for review.
+
+---
+
+## 👥 Contributors
+
+- **Shaik Mahammad Shariff** ([skmdshariff143-ai](https://github.com/skmdshariff143-ai)) — Lead Developer & Maintainer
