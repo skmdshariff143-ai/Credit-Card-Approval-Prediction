@@ -97,7 +97,7 @@ We verified all project linkages:
 ## 10. Submission Checklist
 - [x] Paste the GitHub Repository link.
 - [x] Paste the GitHub Pages URL.
-- [x] Upload `CreditGuard_AI_Final_Report.pdf` (exported from `Project_Report.md`).
+- [x] Upload [Project_Report.pdf](file:///e:/Credit-Card-Approval-Prediction/7_Project_Documentation/Project_Report.pdf) (exported from [Project_Report.md](file:///e:/Credit-Card-Approval-Prediction/7_Project_Documentation/Project_Report.md)).
 - [x] Record and submit a screen capture link using the [Demo_Video_Script.md](file:///e:/Credit-Card-Approval-Prediction/Demo_Video_Script.md) script.
 - [x] Upload `ER_Diagram.png` and `Flowchart.png` diagrams.
 

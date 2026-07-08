@@ -120,6 +120,6 @@ You will need to manually upload the following items to the Skill Wallet dashboa
 3. **Demo Video URL**:
    Record a screen capture of the application running locally or in staging using the [Demo_Video_Script.md](7_Project_Documentation/Demo_Video_Script.md) guide, publish it (e.g. YouTube or Loom), and submit the URL.
 4. **Final PDF Project Report**:
-   Export [Final_Project_Report.md](reports/Final_Project_Report.md) as a PDF file, rename it to `CreditGuard_AI_Final_Report.pdf`, and upload it under the "Project Report" field.
+   Export [Project_Report.md](file:///e:/Credit-Card-Approval-Prediction/7_Project_Documentation/Project_Report.md) as a PDF file, and upload the generated [Project_Report.pdf](file:///e:/Credit-Card-Approval-Prediction/7_Project_Documentation/Project_Report.pdf) under the "Project Report" field.
 5. **System Diagram Assets**:
    Download and upload `diagrams/ER_Diagram.png` and `diagrams/Flowchart.png` to the visual architecture section.
