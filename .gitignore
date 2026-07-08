@@ -87,3 +87,6 @@ Thumbs.db
 
 .vercel
 !.env.example
+
+# Ignore local runtime predictions history
+5_Project_Development_Phase/data/processed/prediction_history.json
