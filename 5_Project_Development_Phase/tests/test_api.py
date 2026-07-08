@@ -185,7 +185,10 @@ def test_create_app_envs():
     Test app factory pattern with different environment profiles.
     """
     with patch("os.getenv") as mock_getenv:
-        mock_getenv.side_effect = lambda key, default=None: "production" if key == "FLASK_ENV" else default
+        mock_getenv.side_effect = lambda key, default=None: {
+            "FLASK_ENV": "production",
+            "SECRET_KEY": "test-mock-secret-key",
+        }.get(key, default)
         app = create_app()
         assert app.config.get("ENV") == "production" or app.config.get("TESTING") is False
 
