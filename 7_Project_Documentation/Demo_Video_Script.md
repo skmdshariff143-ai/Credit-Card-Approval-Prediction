@@ -1,14 +1,14 @@
 # Demo Video Script: CreditCard Approval Prediction
 
 **Duration:** ~3 Minutes
-**Presenter:** Mahammad Shariff Shaik
+**Presenter:** Shaik Mahammad Shariff
 
 ---
 
 ## Scene 1: Introduction & Problem Statement (~45 Seconds)
 - **Visual:** Screen sharing the repository homepage (`README.md` and file tree). Presenter's camera in the corner.
 - **Audio (Script):**
-  > "Hello everyone! My name is Mahammad Shariff Shaik, and today I'm presenting my end-to-end Machine Learning project: Credit Card Approval Prediction.
+  > "Hello everyone! My name is Shaik Mahammad Shariff, and today I'm presenting my end-to-end Machine Learning project: Credit Card Approval Prediction.
   > In the banking sector, automated risk evaluation is critical. Manual reviews are slow and error-prone. This project delivers a production-grade machine learning system that automates credit application approvals. 
   > We utilize the Kaggle Credit Card Approval dataset, joining demographic application profiles with monthly repayment records, defining credit risk based on historical delinquencies of 60 days or more."
 

@@ -197,18 +197,18 @@ pytest 5_Project_Development_Phase/tests/ -v
 
 ---
 
-## 🤝 Project Contributors
-- **Sk Md Shariff** — Lead Developer, Security Analyst, and DevOps Engineer.
+## 🤝 Author
+- **Shaik Mahammad Shariff** — Lead Developer, Security Analyst, and DevOps Engineer
+  ([skmdshariff143-ai](https://github.com/skmdshariff143-ai))
+
+## 🙏 Acknowledgements
+- **Data Source**: Kaggle Credit Card Approval dataset
+- **Reference**: Scikit-Learn, LIME, and XGBoost documentation suites
 
 ---
 
 ## 📄 License
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.--
-
-## 🤝 Author & Acknowledgements
-- **Author**: **Mahammad Shariff Shaik** - [skmdshariff143-ai](https://github.com/skmdshariff143-ai)
-- **Data Source**: Kaggle Credit Card Approval dataset.
-- **Reference**: Scikit-Learn, LIME, and XGBoost documentation suites.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ---
 

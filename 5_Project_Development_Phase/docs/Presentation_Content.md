@@ -7,7 +7,7 @@ This document provides the slides structure and content outline for presenting t
 ## Slide 1: Title Slide
 - **Title:** CreditGuard AI
 - **Subtitle:** Enterprise Risk Assessment & Credit Card Approval Platform
-- **Presenter:** Mahammad Shariff Shaik (Senior AI/ML Engineer)
+- **Presenter:** Shaik Mahammad Shariff (Senior AI/ML Engineer)
 - **Visual:** System logo/banner, links to GitHub & Live Demo.
 
 ---
