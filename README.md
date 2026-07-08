@@ -56,7 +56,7 @@ python 5_Project_Development_Phase/scripts/seed_db.py
 ---
 
 ## 🎥 Demo Video
-Watch the full project walkthrough here: [![Project Demo Video](https://img.shields.io/badge/YouTube-Project--Demo--Video-red?style=flat&logo=youtube&logoColor=white)](https://youtu.be/zli5C77xTHg)
+Watch the full project walkthrough here: [Project Demo Video](https://youtu.be/zli5C77xTHg)
 
 ---
 
