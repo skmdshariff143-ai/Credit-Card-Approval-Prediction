@@ -99,9 +99,10 @@ def test_preprocessing_pipeline_single_class_edge_case():
     from config.config import config
     with patch.object(config, "get_paths", return_value=mock_paths):
         with patch("src.preprocessing.pipeline.DataLoader.load_all", return_value=(mock_app_df, mock_credit_df)):
-            with patch("pandas.DataFrame.to_csv") as mock_csv, \
+            with patch("pandas.DataFrame.to_csv") as mock_df_csv, \
+                 patch("pandas.Series.to_csv") as mock_series_csv, \
                  patch("src.preprocessing.pipeline.save_pkl") as mock_save:
                 train_shape, test_shape = pipeline.execute_full_pipeline()
                 assert train_shape is not None
                 assert test_shape is not None
-                assert mock_csv.called
+                assert mock_df_csv.called
