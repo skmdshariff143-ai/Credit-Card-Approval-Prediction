@@ -11,7 +11,10 @@
 [![Flask Framework](https://img.shields.io/badge/flask-3.0-lightgrey.svg)](https://flask.palletsprojects.com/)
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.3-orange.svg)](https://scikit-learn.org/)
 [![XGBoost](https://img.shields.io/badge/xgboost-2.0-red.svg)](https://xgboost.readthedocs.io/)
-[![CI Tests Workflow](https://img.shields.io/badge/github%20actions-CI%20pytest-green.svg)](https://github.com/features/actions)
+[![Continuous Integration](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/ci.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/ci.yml)
+[![Python Test Suite](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/tests.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/tests.yml)
+[![Coverage Status](https://img.shields.io/badge/Coverage-86%25-brightgreen.svg)](#)
+[![Demo Video](https://img.shields.io/badge/Demo--Video-YouTube-red?logo=youtube&logoColor=white)](https://youtu.be/zli5C77xTHg)
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ---
@@ -32,21 +35,28 @@
 
 ---
 
-## 🔑 Default Demo Credentials
-Use these pre-seeded demo credentials to explore role-based dashboard telemetries:
+## 🔑 Authentication & Local User Seeding
+To explore role-based dashboard telemetries, copy the environment template to `.env` and populate the optional account environment variables:
+- `ADMIN_USERNAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` (Administrator account)
+- `OFFICER_USERNAME`, `OFFICER_EMAIL`, `OFFICER_PASSWORD` (Loan Officer account)
+- `DEMO_USERNAME`, `DEMO_EMAIL`, `DEMO_PASSWORD` (Client User account)
 
-| Role | Email | Password | Access Rights |
-|---|---|---|---|
-| **Administrator** | `admin@creditguard.ai` | `Admin@123` | Full access to charts, database log registries, and configs |
-| **Administrator** | `admin@example.com` | `Admin@123` | Full access to charts, database log registries, and configs |
-| **Loan Officer** | `officer@creditguard.ai` | `Officer@123` | Search, sort, and inspect prediction transactions |
-| **Client User** | `demo@creditguard.ai` | `Demo@123` | Submit scoring forms, view personal telemetry metrics |
+Then seed the local SQLite database by executing:
+```bash
+python 5_Project_Development_Phase/scripts/seed_db.py
+```
+*(No hardcoded credentials are pre-published or committed to repository files. The app enforces RBAC role validation at runtime based on these seeded database records.)*
 
 ---
 
-## 🌐 Live Deployments & Presentation Links
+## 🚀 Live Demo
 - 🚀 **Live Production Application**: [credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app)
 - 🖥️ **Static Portfolio Website**: [skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction](https://skmdshariff143-ai.github.io/Credit-Card-Approval-Prediction/)
+
+---
+
+## 🎥 Demo Video
+Watch the full project walkthrough here: [![Project Demo Video](https://img.shields.io/badge/YouTube-Project--Demo--Video-red?style=flat&logo=youtube&logoColor=white)](https://youtu.be/zli5C77xTHg)
 
 ---
 
