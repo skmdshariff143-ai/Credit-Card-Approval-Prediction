@@ -1,14 +1,50 @@
 [
     {
-        "Model": "test_model",
-        "Accuracy": 0.8,
-        "Precision": 0.7,
-        "Recall": 0.9,
-        "F1-Score": 0.79,
-        "ROC-AUC": 0.85,
-        "Balanced_Accuracy": 0.8,
-        "Log_Loss": 0.3,
-        "Training_Time_Sec": 1.2,
-        "Prediction_Time_Sec": 0.05
+        "Model": "logistic_regression",
+        "Accuracy": 0.719,
+        "Precision": 0.1423611111111111,
+        "Recall": 0.5466666666666666,
+        "F1-Score": 0.22589531680440772,
+        "ROC-AUC": 0.6885333333333334,
+        "Balanced_Accuracy": 0.6398198198198197,
+        "Log_Loss": 0.563060423173979,
+        "Training_Time_Sec": 1.7491,
+        "Prediction_Time_Sec": 0.0018
+    },
+    {
+        "Model": "decision_tree",
+        "Accuracy": 0.897,
+        "Precision": 0.22,
+        "Recall": 0.14666666666666667,
+        "F1-Score": 0.176,
+        "ROC-AUC": 0.6534846846846847,
+        "Balanced_Accuracy": 0.5522522522522523,
+        "Log_Loss": 1.4766164729919677,
+        "Training_Time_Sec": 0.1681,
+        "Prediction_Time_Sec": 0.0023
+    },
+    {
+        "Model": "random_forest",
+        "Accuracy": 0.923,
+        "Precision": 0.4,
+        "Recall": 0.05333333333333334,
+        "F1-Score": 0.09411764705882353,
+        "ROC-AUC": 0.7079927927927928,
+        "Balanced_Accuracy": 0.5234234234234234,
+        "Log_Loss": 0.25891614474478175,
+        "Training_Time_Sec": 0.3938,
+        "Prediction_Time_Sec": 0.1166
+    },
+    {
+        "Model": "xgboost",
+        "Accuracy": 0.914,
+        "Precision": 0.28,
+        "Recall": 0.09333333333333334,
+        "F1-Score": 0.14,
+        "ROC-AUC": 0.6600216216216216,
+        "Balanced_Accuracy": 0.5369369369369369,
+        "Log_Loss": 0.3032143096342338,
+        "Training_Time_Sec": 0.4659,
+        "Prediction_Time_Sec": 0.0249
     }
 ]
