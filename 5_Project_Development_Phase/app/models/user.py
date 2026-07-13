@@ -9,7 +9,20 @@ class User(UserMixin):
     into a Flask-Login compatible object with session persistence.
     """
 
-    def __init__(self, id, username, email, password_hash, name=None, created_at=None, is_admin=0, role='User', last_login=None, status='Active', full_name=None):
+    def __init__(
+        self,
+        id,
+        username,
+        email,
+        password_hash,
+        name=None,
+        created_at=None,
+        is_admin=0,
+        role="User",
+        last_login=None,
+        status="Active",
+        full_name=None,
+    ):
         self.id = id
         self.username = username
         self.email = email
@@ -17,7 +30,7 @@ class User(UserMixin):
         self.name = name or full_name or username
         self.full_name = self.name
         self.created_at = created_at
-        self.is_admin = bool(is_admin) or (role == 'Administrator')
+        self.is_admin = bool(is_admin) or (role == "Administrator")
         self.role = role
         self.last_login = last_login
         self.status = status
@@ -38,7 +51,7 @@ class User(UserMixin):
             role=row.get("role", "User"),
             last_login=row.get("last_login"),
             status=row.get("status", "Active"),
-            full_name=row.get("full_name")
+            full_name=row.get("full_name"),
         )
 
     @property
@@ -49,4 +62,3 @@ class User(UserMixin):
 
     def __repr__(self):
         return f"<User {self.username} (id={self.id})>"
-

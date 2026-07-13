@@ -103,6 +103,13 @@
 
   <!-- Main Content -->
   <main class="cg-main">
+    {% if is_vercel %}
+    <div style="margin: 16px 24px 8px 24px; border-radius: 8px; font-size: 13px; padding: 10px 16px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <span><strong>Demo Mode:</strong> History and user sessions reset periodically on server cold starts.</span>
+    </div>
+    {% endif %}
+
     <!-- Flash Messages (rendered hidden, picked up by JS Toast system) -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}

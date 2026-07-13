@@ -20,6 +20,7 @@ class DatabaseManager:
         except Exception as e:
             # Under read-only environments (like Vercel build stages), ignore write failure
             import logging
+
             logging.getLogger(__name__).warning(f"Database initialization deferred/ignored: {str(e)}")
 
     def _get_connection(self):
@@ -95,7 +96,7 @@ class DatabaseManager:
                 ("full_name", "TEXT"),
                 ("role", "TEXT NOT NULL DEFAULT 'User'"),
                 ("last_login", "TEXT"),
-                ("status", "TEXT NOT NULL DEFAULT 'Active'")
+                ("status", "TEXT NOT NULL DEFAULT 'Active'"),
             ]:
                 try:
                     conn.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
@@ -104,19 +105,23 @@ class DatabaseManager:
 
             # Seed default users from environment variables if present
             from werkzeug.security import generate_password_hash
-            
+
             admin_email = os.getenv("ADMIN_EMAIL")
             admin_pwd = os.getenv("ADMIN_PASSWORD")
             officer_email = os.getenv("OFFICER_EMAIL")
             officer_pwd = os.getenv("OFFICER_PASSWORD")
             demo_email = os.getenv("DEMO_EMAIL")
             demo_pwd = os.getenv("DEMO_PASSWORD")
-            
+
             default_users = []
             if admin_email and admin_pwd:
-                default_users.append((os.getenv("ADMIN_USERNAME", "admin"), admin_email, admin_pwd, "Admin", "Administrator"))
+                default_users.append(
+                    (os.getenv("ADMIN_USERNAME", "admin"), admin_email, admin_pwd, "Admin", "Administrator")
+                )
             if officer_email and officer_pwd:
-                default_users.append((os.getenv("OFFICER_USERNAME", "officer"), officer_email, officer_pwd, "Loan Officer", "Officer"))
+                default_users.append(
+                    (os.getenv("OFFICER_USERNAME", "officer"), officer_email, officer_pwd, "Loan Officer", "Officer")
+                )
             if demo_email and demo_pwd:
                 default_users.append((os.getenv("DEMO_USERNAME", "demo"), demo_email, demo_pwd, "Demo User", "User"))
 
@@ -128,7 +133,16 @@ class DatabaseManager:
                     cursor.execute(
                         """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                        (username, email, pwd_hash, name, name, role, "Active", datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                        (
+                            username,
+                            email,
+                            pwd_hash,
+                            name,
+                            name,
+                            role,
+                            "Active",
+                            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        ),
                     )
 
             # Add user_id column to prediction_history (safe migration)
@@ -193,7 +207,7 @@ class DatabaseManager:
             )
             conn.commit()
 
-    def create_user(self, username, email, password_hash, name=None, role='User', status='Active', full_name=None):
+    def create_user(self, username, email, password_hash, name=None, role="User", status="Active", full_name=None):
         """Creates a new user account. Returns user id or None on conflict."""
         with self._get_connection() as conn:
             try:
@@ -202,7 +216,16 @@ class DatabaseManager:
                 cursor.execute(
                     """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                    (username, email, password_hash, display_name, display_name, role, status, datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+                    (
+                        username,
+                        email,
+                        password_hash,
+                        display_name,
+                        display_name,
+                        role,
+                        status,
+                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    ),
                 )
                 conn.commit()
                 return cursor.lastrowid
@@ -343,9 +366,7 @@ class DatabaseManager:
             )
             rejected = cursor.fetchone()[0] or 0
 
-            cursor.execute(
-                "SELECT AVG(probability) FROM prediction_history WHERE user_id = ?", (user_id,)
-            )
+            cursor.execute("SELECT AVG(probability) FROM prediction_history WHERE user_id = ?", (user_id,))
             avg_prob = cursor.fetchone()[0]
             avg_prob = avg_prob if avg_prob is not None else 0.0
 
@@ -423,7 +444,8 @@ class DatabaseManager:
         with self._get_connection() as conn:
             # Insert into predictions (compat)
             conn.execute(
-                "INSERT INTO predictions (timestamp, input_features, prediction, probability, model, explanation) VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO predictions (timestamp, input_features, prediction, probability, model, explanation) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
                 (timestamp, raw_json, prediction, probability, model, explanation_json),
             )
 
