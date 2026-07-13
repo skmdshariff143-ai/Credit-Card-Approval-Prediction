@@ -33,8 +33,9 @@ class ProjectConfig:
         self.IBM_SPACE_ID = os.getenv("IBM_SPACE_ID")
         self.IBM_SCORING_URL = os.getenv("IBM_SCORING_URL")
 
-        # Create log directories if they don't exist
-        os.makedirs(os.path.dirname(self.LOG_FILE_PATH), exist_ok=True)
+        # Create directories if they don't exist
+        for path in self.get_paths().values():
+            os.makedirs(path, exist_ok=True)
 
     def get_paths(self):
         """
@@ -44,7 +45,7 @@ class ProjectConfig:
         logs_dir = Path(tempfile.gettempdir()) if is_vercel else self.BASE_DIR / "logs"
         processed_dir = Path(tempfile.gettempdir()) if is_vercel else self.BASE_DIR / "data" / "processed"
         reports_dir = Path(tempfile.gettempdir()) if is_vercel else self.BASE_DIR / "reports"
-        
+
         return {
             "raw_dir": self.BASE_DIR / "data" / "raw",
             "processed_dir": processed_dir,

@@ -9,8 +9,16 @@ from flask_wtf.csrf import CSRFProtect
 # Ensure root directory is on Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+# Apply sklearn compatibility patch if available
+try:
+    import src.utils.sklearn_compat  # noqa: F401
+except ModuleNotFoundError:
+    pass
+
+
 # Load environmental variables
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../.env"))
+
 
 # Initialize Flask-Login extension at module level
 login_manager = LoginManager()
@@ -87,6 +95,11 @@ def create_app() -> Flask:
         app.logger.info("ML Model and preprocessing pipeline successfully pre-loaded during application startup.")
     except Exception as e:
         app.logger.error(f"Error pre-loading ML model or pipeline during startup: {str(e)}")
+
+    # Register context processors
+    @app.context_processor
+    def inject_global_variables():
+        return {"is_vercel": os.getenv("VERCEL") == "1"}
 
     return app
 
