@@ -14,6 +14,8 @@ from app.routes.forms import (
     ResetPasswordForm,
 )
 from app.utils.logger import get_logger
+from app.utils.email import send_reset_email
+from app.utils.limiter import rate_limit
 
 logger = get_logger(__name__)
 
@@ -141,6 +143,7 @@ def logout():
 
 
 @auth_bp.route("/forgot-password", methods=["GET", "POST"])
+@rate_limit(limit_count=5, period_seconds=3600)
 def forgot_password():
     """Request a password reset token."""
     if current_user.is_authenticated:
@@ -154,17 +157,13 @@ def forgot_password():
             token = _generate_reset_token(row["email"])
             reset_url = url_for("auth.reset_password", token=token, _external=True)
             logger.info(f"Password reset requested for: {row['email']}")
-            flash(
-                f"A reset link has been generated. In production this would be emailed. "
-                f"For now, use this link: {reset_url}",
-                "info",
-            )
-        else:
-            # Don't reveal whether the email exists (security)
-            flash(
-                "If an account with that email exists, a reset link has been sent.",
-                "info",
-            )
+            send_reset_email(row["email"], reset_url)
+
+        # Don't reveal whether the email exists (security)
+        flash(
+            "If an account with that email exists, a reset link has been sent.",
+            "info",
+        )
 
         return redirect(url_for("auth.login"))
 

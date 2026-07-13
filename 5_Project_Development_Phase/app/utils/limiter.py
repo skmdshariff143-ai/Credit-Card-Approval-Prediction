@@ -15,6 +15,11 @@ def rate_limit(limit_count: int = 60, period_seconds: int = 60):
     def decorator(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
+            from flask import current_app
+
+            if current_app and current_app.testing:
+                return f(*args, **kwargs)
+
             ip = request.remote_addr
             now = time.time()
 
