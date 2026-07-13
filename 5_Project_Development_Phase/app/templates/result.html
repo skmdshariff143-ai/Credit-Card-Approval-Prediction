@@ -353,7 +353,7 @@
           {% for f in support_factors %}
             <div class="cg-factor-card">
               <span class="cg-text-secondary" style="font-size:12.5px;">{{ f.feature }}</span>
-              <span class="cg-factor-badge positive">+{{ '%.1f'|format(f.contribution * 100) }}%</span>
+              <span class="cg-factor-badge positive">+{{ '%.1f'|format(f.impact * 100) }}%</span>
             </div>
           {% else %}
             <span class="cg-text-xs cg-text-muted">No positive indicators computed.</span>
@@ -368,7 +368,7 @@
           {% for f in risk_factors %}
             <div class="cg-factor-card">
               <span class="cg-text-secondary" style="font-size:12.5px;">{{ f.feature }}</span>
-              <span class="cg-factor-badge negative">-{{ '%.1f'|format(f.contribution * 100) }}%</span>
+              <span class="cg-factor-badge negative">-{{ '%.1f'|format(f.impact * 100) }}%</span>
             </div>
           {% else %}
             <span class="cg-text-xs cg-text-muted">No risk factors computed.</span>

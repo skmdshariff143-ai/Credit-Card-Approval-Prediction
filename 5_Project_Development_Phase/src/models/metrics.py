@@ -19,7 +19,9 @@ def calculate_all_metrics(y_true, y_pred, y_prob=None) -> dict:
     Computes a comprehensive suite of classification metrics.
     """
     if len(y_true) == 0 or len(y_pred) == 0:
-        logger.warning("Empty ground truth or prediction array passed to metrics calculation. Returning zeroed metrics.")
+        logger.warning(
+            "Empty ground truth or prediction array passed to metrics calculation. Returning zeroed metrics."
+        )
         return {
             "Accuracy": 0.0,
             "Precision": 0.0,

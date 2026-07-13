@@ -5,27 +5,10 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import pandas as pd  # noqa: E402
-from sklearn.base import BaseEstimator, ClassifierMixin  # noqa: E402
+import src.utils.sklearn_compat  # noqa: E402, F401
 from sklearn.metrics import classification_report  # noqa: E402
 from sklearn.model_selection import StratifiedKFold, cross_val_score  # noqa: E402
-from sklearn.utils._tags import ClassifierTags  # noqa: E402
 
-
-# Global patch to fix scikit-learn 1.6 / Python 3.13 / XGBoost MRO compatibility bug
-def safe_sklearn_tags(self):
-    try:
-        # BaseEstimator is parent class, resolve its tags
-        tags = BaseEstimator.__sklearn_tags__(self)
-        tags.estimator_type = "classifier"
-        tags.classifier_tags = ClassifierTags()
-        tags.target_tags.required = True
-        return tags
-    except Exception:
-        # Fallback to default empty tags if resolution fails
-        return BaseEstimator.__sklearn_tags__(self)
-
-
-ClassifierMixin.__sklearn_tags__ = safe_sklearn_tags
 
 from config.config import config  # noqa: E402
 from config.constants import TARGET_COL  # noqa: E402
