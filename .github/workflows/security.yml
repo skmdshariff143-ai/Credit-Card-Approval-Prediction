@@ -34,4 +34,4 @@ jobs:
         run: |
           # Check requirements.txt for known vulnerabilities
           # Ignore safety failure if check fails to keep CI green while checking dependencies
-          safety check -r requirements.txt || true
+          safety check -r requirements.txt
