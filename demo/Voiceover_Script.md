@@ -15,7 +15,7 @@ Use this script as a narration guideline while recording.
 ---
 
 ### New Application (1:00 - 2:00)
-> *"Let's run a new credit evaluation. Our form has been completely overhauled into a premium 4-step wizard. Step 1 collects applicant demographics. Click Next. Step 2 captures financial metrics, including annual income, employment years, existing monthly debt liabilities, and requested loan limit. Step 3 compiles a clean verification summary for review. Step 4 triggers our active XGBoost predictive classifier pipeline."*
+> *"Let's run a new credit evaluation. Our form has been completely overhauled into a premium 4-step wizard. Step 1 collects applicant demographics. Click Next. Step 2 captures financial metrics, including annual income, employment years, existing monthly debt liabilities, and requested loan limit. Step 3 compiles a clean verification summary for review. Step 4 triggers our active predictive risk classifier pipeline."*
 
 ---
 
