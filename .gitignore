@@ -90,3 +90,8 @@ Thumbs.db
 
 # Ignore local runtime predictions history
 5_Project_Development_Phase/data/processed/prediction_history.json
+
+# Ignore local runtime reports and model plots
+5_Project_Development_Phase/reports/
+5_Project_Development_Phase/screenshots/models/
+
