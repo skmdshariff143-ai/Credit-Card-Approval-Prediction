@@ -406,7 +406,7 @@ def test_rbac_user_denied(client):
     """Verify that a regular user (role='User') is denied access to admin console and stats API."""
     response = client.get("/admin", follow_redirects=True)
     assert b"permission" in response.data or b"permission to access" in response.data or response.status_code == 403
-    
+
     response_stats = client.get("/api/v1/admin/stats")
     assert response_stats.status_code == 403
 
@@ -415,28 +415,25 @@ def test_rbac_admin_allowed(app):
     """Verify that an Administrator (role='Administrator') is allowed access to admin console and stats API."""
     from app.database.database import DatabaseManager
     from werkzeug.security import generate_password_hash
-    
+
     with app.test_client() as test_client:
         with app.app_context():
             db = DatabaseManager()
             pwd_hash = generate_password_hash("adminpass123", method="scrypt")
             db.create_user(
-                username="admintest",
-                email="admintest@test.com",
-                password_hash=pwd_hash,
-                role="Administrator"
+                username="admintest", email="admintest@test.com", password_hash=pwd_hash, role="Administrator"
             )
-            
+
         # Log in
-        test_client.post("/auth/login", data={
-            "email": "admintest@test.com",
-            "password": "adminpass123",
-            "submit": "Sign In"
-        }, follow_redirects=True)
-        
+        test_client.post(
+            "/auth/login",
+            data={"email": "admintest@test.com", "password": "adminpass123", "submit": "Sign In"},
+            follow_redirects=True,
+        )
+
         response = test_client.get("/admin")
         assert response.status_code == 200
-        
+
         response_stats = test_client.get("/api/v1/admin/stats")
         assert response_stats.status_code == 200
 
@@ -445,27 +442,272 @@ def test_rbac_officer_allowed(app):
     """Verify that an Officer (role='Officer') is allowed access to admin console and stats API."""
     from app.database.database import DatabaseManager
     from werkzeug.security import generate_password_hash
-    
+
     with app.test_client() as test_client:
         with app.app_context():
             db = DatabaseManager()
             pwd_hash = generate_password_hash("officerpass123", method="scrypt")
-            db.create_user(
-                username="officertest",
-                email="officertest@test.com",
-                password_hash=pwd_hash,
-                role="Officer"
-            )
-            
+            db.create_user(username="officertest", email="officertest@test.com", password_hash=pwd_hash, role="Officer")
+
         # Log in
-        test_client.post("/auth/login", data={
-            "email": "officertest@test.com",
-            "password": "officerpass123",
-            "submit": "Sign In"
-        }, follow_redirects=True)
-        
+        test_client.post(
+            "/auth/login",
+            data={"email": "officertest@test.com", "password": "officerpass123", "submit": "Sign In"},
+            follow_redirects=True,
+        )
+
         response = test_client.get("/admin")
         assert response.status_code == 200
-        
+
         response_stats = test_client.get("/api/v1/admin/stats")
         assert response_stats.status_code == 200
+
+
+def test_forgot_password_no_token_leak(app):
+    """
+    Assert that the response to /auth/forgot-password never contains the raw reset token
+    in its body, headers, or flashed messages.
+    """
+    from app.database.database import DatabaseManager
+    from werkzeug.security import generate_password_hash
+
+    # Ensure a user exists for password reset
+    with app.app_context():
+        db = DatabaseManager()
+        # Delete user if exists to guarantee clean slate
+        with db._get_connection() as conn:
+            conn.execute("DELETE FROM users WHERE email = ?", ("resetuser@test.com",))
+            conn.commit()
+        pwd_hash = generate_password_hash("userpass123", method="scrypt")
+        db.create_user(username="resetuser", email="resetuser@test.com", password_hash=pwd_hash, role="Client User")
+
+    with app.test_client() as test_client:
+        # Trigger forgot password request
+        response = test_client.post(
+            "/auth/forgot-password", data={"email": "resetuser@test.com", "submit": "Submit"}, follow_redirects=True
+        )
+
+        assert response.status_code == 200
+
+        # Check that the generic message is flashed
+        assert b"If an account with that email exists, a reset link has been sent." in response.data
+
+        # Ensure the token does not leak anywhere in the response body or headers
+        assert b"/auth/reset-password/" not in response.data
+        assert b"reset_url" not in response.data
+
+        # Verify no token is present in the flashed cookies or headers
+        for header, val in response.headers.items():
+            assert "reset-password" not in val
+
+
+def test_auth_registration_flow(app):
+    """
+    Test user registration page and handling, including duplicate username/email errors.
+    """
+    from app.database.database import DatabaseManager
+
+    with app.app_context():
+        db = DatabaseManager()
+        with db._get_connection() as conn:
+            conn.execute("DELETE FROM users WHERE username IN (?, ?)", ("regtest", "regtest2"))
+            conn.execute("DELETE FROM users WHERE email IN (?, ?)", ("regtest@test.com", "regtest2@test.com"))
+            conn.commit()
+
+    with app.test_client() as test_client:
+        # GET registration page
+        response = test_client.get("/auth/register")
+        assert response.status_code == 200
+
+        # Successful Registration
+        response = test_client.post(
+            "/auth/register",
+            data={
+                "username": "regtest",
+                "email": "regtest@test.com",
+                "password": "Password123",
+                "confirm_password": "Password123",
+                "full_name": "Registration Test",
+                "submit": "Sign Up",
+            },
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"Account created successfully! Please sign in." in response.data
+
+        # Duplicate Username
+        response = test_client.post(
+            "/auth/register",
+            data={
+                "username": "regtest",
+                "email": "regtest2@test.com",
+                "password": "Password123",
+                "confirm_password": "Password123",
+                "full_name": "Registration Test 2",
+                "submit": "Sign Up",
+            },
+            follow_redirects=True,
+        )
+        assert b"Username is already taken" in response.data
+
+        # Duplicate Email
+        response = test_client.post(
+            "/auth/register",
+            data={
+                "username": "regtest2",
+                "email": "regtest@test.com",
+                "password": "Password123",
+                "confirm_password": "Password123",
+                "full_name": "Registration Test 2",
+                "submit": "Sign Up",
+            },
+            follow_redirects=True,
+        )
+        assert b"An account with this email already exists" in response.data
+
+
+def test_auth_forgot_password_nonexistent_user(app):
+    """
+    Requesting a reset link for a non-existent user should not reveal user existence.
+    """
+    with app.test_client() as test_client:
+        response = test_client.post(
+            "/auth/forgot-password",
+            data={"email": "nonexistent@test.com", "submit": "Submit"},
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"If an account with that email exists, a reset link has been sent." in response.data
+
+
+def test_auth_reset_password_valid_token(app):
+    """
+    Test using a valid timed token to set a new password.
+    """
+    from app.database.database import DatabaseManager
+    from app.routes.auth import _generate_reset_token
+    from werkzeug.security import generate_password_hash
+
+    email = "validreset@test.com"
+    with app.app_context():
+        db = DatabaseManager()
+        with db._get_connection() as conn:
+            conn.execute("DELETE FROM users WHERE email = ?", (email,))
+            conn.commit()
+        pwd_hash = generate_password_hash("oldpass123", method="scrypt")
+        db.create_user(username="validreset", email=email, password_hash=pwd_hash)
+        token = _generate_reset_token(email)
+
+    with app.test_client() as test_client:
+        # GET with valid token
+        response = test_client.get(f"/auth/reset-password/{token}")
+        assert response.status_code == 200
+        assert b"Reset Password" in response.data
+
+        # POST with valid token
+        response = test_client.post(
+            f"/auth/reset-password/{token}",
+            data={
+                "password": "newpassword123",
+                "confirm_password": "newpassword123",
+                "submit": "Reset Password",
+            },
+            follow_redirects=True,
+        )
+        assert response.status_code == 200
+        assert b"Your password has been reset. Please sign in." in response.data
+
+        # Attempt to log in with new password
+        response = test_client.post(
+            "/auth/login",
+            data={"email": email, "password": "newpassword123", "submit": "Sign In"},
+            follow_redirects=True,
+        )
+        assert b"logout" in response.data.lower()
+
+
+def test_auth_reset_password_invalid_token(app):
+    """
+    Test using an invalid or expired token.
+    """
+    with app.test_client() as test_client:
+        # Invalid token signature
+        response = test_client.get("/auth/reset-password/invalidtokenvalue123", follow_redirects=True)
+        assert b"The reset link is invalid or has expired." in response.data
+
+
+def test_auth_profile_edit_and_password_change(app):
+    """
+    Test profile edit details and changing password from profile page.
+    """
+    from app.database.database import DatabaseManager
+    from werkzeug.security import generate_password_hash
+
+    email = "profileedit@test.com"
+    with app.app_context():
+        db = DatabaseManager()
+        with db._get_connection() as conn:
+            conn.execute("DELETE FROM users WHERE email IN (?, ?)", (email, "newemail@test.com"))
+            conn.commit()
+        pwd_hash = generate_password_hash("profilepass", method="scrypt")
+        db.create_user(username="profileedit", email=email, password_hash=pwd_hash, full_name="Old Name")
+
+    with app.test_client() as test_client:
+        # Login
+        test_client.post(
+            "/auth/login",
+            data={"email": email, "password": "profilepass", "submit": "Sign In"},
+            follow_redirects=True,
+        )
+
+        # GET Profile page
+        response = test_client.get("/auth/profile")
+        assert response.status_code == 200
+
+        # POST Update Profile details
+        response = test_client.post(
+            "/auth/profile/edit",
+            data={
+                "form_type": "profile",
+                "full_name": "New Name",
+                "email": "newemail@test.com",
+            },
+            follow_redirects=True,
+        )
+        assert b"Profile updated successfully." in response.data
+
+        # POST Update Profile password (wrong current password)
+        response = test_client.post(
+            "/auth/profile/edit",
+            data={
+                "form_type": "password",
+                "current_password": "wrongpassword",
+                "new_password": "newprofilepass",
+            },
+            follow_redirects=True,
+        )
+        assert b"Current password is incorrect." in response.data
+
+        # POST Update Profile password (too short new password)
+        response = test_client.post(
+            "/auth/profile/edit",
+            data={
+                "form_type": "password",
+                "current_password": "profilepass",
+                "new_password": "short",
+            },
+            follow_redirects=True,
+        )
+        assert b"New password must be at least 8 characters." in response.data
+
+        # POST Update Profile password (success)
+        response = test_client.post(
+            "/auth/profile/edit",
+            data={
+                "form_type": "password",
+                "current_password": "profilepass",
+                "new_password": "newprofilepass",
+            },
+            follow_redirects=True,
+        )
+        assert b"Password updated successfully." in response.data

@@ -55,39 +55,38 @@ def test_preprocessing_pipeline_single_class_edge_case():
     from src.preprocessing.pipeline import PreprocessingPipeline
     from unittest.mock import patch
     import pandas as pd
-    
+
     pipeline = PreprocessingPipeline()
-    
+
     # Create mock inputs where y has only a single class
-    mock_app_df = pd.DataFrame({
-        "ID": [1, 2, 3],
-        "CODE_GENDER": ["M", "F", "M"],
-        "FLAG_OWN_CAR": ["N", "N", "N"],
-        "FLAG_OWN_REALTY": ["N", "N", "N"],
-        "CNT_CHILDREN": [0, 0, 0],
-        "AMT_INCOME_TOTAL": [50000.0, 60000.0, 70000.0],
-        "NAME_INCOME_TYPE": ["Working", "Working", "Working"],
-        "NAME_EDUCATION_TYPE": ["Higher education", "Higher education", "Higher education"],
-        "NAME_FAMILY_STATUS": ["Single / not married", "Single / not married", "Single / not married"],
-        "NAME_HOUSING_TYPE": ["House / apartment", "House / apartment", "House / apartment"],
-        "DAYS_BIRTH": [-12000, -13000, -14000],
-        "DAYS_EMPLOYED": [-1000, -2000, -3000],
-        "FLAG_MOBIL": [1, 1, 1],
-        "FLAG_WORK_PHONE": [0, 0, 0],
-        "FLAG_PHONE": [0, 0, 0],
-        "FLAG_EMAIL": [0, 0, 0],
-        "OCCUPATION_TYPE": ["Laborers", "Laborers", "Laborers"],
-        "CNT_FAM_MEMBERS": [1, 1, 1]
-    })
-    
+    mock_app_df = pd.DataFrame(
+        {
+            "ID": [1, 2, 3],
+            "CODE_GENDER": ["M", "F", "M"],
+            "FLAG_OWN_CAR": ["N", "N", "N"],
+            "FLAG_OWN_REALTY": ["N", "N", "N"],
+            "CNT_CHILDREN": [0, 0, 0],
+            "AMT_INCOME_TOTAL": [50000.0, 60000.0, 70000.0],
+            "NAME_INCOME_TYPE": ["Working", "Working", "Working"],
+            "NAME_EDUCATION_TYPE": ["Higher education", "Higher education", "Higher education"],
+            "NAME_FAMILY_STATUS": ["Single / not married", "Single / not married", "Single / not married"],
+            "NAME_HOUSING_TYPE": ["House / apartment", "House / apartment", "House / apartment"],
+            "DAYS_BIRTH": [-12000, -13000, -14000],
+            "DAYS_EMPLOYED": [-1000, -2000, -3000],
+            "FLAG_MOBIL": [1, 1, 1],
+            "FLAG_WORK_PHONE": [0, 0, 0],
+            "FLAG_PHONE": [0, 0, 0],
+            "FLAG_EMAIL": [0, 0, 0],
+            "OCCUPATION_TYPE": ["Laborers", "Laborers", "Laborers"],
+            "CNT_FAM_MEMBERS": [1, 1, 1],
+        }
+    )
+
     # A single class target: all "Approved" (0)
-    mock_credit_df = pd.DataFrame({
-        "ID": [1, 2, 3],
-        "MONTHS_BALANCE": [0, 0, 0],
-        "STATUS": ["C", "C", "C"]
-    })
-    
+    mock_credit_df = pd.DataFrame({"ID": [1, 2, 3], "MONTHS_BALANCE": [0, 0, 0], "STATUS": ["C", "C", "C"]})
+
     from pathlib import Path
+
     mock_paths = {
         "raw_dir": Path("."),
         "processed_dir": Path("."),
@@ -95,13 +94,16 @@ def test_preprocessing_pipeline_single_class_edge_case():
         "reports_dir": Path("."),
         "logs_dir": Path("."),
     }
-    
+
     from config.config import config
+
     with patch.object(config, "get_paths", return_value=mock_paths):
         with patch("src.preprocessing.pipeline.DataLoader.load_all", return_value=(mock_app_df, mock_credit_df)):
-            with patch("pandas.DataFrame.to_csv") as mock_df_csv, \
-                 patch("pandas.Series.to_csv") as mock_series_csv, \
-                 patch("src.preprocessing.pipeline.save_pkl") as mock_save:
+            with (
+                patch("pandas.DataFrame.to_csv") as mock_df_csv,
+                patch("pandas.Series.to_csv"),
+                patch("src.preprocessing.pipeline.save_pkl"),
+            ):
                 train_shape, test_shape = pipeline.execute_full_pipeline()
                 assert train_shape is not None
                 assert test_shape is not None

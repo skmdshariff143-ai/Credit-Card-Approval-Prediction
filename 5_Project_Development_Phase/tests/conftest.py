@@ -34,7 +34,7 @@ def client(app):
                 email="testrunner@test.com",
                 password_hash=password_hash,
                 full_name="Test Runner",
-                role="User"
+                role="User",
             )
             user_row = db.get_user_by_username("testrunner")
             user = User.from_db_row(user_row)
@@ -47,11 +47,15 @@ def client(app):
                 login_user(user)
 
         # Set the session cookie by posting to the login form
-        test_client.post("/auth/login", data={
-            "email": "testrunner@test.com",
-            "password": "testpass123",
-            "submit": "Sign In",
-        }, follow_redirects=True)
+        test_client.post(
+            "/auth/login",
+            data={
+                "email": "testrunner@test.com",
+                "password": "testpass123",
+                "submit": "Sign In",
+            },
+            follow_redirects=True,
+        )
 
         yield test_client
 
@@ -78,19 +82,24 @@ def admin_client(app):
                 email="testadmin@test.com",
                 password_hash=password_hash,
                 full_name="Test Admin",
-                role="Administrator"
+                role="Administrator",
             )
             user_row = db.get_user_by_username("testadmin")
             user = User.from_db_row(user_row)
 
             from flask_login import login_user
+
             with app.test_request_context():
                 login_user(user)
 
-        test_client.post("/auth/login", data={
-            "email": "testadmin@test.com",
-            "password": "adminpass123",
-            "submit": "Sign In",
-        }, follow_redirects=True)
+        test_client.post(
+            "/auth/login",
+            data={
+                "email": "testadmin@test.com",
+                "password": "adminpass123",
+                "submit": "Sign In",
+            },
+            follow_redirects=True,
+        )
 
         yield test_client

@@ -37,7 +37,6 @@ from src.preprocessing.pipeline import PreprocessingPipeline  # noqa: E402
 from src.preprocessing.scaling import NumericalScaler  # noqa: E402
 from src.utils.exceptions import (  # noqa: E402
     DataLoadingError,
-    DataPreprocessingError,
 )
 from app.utils.helper import load_json, load_pkl, save_json, save_pkl  # noqa: E402
 from app.utils.tracker import ExperimentTracker  # noqa: E402
@@ -311,13 +310,18 @@ def test_model_trainer():
     assert inf_t > 0
 
 
-def test_model_comparator():
-    comp = ModelComparator()
-    metrics = {"Accuracy": 0.8, "Precision": 0.7, "Recall": 0.9, "F1-Score": 0.79, "ROC-AUC": 0.85, "Log_Loss": 0.3}
-    comp.add_model_metrics("test_model", metrics, 1.2, 0.05)
-    df = comp.compare_and_rank()
-    assert df.shape[0] == 1
-    assert df.loc[0, "Model"] == "test_model"
+def test_model_comparator(tmp_path):
+    mock_paths = {
+        "models_dir": Path(tmp_path),
+        "reports_dir": Path(tmp_path),
+    }
+    with patch.object(config, "get_paths", return_value=mock_paths):
+        comp = ModelComparator()
+        metrics = {"Accuracy": 0.8, "Precision": 0.7, "Recall": 0.9, "F1-Score": 0.79, "ROC-AUC": 0.85, "Log_Loss": 0.3}
+        comp.add_model_metrics("test_model", metrics, 1.2, 0.05)
+        df = comp.compare_and_rank()
+        assert df.shape[0] == 1
+        assert df.loc[0, "Model"] == "test_model"
 
 
 def test_hyperparameter_tuner():
@@ -461,6 +465,7 @@ def test_input_validator():
     invalid_data = valid_data.copy()
     invalid_data["age_years"] = 10
     from app.utils.exceptions import ValidationError as AppValidationError
+
     with pytest.raises(AppValidationError):
         InputValidator.validate_predict_json(invalid_data)
 
@@ -843,6 +848,7 @@ def test_helpers_exceptions(tmp_path):
     with open(invalid_pkl, "w") as f:
         f.write("invalid data")
     from app.utils.exceptions import DataPreprocessingError as AppDataPreprocessingError
+
     with pytest.raises(AppDataPreprocessingError):
         load_pkl(invalid_pkl)
 

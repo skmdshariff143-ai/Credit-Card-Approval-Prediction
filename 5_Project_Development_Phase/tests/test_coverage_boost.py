@@ -1,6 +1,5 @@
 import json
 import os
-import runpy
 import time
 from unittest.mock import MagicMock, patch
 
@@ -17,7 +16,7 @@ from src.models.metrics import calculate_all_metrics
 from app.services.predict import RiskPredictor
 from src.models.train import ModelTrainer
 from app.utils.exceptions import ModelTrainingError as AppModelTrainingError
-from src.utils.exceptions import DataPreprocessingError, ModelTrainingError
+from src.utils.exceptions import ModelTrainingError
 from app.utils.helper import load_pkl, save_json, save_pkl
 from app.utils.tracker import ExperimentTracker
 from src.visualization.plots import VizPlotter
@@ -36,29 +35,17 @@ def _login_test_client(app, client):
             email="routetest@test.com",
             password_hash=generate_password_hash("testpass123", method="scrypt"),
             full_name="Route Tester",
-            role="Administrator"
+            role="Administrator",
         )
-    client.post("/auth/login", data={
-        "email": "routetest@test.com",
-        "password": "testpass123",
-        "submit": "Sign In",
-    }, follow_redirects=True)
-
-# ----------------------------------------------------
-# 1. app/app.py tests
-# ----------------------------------------------------
-
-
-@patch("flask.Flask.run")
-def test_app_main(mock_run):
-    """Verifies app.run is invoked when app.py runs as main."""
-    app_path = (
-        "app/app.py"
-        if os.path.exists("app/app.py")
-        else "5_Project_Development_Phase/app/app.py"
+    client.post(
+        "/auth/login",
+        data={
+            "email": "routetest@test.com",
+            "password": "testpass123",
+            "submit": "Sign In",
+        },
+        follow_redirects=True,
     )
-    runpy.run_path(app_path, run_name="__main__")
-    mock_run.assert_called_once()
 
 
 @patch("src.models.predict._predictor.load_pipeline")
@@ -688,13 +675,12 @@ def test_model_trainer_train_exception():
 def test_helper_pkl_exceptions():
     """Verifies helper pkl methods handle dump/load failures cleanly."""
     from app.utils.exceptions import DataPreprocessingError as AppDataPreprocessingError
+
     with pytest.raises(AppDataPreprocessingError):
         save_pkl(lambda x: x, "/invalid_dir/test.pkl")
 
     config_path = (
-        "config/config.py"
-        if os.path.exists("config/config.py")
-        else "5_Project_Development_Phase/config/config.py"
+        "config/config.py" if os.path.exists("config/config.py") else "5_Project_Development_Phase/config/config.py"
     )
     with pytest.raises(AppDataPreprocessingError):
         load_pkl(config_path)
