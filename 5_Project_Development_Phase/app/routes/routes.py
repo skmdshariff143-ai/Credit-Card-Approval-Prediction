@@ -69,6 +69,52 @@ def predict_get():
     return render_template("predict.html", form=form)
 
 
+def _apply_business_overlays(form_data, credit_history, existing_debt, base_probability, base_decision):
+    decision = base_decision
+    probability = base_probability
+    reasons = []
+    recommendations = []
+
+    if credit_history == "Bad":
+        decision = "Rejected"
+        probability = min(probability, 18.5)
+        reasons.append("Prior payment default records registered in Credit Bureau.")
+        recommendations.append("Applicant must maintain a clean repayment record for 6+ months.")
+
+    # Debt to Income Ratio Check
+    dti = existing_debt / (form_data["amt_income_total"] + 1e-5)
+    if dti > 0.45:
+        decision = "Rejected"
+        probability = min(probability, 25.0)
+        reasons.append("Debt-to-Income (DTI) ratio exceeds critical threshold.")
+        recommendations.append("Reduce outstanding liabilities below 35% of gross annual income.")
+
+    # Success logic explanation
+    if decision == "Approved":
+        reasons.append("Low DTI ratio with strong annual gross income flow.")
+        reasons.append("Stable socio-economic profile and asset coverage.")
+        if credit_history == "Good":
+            reasons.append("Excellent credit bureau history with zero defaults.")
+        recommendations.append("Approve standard credit card facility limit.")
+        recommendations.append("Apply standard introductory APR parameters.")
+    else:
+        if form_data["years_employed"] < 2.0 and not form_data["flag_unemployed"]:
+            reasons.append("Short employment duration indicates potential cash flow instability.")
+            recommendations.append("Establish a stable job profile with 2+ continuous years of employment.")
+        if len(reasons) == 0:
+            reasons.append("Socio-demographic parameters classify profile as high default risk.")
+            recommendations.append("Resubmit application with collateral backing or a co-signer.")
+
+    return decision, probability, reasons, recommendations
+
+
+def _calculate_risk_level(decision, probability):
+    if decision == "Rejected":
+        return "High" if probability < 15.0 else "Medium-High"
+    else:
+        return "Low" if probability > 80.0 else "Medium-Low"
+
+
 @api_bp.route("/predict", methods=["POST"])
 @login_required
 def predict_post():
@@ -111,48 +157,13 @@ def predict_post():
             # Predict base probability
             result = predictor.process_and_predict(form_data)
 
-            probability = result["approval_probability_percent"]
-            decision = result["decision"]
-
             # Business rules overlay (DTI and Credit rating checks)
-            reasons = []
-            recommendations = []
-
-            if credit_history == "Bad":
-                decision = "Rejected"
-                probability = min(probability, 18.5)
-                reasons.append("Prior payment default records registered in Credit Bureau.")
-                recommendations.append("Applicant must maintain a clean repayment record for 6+ months.")
-
-            # Debt to Income Ratio Check
-            dti = existing_debt / (form_data["amt_income_total"] + 1e-5)
-            if dti > 0.45:
-                decision = "Rejected"
-                probability = min(probability, 25.0)
-                reasons.append("Debt-to-Income (DTI) ratio exceeds critical threshold.")
-                recommendations.append("Reduce outstanding liabilities below 35% of gross annual income.")
-
-            # Success logic explanation
-            if decision == "Approved":
-                reasons.append("Low DTI ratio with strong annual gross income flow.")
-                reasons.append("Stable socio-economic profile and asset coverage.")
-                if credit_history == "Good":
-                    reasons.append("Excellent credit bureau history with zero defaults.")
-                recommendations.append("Approve standard credit card facility limit.")
-                recommendations.append("Apply standard introductory APR parameters.")
-            else:
-                if form_data["years_employed"] < 2.0 and not form_data["flag_unemployed"]:
-                    reasons.append("Short employment duration indicates potential cash flow instability.")
-                    recommendations.append("Establish a stable job profile with 2+ continuous years of employment.")
-                if len(reasons) == 0:
-                    reasons.append("Socio-demographic parameters classify profile as high default risk.")
-                    recommendations.append("Resubmit application with collateral backing or a co-signer.")
+            decision, probability, reasons, recommendations = _apply_business_overlays(
+                form_data, credit_history, existing_debt, result["approval_probability_percent"], result["decision"]
+            )
 
             # Calculate risk level
-            if decision == "Rejected":
-                risk_level = "High" if probability < 15.0 else "Medium-High"
-            else:
-                risk_level = "Low" if probability > 80.0 else "Medium-Low"
+            risk_level = _calculate_risk_level(decision, probability)
 
             prediction_time_ms = round((time.time() - start_time) * 1000, 2)
 

@@ -30,12 +30,21 @@ class InputValidator:
             "flag_unemployed",
         }
 
-        # Check required fields
+        InputValidator._check_missing_fields(data, required)
+        InputValidator._check_numeric_bounds(data)
+        InputValidator._check_categorical_values(data)
+
+        logger.info("Input prediction request validated successfully.")
+        return True
+
+    @staticmethod
+    def _check_missing_fields(data: dict, required: set):
         missing = required - set(data.keys())
         if missing:
             raise ValidationError(f"Missing required parameters: {list(missing)}")
 
-        # Validate value bounds
+    @staticmethod
+    def _check_numeric_bounds(data: dict):
         try:
             age = float(data["age_years"])
             income = float(data["amt_income_total"])
@@ -60,7 +69,8 @@ class InputValidator:
         if years_employed < 0.0 or years_employed > 80.0:
             raise ValidationError("Years employed must be between 0 and 80.")
 
-        # Categorical choices check
+    @staticmethod
+    def _check_categorical_values(data: dict):
         valid_genders = {"M", "F"}
         if data["code_gender"] not in valid_genders:
             raise ValidationError(f"Invalid Gender selection: {data['code_gender']}. Expected: M or F.")
@@ -68,6 +78,3 @@ class InputValidator:
         valid_assets = {"Y", "N"}
         if data["flag_own_car"] not in valid_assets or data["flag_own_realty"] not in valid_assets:
             raise ValidationError("Asset flags (car, realty) must be Y or N.")
-
-        logger.info("Input prediction request validated successfully.")
-        return True

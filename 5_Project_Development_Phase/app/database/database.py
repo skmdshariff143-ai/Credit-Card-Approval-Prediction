@@ -31,159 +31,169 @@ class DatabaseManager:
     def init_db(self):
         """Initializes the database schema if it does not exist."""
         with self._get_connection() as conn:
-            # Core prediction history table (Phase 11 spec)
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS prediction_history (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    application_id TEXT NOT NULL UNIQUE,
-                    timestamp TEXT NOT NULL,
-                    gender TEXT NOT NULL,
-                    income REAL NOT NULL,
-                    employment TEXT NOT NULL,
-                    experience REAL NOT NULL,
-                    children INTEGER NOT NULL,
-                    debt REAL NOT NULL,
-                    prediction TEXT NOT NULL,
-                    probability REAL NOT NULL,
-                    risk_level TEXT NOT NULL,
-                    model TEXT NOT NULL,
-                    recommendation TEXT NOT NULL,
-                    raw_input TEXT,
-                    explanation TEXT
-                )
-            """)
-
-            # Backwards compatibility table
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS predictions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp TEXT NOT NULL,
-                    input_features TEXT NOT NULL,
-                    prediction TEXT NOT NULL,
-                    probability REAL NOT NULL,
-                    model TEXT,
-                    explanation TEXT
-                )
-            """)
-            # Create performance indexes for search and sorting
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_app_id ON prediction_history(application_id);")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_timestamp ON prediction_history(timestamp);")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_income ON prediction_history(income);")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_risk ON prediction_history(risk_level);")
-
-            # Authentication: users table
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    email TEXT UNIQUE NOT NULL,
-                    password_hash TEXT NOT NULL,
-                    name TEXT,
-                    full_name TEXT,
-                    role TEXT NOT NULL DEFAULT 'User',
-                    created_at TEXT NOT NULL DEFAULT (datetime('now')),
-                    last_login TEXT,
-                    status TEXT NOT NULL DEFAULT 'Active',
-                    is_admin INTEGER DEFAULT 0
-                )
-            """)
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);")
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);")
-
-            # Add columns to users (safe migration for existing db)
-            for col_name, col_type in [
-                ("name", "TEXT"),
-                ("full_name", "TEXT"),
-                ("role", "TEXT NOT NULL DEFAULT 'User'"),
-                ("last_login", "TEXT"),
-                ("status", "TEXT NOT NULL DEFAULT 'Active'"),
-            ]:
-                try:
-                    conn.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
-                except sqlite3.OperationalError:
-                    pass
-
-            # Seed default users from environment variables if present
-            from werkzeug.security import generate_password_hash
-
-            admin_email = os.getenv("ADMIN_EMAIL")
-            admin_pwd = os.getenv("ADMIN_PASSWORD")
-            officer_email = os.getenv("OFFICER_EMAIL")
-            officer_pwd = os.getenv("OFFICER_PASSWORD")
-            demo_email = os.getenv("DEMO_EMAIL")
-            demo_pwd = os.getenv("DEMO_PASSWORD")
-
-            default_users = []
-            if admin_email and admin_pwd:
-                default_users.append(
-                    (os.getenv("ADMIN_USERNAME", "admin"), admin_email, admin_pwd, "Admin", "Administrator")
-                )
-            if officer_email and officer_pwd:
-                default_users.append(
-                    (os.getenv("OFFICER_USERNAME", "officer"), officer_email, officer_pwd, "Loan Officer", "Officer")
-                )
-            if demo_email and demo_pwd:
-                default_users.append((os.getenv("DEMO_USERNAME", "demo"), demo_email, demo_pwd, "Demo User", "User"))
-
-            for username, email, pwd, name, role in default_users:
-                cursor = conn.cursor()
-                cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
-                if not cursor.fetchone():
-                    pwd_hash = generate_password_hash(pwd, method="scrypt")
-                    cursor.execute(
-                        """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                        (
-                            username,
-                            email,
-                            pwd_hash,
-                            name,
-                            name,
-                            role,
-                            "Active",
-                            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                        ),
-                    )
-
-            # Add user_id column to prediction_history (safe migration)
-            try:
-                conn.execute("ALTER TABLE prediction_history ADD COLUMN user_id INTEGER REFERENCES users(id)")
-            except sqlite3.OperationalError:
-                pass  # Column already exists
-
-            # Add explanation column to prediction_history (safe migration)
-            try:
-                conn.execute("ALTER TABLE prediction_history ADD COLUMN explanation TEXT")
-            except sqlite3.OperationalError:
-                pass  # Column already exists
-
-            # Add model and explanation columns to predictions (safe migration)
-            try:
-                conn.execute("ALTER TABLE predictions ADD COLUMN model TEXT")
-            except sqlite3.OperationalError:
-                pass  # Column already exists
-            try:
-                conn.execute("ALTER TABLE predictions ADD COLUMN explanation TEXT")
-            except sqlite3.OperationalError:
-                pass  # Column already exists
-
-            # New reports table
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS reports (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    application_id TEXT NOT NULL UNIQUE REFERENCES prediction_history(application_id) ON DELETE CASCADE,
-                    timestamp TEXT NOT NULL,
-                    inputs TEXT NOT NULL,
-                    prediction TEXT NOT NULL,
-                    confidence REAL NOT NULL,
-                    model_used TEXT NOT NULL,
-                    explanation TEXT NOT NULL,
-                    user_id INTEGER REFERENCES users(id)
-                )
-            """)
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_reports_app_id ON reports(application_id);")
-
+            self._create_prediction_tables(conn)
+            self._create_user_tables(conn)
+            self._run_user_migrations(conn)
+            self._seed_default_users(conn)
+            self._run_prediction_migrations(conn)
             conn.commit()
+
+    def _create_prediction_tables(self, conn):
+        # Core prediction history table (Phase 11 spec)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS prediction_history (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                application_id TEXT NOT NULL UNIQUE,
+                timestamp TEXT NOT NULL,
+                gender TEXT NOT NULL,
+                income REAL NOT NULL,
+                employment TEXT NOT NULL,
+                experience REAL NOT NULL,
+                children INTEGER NOT NULL,
+                debt REAL NOT NULL,
+                prediction TEXT NOT NULL,
+                probability REAL NOT NULL,
+                risk_level TEXT NOT NULL,
+                model TEXT NOT NULL,
+                recommendation TEXT NOT NULL,
+                raw_input TEXT,
+                explanation TEXT
+            )
+        """)
+
+        # Backwards compatibility table
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS predictions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT NOT NULL,
+                input_features TEXT NOT NULL,
+                prediction TEXT NOT NULL,
+                probability REAL NOT NULL,
+                model TEXT,
+                explanation TEXT
+            )
+        """)
+        # Create performance indexes for search and sorting
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_app_id ON prediction_history(application_id);")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_timestamp ON prediction_history(timestamp);")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_income ON prediction_history(income);")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_risk ON prediction_history(risk_level);")
+
+    def _create_user_tables(self, conn):
+        # Authentication: users table
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password_hash TEXT NOT NULL,
+                name TEXT,
+                full_name TEXT,
+                role TEXT NOT NULL DEFAULT 'User',
+                created_at TEXT NOT NULL DEFAULT (datetime('now')),
+                last_login TEXT,
+                status TEXT NOT NULL DEFAULT 'Active',
+                is_admin INTEGER DEFAULT 0
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);")
+
+    def _run_user_migrations(self, conn):
+        # Add columns to users (safe migration for existing db)
+        for col_name, col_type in [
+            ("name", "TEXT"),
+            ("full_name", "TEXT"),
+            ("role", "TEXT NOT NULL DEFAULT 'User'"),
+            ("last_login", "TEXT"),
+            ("status", "TEXT NOT NULL DEFAULT 'Active'"),
+        ]:
+            try:
+                conn.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
+            except sqlite3.OperationalError:
+                pass
+
+    def _seed_default_users(self, conn):
+        # Seed default users from environment variables if present
+        from werkzeug.security import generate_password_hash
+
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_pwd = os.getenv("ADMIN_PASSWORD")
+        officer_email = os.getenv("OFFICER_EMAIL")
+        officer_pwd = os.getenv("OFFICER_PASSWORD")
+        demo_email = os.getenv("DEMO_EMAIL")
+        demo_pwd = os.getenv("DEMO_PASSWORD")
+
+        default_users = []
+        if admin_email and admin_pwd:
+            default_users.append(
+                (os.getenv("ADMIN_USERNAME", "admin"), admin_email, admin_pwd, "Admin", "Administrator")
+            )
+        if officer_email and officer_pwd:
+            default_users.append(
+                (os.getenv("OFFICER_USERNAME", "officer"), officer_email, officer_pwd, "Loan Officer", "Officer")
+            )
+        if demo_email and demo_pwd:
+            default_users.append((os.getenv("DEMO_USERNAME", "demo"), demo_email, demo_pwd, "Demo User", "User"))
+
+        for username, email, pwd, name, role in default_users:
+            cursor = conn.cursor()
+            cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
+            if not cursor.fetchone():
+                pwd_hash = generate_password_hash(pwd, method="scrypt")
+                cursor.execute(
+                    """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    (
+                        username,
+                        email,
+                        pwd_hash,
+                        name,
+                        name,
+                        role,
+                        "Active",
+                        datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    ),
+                )
+
+    def _run_prediction_migrations(self, conn):
+        # Add user_id column to prediction_history (safe migration)
+        try:
+            conn.execute("ALTER TABLE prediction_history ADD COLUMN user_id INTEGER REFERENCES users(id)")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
+        # Add explanation column to prediction_history (safe migration)
+        try:
+            conn.execute("ALTER TABLE prediction_history ADD COLUMN explanation TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
+        # Add model and explanation columns to predictions (safe migration)
+        try:
+            conn.execute("ALTER TABLE predictions ADD COLUMN model TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+        try:
+            conn.execute("ALTER TABLE predictions ADD COLUMN explanation TEXT")
+        except sqlite3.OperationalError:
+            pass  # Column already exists
+
+        # New reports table
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS reports (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                application_id TEXT NOT NULL UNIQUE REFERENCES prediction_history(application_id) ON DELETE CASCADE,
+                timestamp TEXT NOT NULL,
+                inputs TEXT NOT NULL,
+                prediction TEXT NOT NULL,
+                confidence REAL NOT NULL,
+                model_used TEXT NOT NULL,
+                explanation TEXT NOT NULL,
+                user_id INTEGER REFERENCES users(id)
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_reports_app_id ON reports(application_id);")
 
     def check_connection(self) -> bool:
         """Verifies database connectivity."""
@@ -512,6 +522,14 @@ class DatabaseManager:
         risk_level=None,
     ) -> list:
         """Retrieves history from database supporting filter, search, sorting."""
+        query, params = self._build_predictions_query(limit, search, sort_by, order, decision, risk_level)
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, tuple(params))
+            rows = cursor.fetchall()
+            return [self._parse_prediction_row(row) for row in rows]
+
+    def _build_predictions_query(self, limit, search, sort_by, order, decision, risk_level):
         query = "SELECT * FROM prediction_history"
         params = []
         where_clauses = []
@@ -541,44 +559,36 @@ class DatabaseManager:
 
         query += f" ORDER BY {sort_by} {order} LIMIT ?"
         params.append(limit)
+        return query, params
 
-        with self._get_connection() as conn:
-            cursor = conn.cursor()
-            cursor.execute(query, tuple(params))
-            rows = cursor.fetchall()
-
-            history_list = []
-            for row in rows:
-                row_dict = dict(row)
-                explanation_data = {}
-                if "explanation" in row_dict and row_dict["explanation"]:
-                    try:
-                        explanation_data = json.loads(row_dict["explanation"])
-                    except Exception:
-                        pass
-                history_list.append(
-                    {
-                        "id": row["id"],
-                        "application_id": row["application_id"],
-                        "timestamp": row["timestamp"],
-                        "gender": row["gender"],
-                        "income": row["income"],
-                        "employment": row["employment"],
-                        "experience": row["experience"],
-                        "children": row["children"],
-                        "debt": row["debt"],
-                        "prediction": row["prediction"],
-                        "decision": row["prediction"],  # compat
-                        "probability": row["probability"],
-                        "probability_percent": row["probability"],  # compat
-                        "risk_level": row["risk_level"],
-                        "model": row["model"],
-                        "recommendation": row["recommendation"],
-                        "input": json.loads(row["raw_input"]) if row["raw_input"] else {},
-                        "explanation": explanation_data,
-                    }
-                )
-            return history_list
+    def _parse_prediction_row(self, row):
+        row_dict = dict(row)
+        explanation_data = {}
+        if "explanation" in row_dict and row_dict["explanation"]:
+            try:
+                explanation_data = json.loads(row_dict["explanation"])
+            except Exception:
+                pass
+        return {
+            "id": row["id"],
+            "application_id": row["application_id"],
+            "timestamp": row["timestamp"],
+            "gender": row["gender"],
+            "income": row["income"],
+            "employment": row["employment"],
+            "experience": row["experience"],
+            "children": row["children"],
+            "debt": row["debt"],
+            "prediction": row["prediction"],
+            "decision": row["prediction"],  # compat
+            "probability": row["probability"],
+            "probability_percent": row["probability"],  # compat
+            "risk_level": row["risk_level"],
+            "model": row["model"],
+            "recommendation": row["recommendation"],
+            "input": json.loads(row["raw_input"]) if row["raw_input"] else {},
+            "explanation": explanation_data,
+        }
 
     def get_admin_stats(self) -> dict:
         """Calculates statistics for admin dashboard metrics."""

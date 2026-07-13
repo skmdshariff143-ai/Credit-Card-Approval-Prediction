@@ -72,38 +72,41 @@ class RiskPredictor:
         preds = model.predict(X_trans)
 
         if len(input_df) == 1:
-            prob_1 = 0.0
-            if hasattr(model, "predict_proba"):
-                prob_raw = model.predict_proba(X_trans)
-                try:
-                    prob_1 = prob_raw[0][1]
-                except Exception:
-                    try:
-                        prob_1 = prob_raw[0]
-                    except Exception:
-                        prob_1 = 0.0
-            decision = "Approved" if preds[0] == 0 else "Rejected"
-            try:
-                prob_1_val = float(prob_1)
-            except Exception:
-                prob_1_val = 0.0
-
-            approval_prob = (1.0 - prob_1_val) * 100.0
-
-            # Generate explanation map
-            try:
-                explainer = ExplanationEngine(model, pipeline)
-                explanation = explainer.explain_instance(input_df)
-            except Exception as e:
-                logger.error(f"Failed to calculate local explanation: {str(e)}")
-                explanation = {"error": str(e)}
-
-            return {
-                "decision": decision,
-                "approval_probability_percent": float(round(approval_prob, 2)),
-                "explanation": explanation,
-            }
+            return self._predict_single(model, pipeline, X_trans, input_df, preds[0])
         return list(preds)
+
+    def _predict_single(self, model, pipeline, X_trans, input_df, pred_val) -> dict:
+        prob_1 = 0.0
+        if hasattr(model, "predict_proba"):
+            prob_raw = model.predict_proba(X_trans)
+            try:
+                prob_1 = prob_raw[0][1]
+            except Exception:
+                try:
+                    prob_1 = prob_raw[0]
+                except Exception:
+                    prob_1 = 0.0
+        decision = "Approved" if pred_val == 0 else "Rejected"
+        try:
+            prob_1_val = float(prob_1)
+        except Exception:
+            prob_1_val = 0.0
+
+        approval_prob = (1.0 - prob_1_val) * 100.0
+
+        # Generate explanation map
+        try:
+            explainer = ExplanationEngine(model, pipeline)
+            explanation = explainer.explain_instance(input_df)
+        except Exception as e:
+            logger.error(f"Failed to calculate local explanation: {str(e)}")
+            explanation = {"error": str(e)}
+
+        return {
+            "decision": decision,
+            "approval_probability_percent": float(round(approval_prob, 2)),
+            "explanation": explanation,
+        }
 
     def predict_probability(self, input_df: pd.DataFrame) -> list:
         """Runs risk probability calculations."""
