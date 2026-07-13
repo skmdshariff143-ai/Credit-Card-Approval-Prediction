@@ -34,8 +34,12 @@ class ProjectConfig:
         self.IBM_SCORING_URL = os.getenv("IBM_SCORING_URL")
 
         # Create directories if they don't exist
-        for path in self.get_paths().values():
-            os.makedirs(path, exist_ok=True)
+        if os.getenv("VERCEL") != "1":
+            for path in self.get_paths().values():
+                try:
+                    os.makedirs(path, exist_ok=True)
+                except OSError:
+                    pass
 
     def get_paths(self):
         """
