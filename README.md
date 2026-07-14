@@ -30,7 +30,7 @@
 3. **Persisted Log Ledgers**: Searchable, filterable, and sortable prediction transaction tables connected to SQLite.
 4. **Operations Analytics Console**: Chart.js graphs mapping approval ratios, family status densities, and income trends.
 5. **Secure Authentication & RBAC**: Werkzeug `scrypt` hashing with role-based route constraints (Admin, Officer, User).
-6. **Print-Ready Assessments**: Exportable PDF assessment summaries containing QR validation blocks.
+6. **Print-Ready Assessments**: Browser-printable HTML decision summaries with verification QR codes, ready to save as PDF.
 7. **Stateless Serverless Hosting**: Built to run cleanly in read-only container volumes via write-redirection to `/tmp`.
 
 ---

@@ -39,6 +39,6 @@ This script outlines the flow, voiceover directions, and screen views for a 3-5 
 
 ---
 
-## Part 6: PDF Export & Logout (Duration: 3:30 - 4:00)
+## Part 6: Printable Report & Logout (Duration: 3:30 - 4:00)
 - **Visuals**: From the history or result view, click "View Printable Report" (`/report/<app_id>`). Review the clean layout, QR code validation box, and officer signature block.
 - **Actions**: Trigger print dialog (`Ctrl + P`), close it, then click "Log Out" in the sidebar to return to the landing home page.

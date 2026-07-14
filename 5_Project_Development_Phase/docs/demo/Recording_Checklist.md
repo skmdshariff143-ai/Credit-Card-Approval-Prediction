@@ -59,7 +59,7 @@ Follow this step-by-step checklist to record a high-quality, professional video 
 - [ ] Slowly hover over the horizontal support factors (green bars) and risk factors (red bars) to show the feature names and impact numbers.
 - [ ] Scroll down to review the natural language recommendation summary.
 
-### Step 7: Prediction History Logs & PDF Report (3:15 - 3:55)
+### Step 7: Prediction History Logs & Printable Report (3:15 - 3:55)
 - [ ] Click "Prediction History" in the sidebar.
 - [ ] Enter the ID of the prediction you just made in the search box to verify the live filter query.
 - [ ] Click "Print Report" on the target row.

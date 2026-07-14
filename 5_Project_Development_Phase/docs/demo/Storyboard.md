@@ -38,7 +38,7 @@ This storyboard outlines the visual sequence, screen focus areas, and content mi
 
 ### Scene 7: Prediction History & Printable Reports (3:15 - 3:55)
 * **Visual**: Navigate to "Prediction History" in the sidebar, search for the application ID, and click "Print Report".
-* **On-Screen Focus**: Writable SQLite logs table, search filter queries, and the PDF-ready report page showing the verification QR code.
+* **On-Screen Focus**: Writable SQLite logs table, search filter queries, and the print-ready report page showing the verification QR code.
 * **Objective**: Show ledger auditing, history management, and reporting with instant verification.
 
 ### Scene 8: Codebase & Git Pipeline (3:55 - 4:25)

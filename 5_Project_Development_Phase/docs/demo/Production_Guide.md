@@ -43,7 +43,7 @@ Select high-tech, ambient corporate electronic tracks with a slow buildup:
 | **1:15 - 1:45** | User Portal | Let Chart.js animate. Hover segments. | Fade through Black | Low sweep SFX |
 | **1:45 - 2:30** | Wizard Form | Fill out form steps, follow checklist timings. | Wipe Left | SFX page sweep |
 | **2:30 - 3:15** | AI Scorecard | Circular gauge counts up. Hover LIME graph. | Fade | Chime SFX |
-| **3:15 - 3:55** | History Logs | Show history logs table, open printable PDF report. | Screen pan | Low sweep SFX |
+| **3:15 - 3:55** | History Logs | Show history logs table, open printable HTML report. | Screen pan | Low sweep SFX |
 | **3:55 - 4:25** | GitHub Repo | walkthrough file structures and workflow tags. | Cut | Voiceover summary |
 | **4:25 - 4:45** | Outro Slide | Display `Outro.png` showing URLs and thank you text. | Fade Out (2s) | Music swells to `-6dB` |
 
@@ -57,4 +57,4 @@ Select high-tech, ambient corporate electronic tracks with a slow buildup:
 4. **Key Zoom Areas**:
    - **Wizard form inputs**: Zoom in to 110% on form cards to highlight specific label inputs.
    - **LIME Explainer bars**: Zoom in on the horizontal green/red bar charts to make the text impacts readable.
-   - **QR Code block**: Highlight the QR code section on the printable PDF report.
+   - **QR Code block**: Highlight the QR code section on the printable HTML report.

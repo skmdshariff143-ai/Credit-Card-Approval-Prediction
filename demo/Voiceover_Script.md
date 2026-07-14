@@ -29,5 +29,5 @@ Use this script as a narration guideline while recording.
 
 ---
 
-### Printable PDF & Sign-out (3:30 - 4:00)
+### Printable Report & Sign-out (3:30 - 4:00)
 > *"Finally, we can view a printable PDF-ready Credit Assessment Report, complete with QR code document validation blocks. Triggering the browser print dialog allows offline downloads. Signing out completes the demo. Thanks for watching!"*
