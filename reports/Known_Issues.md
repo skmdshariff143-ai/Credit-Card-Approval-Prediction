@@ -23,7 +23,10 @@ This document outlines the known system limitations and libraries warnings for t
 
 ---
 
-## 4. In-Memory Rate Limiting in Serverless Environments
-- **Description**: The password reset rate limiter (`app/utils/limiter.py`) utilizes in-memory dictionaries (`_rate_limits`) to count request frequencies by client IP. In serverless deployments (such as Vercel), requests are routed across multiple concurrent/independent serverless execution containers. Consequently, rate limit counters are not shared, resulting in inconsistent limits and resets when containers cold start or scale.
-- **Workaround**: For enterprise scale-out deployments, configure a centralized shared store (such as Upstash Redis or Vercel KV) and wire the `rate_limit` decorator to fetch/store counts from this central database rather than a local memory dict.
+## 4. In-Memory Rate Limiting in Serverless Environments (RESOLVED)
+- **Status**: Resolved
+- **Description**: The rate limiter (`app/utils/limiter.py`) was refactored to support a shared Upstash Redis store via the `REDIS_URL` environment variable, with transparent fallback to in-memory when Redis is unavailable. Rate limit counters now persist across Vercel cold starts and container recycles.
+- **Verification**: A redeploy-interruption test confirmed the Redis counter survived a full production redeployment: 30 requests pre-redeploy + 31 post-redeploy = blocked at request #61. Vercel runtime logs confirm: `Rate limiter successfully initialized with shared Redis store.`
+- **Configuration**: `REDIS_URL` is set as a Sensitive environment variable in Vercel production, pointing to Upstash Redis (`nice-lamprey-162404.upstash.io`).
+
 

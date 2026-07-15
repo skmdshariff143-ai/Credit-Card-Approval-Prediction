@@ -86,15 +86,48 @@ During the closeout verification pass, end-to-end prediction testing revealed a 
 | Real PDF Generation | ✅ | Compiled PDF server-side using `pisa.CreatePDF()` via `?format=pdf` query param. Verified MIME `application/pdf` and `%PDF-` header. |
 | Print Report with QR Code | ✅ | HTML view remains fully functional, print button triggers `window.print()`, and QR code renders via base64 encoding. |
 | Password Reset Flow | ✅ | Submitted forgot-password link successfully on production URL. |
-| Password Reset Rate-Limiting | ✅ | Upstash Redis rate-limiter is implemented in `limiter.py` with in-memory fallback. Throttles requests successfully returning HTTP 429. |
+| Redis Rate-Limiting (Verified) | ✅ | Redeploy-interruption test: 30 reqs → redeploy → blocked at request #61 (counter survived). Vercel log confirms `Rate limiter successfully initialized with shared Redis store.` |
 | Role-Based Access Control | ✅ | Confirmed anonymous and regular users accessing `/admin` redirect to login (302) and home (302) respectively. |
 | Analytics Dashboard | ✅ | Confirmed analytics dashboard plots densities and approval ratios correctly under admin session. |
 | Code Quality Standards | ✅ | Executed pytest (119 passed), black formatting check (100% clean), flake8 (0 issues, McCabe complexity <10), and bandit (0 issues). |
-| GitHub CI Pipeline | ✅ | Confirmed all 5 CI runs (lint, testing, security, docker, pages) completed successfully on commit `d41923e`. |
+| GitHub CI Pipeline | ✅ | All 5 CI runs green (updated per final commit). |
 
+## Redis Rate-Limiting: Definitive Evidence
 
+### 1. Vercel Runtime Log Line (Verbatim)
 
+From `vercel logs --expand --query "redis" --no-branch`:
 
+```
+2026-07-15 04:08:00,119 - cg_limiter - INFO - limiter.py:25 - Rate limiter successfully initialized with shared Redis store.
+```
+
+This confirms the production serverless function connected to Upstash Redis at cold start, not the in-memory fallback.
+
+### 2. Redeploy-Interruption Test (Status Code Sequence)
+
+Test protocol: send 30 requests → force production redeploy (`vercel --prod --force --yes`) → send 35 more requests. Rate limit: 60 requests per 120 seconds.
+
+```
+Phase 1 (pre-redeploy):
+  Request 1:  200 [T+1.9s]
+  Request 30: 200 [T+13.8s]
+
+Redeploy: completed in 55.7s [T+69.5s]
+Routing stabilized at T+72.5s
+Remaining in window: 47.5s
+
+Phase 2 (post-redeploy):
+  Request 31: 200 [T+75.2s]
+  Request 40: 200 [T+79.4s]
+  Request 50: 200 [T+83.6s]
+  Request 60: 200 [T+86.9s]
+  Request 61: 429 RATE LIMITED [T+87.4s]
+    Response: {'error': 'Rate limit exceeded. Too many requests.'}
+```
+
+**Verdict:** 429 at overall request #61, with total wall time 87.4s (within the 120s window).
+An in-memory limiter would have reset to 0 after the redeploy and allowed 60 fresh requests before blocking. The counter carried over from 30 → 61, proving the state is genuinely stored in shared Upstash Redis.
 
 
 
