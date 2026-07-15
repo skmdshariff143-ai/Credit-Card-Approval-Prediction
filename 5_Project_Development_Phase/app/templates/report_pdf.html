@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Credit Assessment Report - {{ record.application_id }}</title>
+<style>
+  @page {
+    size: letter;
+    margin: 0.5in;
+  }
+  body {
+    font-family: Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .header-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  .header-logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4f46e5;
+  }
+  .header-title {
+    font-size: 20px;
+    font-weight: 800;
+    margin: 5px 0 2px 0;
+  }
+  .app-id {
+    font-family: monospace;
+    font-size: 14px;
+    color: #64748b;
+    font-weight: bold;
+  }
+  .qr-box {
+    text-align: right;
+    width: 120px;
+  }
+  .qr-image {
+    width: 90px;
+    height: 90px;
+    border: 1px solid #e2e8f0;
+    padding: 3px;
+    background: #ffffff;
+  }
+  .qr-label {
+    font-size: 9px;
+    color: #64748b;
+    margin-top: 3px;
+  }
+  .divider {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 15px 0;
+  }
+  .decision-container {
+    text-align: center;
+    margin: 20px 0;
+  }
+  .decision-badge {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .badge-approved {
+    background-color: #dcfce7;
+    color: #15803d;
+  }
+  .badge-rejected {
+    background-color: #fee2e2;
+    color: #b91c1c;
+  }
+  .metrics-line {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #64748b;
+  }
+  .mono {
+    font-family: monospace;
+  }
+  .bold {
+    font-weight: bold;
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #4f46e5;
+    margin-bottom: 10px;
+  }
+  .grid-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  .grid-table td {
+    width: 50%;
+    padding: 5px 0;
+  }
+  .field-label {
+    color: #64748b;
+  }
+  .field-val {
+    color: #0f172a;
+    font-weight: bold;
+  }
+  .disclaimer-box {
+    padding: 10px 15px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    margin-top: 30px;
+  }
+  .disclaimer-text {
+    font-size: 10px;
+    color: #64748b;
+    line-height: 1.4;
+    margin: 0;
+  }
+</style>
+</head>
+<body>
+
+  <!-- Report Header -->
+  <table class="header-table">
+    <tr>
+      <td>
+        <div class="header-logo-text">CreditGuard AI</div>
+        <div class="header-title">Credit Assessment Report</div>
+        <div class="app-id">{{ record.application_id }}</div>
+        <div style="font-size: 10px; color: #64748b; margin-top: 3px;">Generated on {{ record.timestamp }}</div>
+      </td>
+      <td class="qr-box">
+        {% if record.qr_code_base64 %}
+          <img src="{{ record.qr_code_base64 }}" class="qr-image" alt="Verification QR Code">
+          <div class="qr-label">Verify Authenticity</div>
+        {% endif %}
+      </td>
+    </tr>
+  </table>
+
+  <hr class="divider">
+
+  <!-- Decision -->
+  <div class="decision-container">
+    {% if record.prediction == 'Approved' %}
+      <div class="decision-badge badge-approved">APPROVED</div>
+    {% else %}
+      <div class="decision-badge badge-rejected">REJECTED</div>
+    {% endif %}
+    
+    <div class="metrics-line">
+      Confidence: <span class="mono bold" style="color:#0f172a;">{{ '%.1f'|format(record.probability) }}%</span>
+      &nbsp;|&nbsp;
+      Risk Level: <span class="bold" style="color:#0f172a;">{{ record.risk_level }}</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Applicant Details -->
+  <div class="section-title">Applicant Profile</div>
+  <table class="grid-table">
+    <tr>
+      <td>
+        <span class="field-label">Gender:</span>
+        <span class="field-val">{{ record.gender }}</span>
+      </td>
+      <td>
+        <span class="field-label">Experience:</span>
+        <span class="field-val">{{ record.experience }} years</span>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="field-label">Annual Income:</span>
+        <span class="field-val mono">${{ '{:,.0f}'.format(record.income) }}</span>
+      </td>
+      <td>
+        <span class="field-label">Dependents:</span>
+        <span class="field-val">{{ record.children }}</span>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <span class="field-label">Employment:</span>
+        <span class="field-val">{{ record.employment }}</span>
+      </td>
+      <td>
+        <span class="field-label">Outstanding Debt:</span>
+        <span class="field-val mono">${{ '{:,.0f}'.format(record.debt|float) }}</span>
+      </td>
+    </tr>
+  </table>
+
+  <hr class="divider">
+
+  <!-- Model Information -->
+  <div class="section-title">Model Information</div>
+  <table class="grid-table" style="margin-bottom:10px;">
+    <tr>
+      <td>
+        <span class="field-label">Model Engine:</span>
+        <span class="field-val">{{ record.model }}</span>
+      </td>
+      <td>
+        <span class="field-label">Recommendation:</span>
+        <span class="field-val">{{ record.recommendation }}</span>
+      </td>
+    </tr>
+  </table>
+
+  <hr class="divider">
+
+  <!-- Disclaimer -->
+  <div class="disclaimer-box">
+    <p class="disclaimer-text">
+      <strong>Disclaimer:</strong> This report is generated by an ML model for informational and educational purposes only.
+      It does not constitute financial advice. Final credit decisions should incorporate human review and additional verification.
+    </p>
+  </div>
+
+</body>
+</html>

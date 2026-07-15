@@ -339,7 +339,54 @@ def get_report(application_id):
     except Exception:
         pass
 
+    # Check for PDF format request
+    format_type = request.args.get("format")
+    if format_type == "pdf":
+        return _generate_pdf_report(application_id, record)
+
     return render_template("report.html", record=record)
+
+
+def _generate_pdf_report(application_id, record):
+    """Helper function to compile and generate server-side PDF response using xhtml2pdf."""
+    import io
+    import base64
+    import requests
+    from xhtml2pdf import pisa
+    from flask import make_response, render_template, flash, redirect, url_for, request
+
+    # Fetch verification QR code image and convert to Base64
+    qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=100x100&data={request.url_root}report/{application_id}"
+    qr_base64 = None
+    try:
+        # Short timeout to prevent server thread hang
+        qr_resp = requests.get(qr_url, timeout=5)
+        if qr_resp.status_code == 200:
+            qr_base64 = f"data:image/png;base64,{base64.b64encode(qr_resp.content).decode('utf-8')}"
+    except Exception:
+        pass
+
+    record["qr_code_base64"] = qr_base64
+
+    # Render PDF specific template
+    html_content = render_template("report_pdf.html", record=record)
+
+    # Compile PDF from HTML in memory
+    pdf_buffer = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_content, dest=pdf_buffer)
+
+    if pisa_status.err:
+        flash("Error generating PDF report server-side.", "danger")
+        return redirect(url_for("api.history"))
+
+    pdf_data = pdf_buffer.getvalue()
+    pdf_buffer.close()
+
+    # Build response
+    response = make_response(pdf_data)
+    response.headers["Content-Type"] = "application/pdf"
+    response.headers["Content-Disposition"] = f"attachment; filename=report_{application_id}.pdf"
+    return response
 
 
 # ==========================================

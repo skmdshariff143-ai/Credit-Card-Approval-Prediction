@@ -17,9 +17,14 @@
       <h1 class="cg-page-title">Credit Assessment Report</h1>
       <p class="cg-page-desc">Application {{ record.application_id }}</p>
     </div>
-    <button class="cg-btn cg-btn-secondary no-print" onclick="window.print()">
-      <i class="fa-solid fa-print"></i> Print Report
-    </button>
+    <div style="display:flex;gap:10px;" class="no-print">
+      <a href="{{ url_for('api.get_report', application_id=record.application_id, format='pdf') }}" class="cg-btn cg-btn-primary">
+        <i class="fa-solid fa-file-pdf"></i> Download PDF
+      </a>
+      <button class="cg-btn cg-btn-secondary" onclick="window.print()">
+        <i class="fa-solid fa-print"></i> Print Report
+      </button>
+    </div>
   </div>
 </div>
 
