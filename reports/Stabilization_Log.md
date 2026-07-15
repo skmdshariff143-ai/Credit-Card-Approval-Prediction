@@ -83,13 +83,14 @@ During the closeout verification pass, end-to-end prediction testing revealed a 
 | E2E Prediction - Approve | ✅ | Submitted high-recall profile on production, returned `decision=Approved` with explainability graphics. |
 | E2E Prediction - Reject | ✅ | Submitted high-default profile on production, returned `decision=Rejected`. |
 | Explainability Rendering | ✅ | Checked prediction response and confirmed risk factors, contributions, and recommendations are parsed and rendered correctly. |
-| Print Report with QR Code | ✅ | Opened printable assessment report on production, confirmed window.print() triggers and QR verification block renders. |
+| Real PDF Generation | ✅ | Compiled PDF server-side using `pisa.CreatePDF()` via `?format=pdf` query param. Verified MIME `application/pdf` and `%PDF-` header. |
+| Print Report with QR Code | ✅ | HTML view remains fully functional, print button triggers `window.print()`, and QR code renders via base64 encoding. |
 | Password Reset Flow | ✅ | Submitted forgot-password link successfully on production URL. |
-| Password Reset Rate-Limiting | ✅ | Throttled user after 5 consecutive forgot-password requests, returning a HTTP 429 status code block. |
+| Password Reset Rate-Limiting | ✅ | Upstash Redis rate-limiter is implemented in `limiter.py` with in-memory fallback. Throttles requests successfully returning HTTP 429. |
 | Role-Based Access Control | ✅ | Confirmed anonymous and regular users accessing `/admin` redirect to login (302) and home (302) respectively. |
 | Analytics Dashboard | ✅ | Confirmed analytics dashboard plots densities and approval ratios correctly under admin session. |
-| Code Quality Standards | ✅ | Executed pytest (119 passed), black formatting check (100% clean), flake8 (0 issues), and bandit (0 issues). |
-| GitHub CI Pipeline | ✅ | Confirmed all 5 CI runs (lint, testing, security, docker, pages) completed successfully on commit `c58a555`. |
+| Code Quality Standards | ✅ | Executed pytest (119 passed), black formatting check (100% clean), flake8 (0 issues, McCabe complexity <10), and bandit (0 issues). |
+| GitHub CI Pipeline | ✅ | Confirmed all 5 CI runs (lint, testing, security, docker, pages) completed successfully on commit `d41923e`. |
 
 
 
