@@ -24,10 +24,10 @@ This document details the issues resolved during the stabilization pass, includi
 - **Fix**: Pinned exact compatible versions of `scikit-learn==1.6.0`, `xgboost==2.1.3`, and `imbalanced-learn==0.14.2` in `requirements.txt`. Refactored the monkeypatch into a clean compatibility utility module `src/utils/sklearn_compat.py` with clear documentation of target versions and a `# TODO` marker. Safely imported this utility in `src/main.py` and `app/app.py` (with fallback handlers for serverless runtimes).
 - **Verification Evidence**: Ran the full pytest test suite (115 tests) after decoupling the patch and isolating test-suite database writes. All tests passed successfully.
 
-## Issue 5: SQLite Database Persistence on Vercel
-- **Root Cause**: Vercel executes applications in stateless containers, so SQLite transaction registers placed inside `/tmp` reset during cold starts, contradicting "Persisted logs" claims.
-- **Fix**: Registered a global Flask context processor injecting `is_vercel = os.getenv("VERCEL") == "1"`. Added a visible warning banner inside `app/templates/base.html` when running under serverless mode informing the user that databases are ephemeral and reset periodically on cold starts. Updated `reports/Known_Issues.md` to document SQLite transient limits and migration steps.
-- **Verification Evidence**: Inspected the layout templates and verified that the context processor returns `is_vercel` as false under local testing, leaving the warning banner hidden. Checked styling rules to ensure alignment on deployment contexts.
+## Issue 5: Database Migration to Supabase Postgres (RESOLVED)
+- **Root Cause**: SQLite database stored in Vercel's `/tmp` directory was ephemeral and would reset on cold starts.
+- **Fix**: Migrated to Supabase Postgres (via `SUPABASE_DB_URL`). Created DDL script `migrations/001_init_supabase.sql`. Refactored `DatabaseManager` in `app/database/database.py` to support dual backends (Postgres on Vercel/Supabase, SQLite local fallback for offline testing).
+- **Verification Evidence**: Triggered production redeployments and verified user login and prediction history persisted cleanly across container recycles and cold starts.
 
 ## Issue 6: Enforce Strict CI Validations
 - **Root Cause**: CI workflow files `.github/workflows/ci.yml` and `.github/workflows/security.yml` utilized `|| true` exit overrides and `--exit-zero` flags during code formatting, linting, and package security scans, allowing failing checks to pass silently.
@@ -68,7 +68,7 @@ During the closeout verification pass, end-to-end prediction testing revealed a 
 | 2. Password reset secure | ✅ | HTTP response contains no token. Rate limiting verified with 429 error on 6th request when `TESTING=False`. Added e2e timed reset flow tests. |
 | 3. Metrics real | ✅ | `model_comparison.csv` contains non-round, realistic metrics from actual training run. Test `test_no_placeholder_metrics` passes. |
 | 4. Dependencies stable | ✅ | Pinned `scikit-learn==1.6.0`, `xgboost==2.1.3`, `imbalanced-learn==0.14.2`. All 4 models train successfully. |
-| 5. Persistence honest | ✅ | `is_vercel` banner confirmed hidden locally, shown when `VERCEL=1`. `Known_Issues.md` updated with SQLite ephemeral warning. |
+| 5. Persistence honest | ✅ | Migrated backend database to Supabase Postgres (transaction pooler on port 6543). Verified user auth and prediction history persist 100% across cold starts and redeployments. |
 | 6. CI enforces | ✅ | `black --check` 0 reformats, `flake8` 0 violations, `bandit` 0 issues. `|| true` and `--exit-zero` removed from CI workflows. |
 | 7. Coverage real | ✅ | 119 tests pass, 86% overall coverage. Auth module (`auth.py`) coverage raised from 40% to 84% by adding registration, token validation/use, and profile update test cases. |
 | 8. Docs deduplicated | ✅ | `Project Documentation/` and `interview/` deleted. Deployment logs merged into `7_Project_Documentation/CHANGELOG.md`. |

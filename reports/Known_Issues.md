@@ -16,9 +16,10 @@ This document outlines the known system limitations and libraries warnings for t
 
 ---
 
-## 3. SQLite Database Ephemeral Persistence on Vercel
-- **Description**: Vercel executes application instances in stateless, serverless environments. The SQLite database stored inside `/tmp` is ephemeral and resets during cold starts.
-- **Workaround**: The application includes a UI banner when running on Vercel informing the user of the periodic session resets. For persistent production use, migrate to a hosted database (such as PostgreSQL or Turso) by configuring a `DATABASE_URL` connection.
+## 3. SQLite Database Ephemeral Persistence on Vercel (RESOLVED)
+- **Status**: Resolved
+- **Description**: The database was migrated from local ephemeral SQLite to a persistent remote Supabase PostgreSQL database (configured via `SUPABASE_DB_URL` environment variable). This ensures that authentication records, prediction history, and report logs are securely persisted and survive across Vercel cold starts and container recycles.
+- **Local Fallback**: Local development and test environments continue to automatically fall back to SQLite when `SUPABASE_DB_URL` is not present, allowing offline development without a live connection.
 
 ---
 
