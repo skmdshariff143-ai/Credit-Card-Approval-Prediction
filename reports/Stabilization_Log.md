@@ -73,6 +73,25 @@ During the closeout verification pass, end-to-end prediction testing revealed a 
 | 7. Coverage real | ✅ | 119 tests pass, 86% overall coverage. Auth module (`auth.py`) coverage raised from 40% to 84% by adding registration, token validation/use, and profile update test cases. |
 | 8. Docs deduplicated | ✅ | `Project Documentation/` and `interview/` deleted. Deployment logs merged into `7_Project_Documentation/CHANGELOG.md`. |
 
+## Final Release Verification Scoreboard (Supabase Postgres Backend)
+
+| Feature / Verification | Status | One-line Evidence |
+|---|---|---|
+| Postgres Schema Migration | ✅ | Successfully ran `001_init_supabase.sql` and verified tables exist via linked CLI query. |
+| Dual Database Backend | ✅ | App falls back to local SQLite when `SUPABASE_DB_URL` is absent, and switches to Postgres when present. |
+| Production Database persistence | ✅ | Registered a test user, submitted prediction, triggered a full redeployment (cold start), and verified credentials and history persisted. |
+| E2E Prediction - Approve | ✅ | Submitted high-recall profile on production, returned `decision=Approved` with explainability graphics. |
+| E2E Prediction - Reject | ✅ | Submitted high-default profile on production, returned `decision=Rejected`. |
+| Explainability Rendering | ✅ | Checked prediction response and confirmed risk factors, contributions, and recommendations are parsed and rendered correctly. |
+| Print Report with QR Code | ✅ | Opened printable assessment report on production, confirmed window.print() triggers and QR verification block renders. |
+| Password Reset Flow | ✅ | Submitted forgot-password link successfully on production URL. |
+| Password Reset Rate-Limiting | ✅ | Throttled user after 5 consecutive forgot-password requests, returning a HTTP 429 status code block. |
+| Role-Based Access Control | ✅ | Confirmed anonymous and regular users accessing `/admin` redirect to login (302) and home (302) respectively. |
+| Analytics Dashboard | ✅ | Confirmed analytics dashboard plots densities and approval ratios correctly under admin session. |
+| Code Quality Standards | ✅ | Executed pytest (119 passed), black formatting check (100% clean), flake8 (0 issues), and bandit (0 issues). |
+| GitHub CI Pipeline | ✅ | Confirmed all 5 CI runs (lint, testing, security, docker, pages) completed successfully on commit `c58a555`. |
+
+
 
 
 
