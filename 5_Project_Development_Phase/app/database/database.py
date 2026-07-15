@@ -1,21 +1,46 @@
 import json
 import os
 import sqlite3
+import contextlib
 from datetime import datetime
 
 from config.config import config
 
+# Dynamic psycopg2 import support for backend-agnostic behavior
+try:
+    import psycopg2
+    import psycopg2.extras
+    from psycopg2 import IntegrityError as PgIntegrityError
+except ImportError:
+    psycopg2 = None
+    PgIntegrityError = None
+
+# Backend-agnostic IntegrityError tuple
+INTEGRITY_ERRORS = (sqlite3.IntegrityError,)
+if PgIntegrityError is not None:
+    INTEGRITY_ERRORS += (PgIntegrityError,)
+
 
 class DatabaseManager:
     """
-    Manages SQLite storage for application prediction history.
+    Manages dual database backends (SQLite / Supabase Postgres)
+    for application prediction history and authentication.
     """
 
     def __init__(self):
-        paths = config.get_paths()
-        self.db_path = os.path.join(paths["logs_dir"], "prediction_history.db")
+        # Determine engine mode based on SUPABASE_DB_URL presence
+        self.db_url = os.getenv("SUPABASE_DB_URL")
+        self.use_postgres = bool(self.db_url)
+
+        if not self.use_postgres:
+            paths = config.get_paths()
+            self.db_path = os.path.join(paths["logs_dir"], "prediction_history.db")
+            try:
+                os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+            except Exception:
+                pass
+
         try:
-            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
             self.init_db()
         except Exception as e:
             # Under read-only environments (like Vercel build stages), ignore write failure
@@ -24,23 +49,71 @@ class DatabaseManager:
             logging.getLogger(__name__).warning(f"Database initialization deferred/ignored: {str(e)}")
 
     def _get_connection(self):
-        conn = sqlite3.connect(self.db_path)
-        conn.row_factory = sqlite3.Row
-        return conn
+        if self.use_postgres:
+            if psycopg2 is None:
+                raise ImportError("psycopg2 is not installed but SUPABASE_DB_URL is configured.")
+            # Remove "?pgbouncer=true" or other query parameters because psycopg2 does not support them in DSN
+            url = self.db_url
+            if "?" in url:
+                url = url.split("?")[0]
+            # Use DictCursor to emulate sqlite3.Row index/string key access
+            conn = psycopg2.connect(url, cursor_factory=psycopg2.extras.DictCursor)
+            return conn
+        else:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            return conn
+
+    @contextlib.contextmanager
+    def _connection(self):
+        """Context manager to ensure connections are closed after use, preventing serverless leaks."""
+        conn = self._get_connection()
+        try:
+            yield conn
+        finally:
+            conn.close()
+
+    def _prepare_query(self, query: str) -> str:
+        """Translates standard SQLite '?' parameters to PostgreSQL '%s' parameters if active."""
+        if self.use_postgres:
+            return query.replace("?", "%s")
+        return query
 
     def init_db(self):
         """Initializes the database schema if it does not exist."""
-        with self._get_connection() as conn:
-            self._create_prediction_tables(conn)
-            self._create_user_tables(conn)
-            self._run_user_migrations(conn)
-            self._seed_default_users(conn)
-            self._run_prediction_migrations(conn)
-            conn.commit()
+        if self.use_postgres:
+            migration_path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "5_Project_Development_Phase",
+                "migrations",
+                "001_init_supabase.sql",
+            )
+            if not os.path.exists(migration_path):
+                migration_path = os.path.join(config.BASE_DIR, "migrations", "001_init_supabase.sql")
 
-    def _create_prediction_tables(self, conn):
+            with open(migration_path, "r", encoding="utf-8") as f:
+                sql = f.read()
+
+            with self._connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute(sql)
+                conn.commit()
+
+            # Seed default users for Postgres
+            self._seed_default_users_postgres()
+        else:
+            with self._connection() as conn:
+                cursor = conn.cursor()
+                self._create_prediction_tables(cursor)
+                self._create_user_tables(cursor)
+                self._run_user_migrations(cursor)
+                self._seed_default_users(cursor)
+                self._run_prediction_migrations(cursor)
+                conn.commit()
+
+    def _create_prediction_tables(self, cursor):
         # Core prediction history table (Phase 11 spec)
-        conn.execute("""
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS prediction_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 application_id TEXT NOT NULL UNIQUE,
@@ -62,7 +135,7 @@ class DatabaseManager:
         """)
 
         # Backwards compatibility table
-        conn.execute("""
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS predictions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 timestamp TEXT NOT NULL,
@@ -74,14 +147,14 @@ class DatabaseManager:
             )
         """)
         # Create performance indexes for search and sorting
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_app_id ON prediction_history(application_id);")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_timestamp ON prediction_history(timestamp);")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_income ON prediction_history(income);")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_risk ON prediction_history(risk_level);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_app_id ON prediction_history(application_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_timestamp ON prediction_history(timestamp);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_income ON prediction_history(income);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_pred_hist_risk ON prediction_history(risk_level);")
 
-    def _create_user_tables(self, conn):
+    def _create_user_tables(self, cursor):
         # Authentication: users table
-        conn.execute("""
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS users (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 username TEXT UNIQUE NOT NULL,
@@ -96,10 +169,10 @@ class DatabaseManager:
                 is_admin INTEGER DEFAULT 0
             )
         """)
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);")
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);")
 
-    def _run_user_migrations(self, conn):
+    def _run_user_migrations(self, cursor):
         # Add columns to users (safe migration for existing db)
         for col_name, col_type in [
             ("name", "TEXT"),
@@ -109,12 +182,11 @@ class DatabaseManager:
             ("status", "TEXT NOT NULL DEFAULT 'Active'"),
         ]:
             try:
-                conn.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
+                cursor.execute(f"ALTER TABLE users ADD COLUMN {col_name} {col_type}")
             except sqlite3.OperationalError:
                 pass
 
-    def _seed_default_users(self, conn):
-        # Seed default users from environment variables if present
+    def _seed_default_users(self, cursor):
         from werkzeug.security import generate_password_hash
 
         admin_email = os.getenv("ADMIN_EMAIL")
@@ -137,7 +209,6 @@ class DatabaseManager:
             default_users.append((os.getenv("DEMO_USERNAME", "demo"), demo_email, demo_pwd, "Demo User", "User"))
 
         for username, email, pwd, name, role in default_users:
-            cursor = conn.cursor()
             cursor.execute("SELECT id FROM users WHERE email = ?", (email,))
             if not cursor.fetchone():
                 pwd_hash = generate_password_hash(pwd, method="scrypt")
@@ -156,31 +227,72 @@ class DatabaseManager:
                     ),
                 )
 
-    def _run_prediction_migrations(self, conn):
-        # Add user_id column to prediction_history (safe migration)
-        try:
-            conn.execute("ALTER TABLE prediction_history ADD COLUMN user_id INTEGER REFERENCES users(id)")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
+    def _seed_default_users_postgres(self):
+        from werkzeug.security import generate_password_hash
 
-        # Add explanation column to prediction_history (safe migration)
-        try:
-            conn.execute("ALTER TABLE prediction_history ADD COLUMN explanation TEXT")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_pwd = os.getenv("ADMIN_PASSWORD")
+        officer_email = os.getenv("OFFICER_EMAIL")
+        officer_pwd = os.getenv("OFFICER_PASSWORD")
+        demo_email = os.getenv("DEMO_EMAIL")
+        demo_pwd = os.getenv("DEMO_PASSWORD")
 
-        # Add model and explanation columns to predictions (safe migration)
-        try:
-            conn.execute("ALTER TABLE predictions ADD COLUMN model TEXT")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
-        try:
-            conn.execute("ALTER TABLE predictions ADD COLUMN explanation TEXT")
-        except sqlite3.OperationalError:
-            pass  # Column already exists
+        default_users = []
+        if admin_email and admin_pwd:
+            default_users.append(
+                (os.getenv("ADMIN_USERNAME", "admin"), admin_email, admin_pwd, "Admin", "Administrator")
+            )
+        if officer_email and officer_pwd:
+            default_users.append(
+                (os.getenv("OFFICER_USERNAME", "officer"), officer_email, officer_pwd, "Loan Officer", "Officer")
+            )
+        if demo_email and demo_pwd:
+            default_users.append((os.getenv("DEMO_USERNAME", "demo"), demo_email, demo_pwd, "Demo User", "User"))
 
-        # New reports table
-        conn.execute("""
+        with self._connection() as conn:
+            with conn.cursor() as cursor:
+                for username, email, pwd, name, role in default_users:
+                    cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+                    if not cursor.fetchone():
+                        pwd_hash = generate_password_hash(pwd, method="scrypt")
+                        cursor.execute(
+                            """INSERT INTO users (username, email, password_hash,
+                               name, full_name, role, status, created_at)
+                               VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                            (
+                                username,
+                                email,
+                                pwd_hash,
+                                name,
+                                name,
+                                role,
+                                "Active",
+                                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            ),
+                        )
+            conn.commit()
+
+    def _run_prediction_migrations(self, cursor):
+        try:
+            cursor.execute("ALTER TABLE prediction_history ADD COLUMN user_id INTEGER REFERENCES users(id)")
+        except sqlite3.OperationalError:
+            pass
+
+        try:
+            cursor.execute("ALTER TABLE prediction_history ADD COLUMN explanation TEXT")
+        except sqlite3.OperationalError:
+            pass
+
+        try:
+            cursor.execute("ALTER TABLE predictions ADD COLUMN model TEXT")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            cursor.execute("ALTER TABLE predictions ADD COLUMN explanation TEXT")
+        except sqlite3.OperationalError:
+            pass
+
+        cursor.execute("""
             CREATE TABLE IF NOT EXISTS reports (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 application_id TEXT NOT NULL UNIQUE REFERENCES prediction_history(application_id) ON DELETE CASCADE,
@@ -193,39 +305,41 @@ class DatabaseManager:
                 user_id INTEGER REFERENCES users(id)
             )
         """)
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_reports_app_id ON reports(application_id);")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_reports_app_id ON reports(application_id);")
 
     def check_connection(self) -> bool:
         """Verifies database connectivity."""
         try:
-            with self._get_connection() as conn:
-                conn.execute("SELECT 1")
+            with self._connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT 1")
+                cursor.close()
             return True
         except Exception:
             return False
 
-    # ==================================================================
-    # User Management Methods (Authentication)
-    # ==================================================================
-
     def update_last_login(self, user_id):
         """Updates the last login timestamp for a user."""
-        with self._get_connection() as conn:
-            conn.execute(
-                "UPDATE users SET last_login = ? WHERE id = ?",
+        with self._connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                self._prepare_query("UPDATE users SET last_login = ? WHERE id = ?"),
                 (datetime.now().strftime("%Y-%m-%d %H:%M:%S"), user_id),
             )
             conn.commit()
+            cursor.close()
 
     def create_user(self, username, email, password_hash, name=None, role="User", status="Active", full_name=None):
         """Creates a new user account. Returns user id or None on conflict."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
+            cursor = conn.cursor()
             try:
-                cursor = conn.cursor()
                 display_name = name or full_name or username
                 cursor.execute(
-                    """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    self._prepare_query(
+                        """INSERT INTO users (username, email, password_hash, name, full_name, role, status, created_at)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
+                    ),
                     (
                         username,
                         email,
@@ -238,59 +352,70 @@ class DatabaseManager:
                     ),
                 )
                 conn.commit()
-                return cursor.lastrowid
-            except sqlite3.IntegrityError:
+                if self.use_postgres:
+                    cursor.execute("SELECT LASTVAL()")
+                    user_id = cursor.fetchone()[0]
+                else:
+                    user_id = cursor.lastrowid
+                return user_id
+            except INTEGRITY_ERRORS:
                 return None
+            finally:
+                cursor.close()
 
     def get_user_by_id(self, user_id):
         """Retrieves a user record by primary key."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
+            cursor.execute(self._prepare_query("SELECT * FROM users WHERE id = ?"), (user_id,))
             row = cursor.fetchone()
+            cursor.close()
             return dict(row) if row else None
 
     def get_user_by_email(self, email):
         """Retrieves a user record by email address."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+            cursor.execute(self._prepare_query("SELECT * FROM users WHERE email = ?"), (email,))
             row = cursor.fetchone()
+            cursor.close()
             return dict(row) if row else None
 
     def get_user_by_username(self, username):
         """Retrieves a user record by username."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
+            cursor.execute(self._prepare_query("SELECT * FROM users WHERE username = ?"), (username,))
             row = cursor.fetchone()
+            cursor.close()
             return dict(row) if row else None
 
     def update_user_password(self, user_id, new_password_hash):
         """Updates a user's password hash."""
-        with self._get_connection() as conn:
-            conn.execute(
-                "UPDATE users SET password_hash = ? WHERE id = ?",
+        with self._connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                self._prepare_query("UPDATE users SET password_hash = ? WHERE id = ?"),
                 (new_password_hash, user_id),
             )
             conn.commit()
+            cursor.close()
 
     def update_user_profile(self, user_id, full_name, email):
         """Updates a user's profile details."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
+            cursor = conn.cursor()
             try:
-                conn.execute(
-                    "UPDATE users SET full_name = ?, email = ? WHERE id = ?",
+                cursor.execute(
+                    self._prepare_query("UPDATE users SET full_name = ?, email = ? WHERE id = ?"),
                     (full_name, email, user_id),
                 )
                 conn.commit()
                 return True
-            except sqlite3.IntegrityError:
-                return False  # Email conflict
-
-    # ==================================================================
-    # Per-User Prediction Methods
-    # ==================================================================
+            except INTEGRITY_ERRORS:
+                return False
+            finally:
+                cursor.close()
 
     def get_user_predictions(
         self, user_id, limit=50, search=None, sort_by="id", order="DESC", decision=None, risk_level=None
@@ -321,10 +446,11 @@ class DatabaseManager:
         query += f" ORDER BY {sort_by} {order} LIMIT ?"
         params.append(limit)
 
-        with self._get_connection() as conn:
+        with self._connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(query, tuple(params))
+            cursor.execute(self._prepare_query(query), tuple(params))
             rows = cursor.fetchall()
+            cursor.close()
 
             history_list = []
             for row in rows:
@@ -361,24 +487,35 @@ class DatabaseManager:
 
     def get_user_stats(self, user_id):
         """Calculates per-user prediction statistics."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM prediction_history WHERE user_id = ?", (user_id,))
+
+            cursor.execute(self._prepare_query("SELECT COUNT(*) FROM prediction_history WHERE user_id = ?"), (user_id,))
             total = cursor.fetchone()[0] or 0
 
             cursor.execute(
-                "SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Approved'", (user_id,)
+                self._prepare_query(
+                    "SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Approved'"
+                ),
+                (user_id,),
             )
             approved = cursor.fetchone()[0] or 0
 
             cursor.execute(
-                "SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Rejected'", (user_id,)
+                self._prepare_query(
+                    "SELECT COUNT(*) FROM prediction_history WHERE user_id = ? AND prediction = 'Rejected'"
+                ),
+                (user_id,),
             )
             rejected = cursor.fetchone()[0] or 0
 
-            cursor.execute("SELECT AVG(probability) FROM prediction_history WHERE user_id = ?", (user_id,))
+            cursor.execute(
+                self._prepare_query("SELECT AVG(probability) FROM prediction_history WHERE user_id = ?"), (user_id,)
+            )
             avg_prob = cursor.fetchone()[0]
-            avg_prob = avg_prob if avg_prob is not None else 0.0
+            avg_prob = float(avg_prob) if avg_prob is not None else 0.0
+
+            cursor.close()
 
             approval_rate = (approved / total * 100.0) if total > 0 else 0.0
 
@@ -392,10 +529,6 @@ class DatabaseManager:
                 "total_rejected": rejected,
                 "avg_probability": avg_prob,
             }
-
-    # ==================================================================
-    # Original Methods (unchanged)
-    # ==================================================================
 
     def add_prediction(
         self,
@@ -451,66 +584,150 @@ class DatabaseManager:
         raw_json = json.dumps(raw_input)
         explanation_json = json.dumps(explanation) if explanation else None
 
-        with self._get_connection() as conn:
+        with self._connection() as conn:
+            cursor = conn.cursor()
+
             # Insert into predictions (compat)
-            conn.execute(
-                "INSERT INTO predictions (timestamp, input_features, prediction, probability, model, explanation) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
+            cursor.execute(
+                self._prepare_query(
+                    "INSERT INTO predictions (timestamp, input_features, prediction, probability, model, explanation) "
+                    "VALUES (?, ?, ?, ?, ?, ?)"
+                ),
                 (timestamp, raw_json, prediction, probability, model, explanation_json),
             )
 
-            # Insert into prediction_history (new spec)
-            cursor = conn.cursor()
-            cursor.execute(
-                """
-                INSERT OR REPLACE INTO prediction_history (
-                    application_id, timestamp, gender, income, employment,
-                    experience, children, debt, prediction, probability,
-                    risk_level, model, recommendation, raw_input, user_id, explanation
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    app_id,
-                    timestamp,
-                    gender,
-                    income,
-                    employment,
-                    experience,
-                    children,
-                    debt,
-                    prediction,
-                    probability,
-                    risk_level,
-                    model,
-                    recommendation,
-                    raw_json,
-                    user_id,
-                    explanation_json,
-                ),
-            )
+            # Insert into prediction_history (new spec - Postgres uses ON CONFLICT, SQLite uses INSERT OR REPLACE)
+            if self.use_postgres:
+                cursor.execute(
+                    """
+                    INSERT INTO prediction_history (
+                        application_id, timestamp, gender, income, employment,
+                        experience, children, debt, prediction, probability,
+                        risk_level, model, recommendation, raw_input, user_id, explanation
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (application_id) DO UPDATE SET
+                        timestamp = EXCLUDED.timestamp,
+                        gender = EXCLUDED.gender,
+                        income = EXCLUDED.income,
+                        employment = EXCLUDED.employment,
+                        experience = EXCLUDED.experience,
+                        children = EXCLUDED.children,
+                        debt = EXCLUDED.debt,
+                        prediction = EXCLUDED.prediction,
+                        probability = EXCLUDED.probability,
+                        risk_level = EXCLUDED.risk_level,
+                        model = EXCLUDED.model,
+                        recommendation = EXCLUDED.recommendation,
+                        raw_input = EXCLUDED.raw_input,
+                        user_id = EXCLUDED.user_id,
+                        explanation = EXCLUDED.explanation
+                    """,
+                    (
+                        app_id,
+                        timestamp,
+                        gender,
+                        income,
+                        employment,
+                        experience,
+                        children,
+                        debt,
+                        prediction,
+                        probability,
+                        risk_level,
+                        model,
+                        recommendation,
+                        raw_json,
+                        user_id,
+                        explanation_json,
+                    ),
+                )
+            else:
+                cursor.execute(
+                    """
+                    INSERT OR REPLACE INTO prediction_history (
+                        application_id, timestamp, gender, income, employment,
+                        experience, children, debt, prediction, probability,
+                        risk_level, model, recommendation, raw_input, user_id, explanation
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        app_id,
+                        timestamp,
+                        gender,
+                        income,
+                        employment,
+                        experience,
+                        children,
+                        debt,
+                        prediction,
+                        probability,
+                        risk_level,
+                        model,
+                        recommendation,
+                        raw_json,
+                        user_id,
+                        explanation_json,
+                    ),
+                )
 
             # Insert into reports table
             confidence_val = float(probability) if probability is not None else 0.0
-            conn.execute(
-                """
-                INSERT OR REPLACE INTO reports (
-                    application_id, timestamp, inputs, prediction, confidence, model_used, explanation, user_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    app_id,
-                    timestamp,
-                    raw_json,
-                    prediction,
-                    confidence_val,
-                    model,
-                    explanation_json or "{}",
-                    user_id,
-                ),
-            )
+            if self.use_postgres:
+                cursor.execute(
+                    """
+                    INSERT INTO reports (
+                        application_id, timestamp, inputs, prediction, confidence, model_used, explanation, user_id
+                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (application_id) DO UPDATE SET
+                        timestamp = EXCLUDED.timestamp,
+                        inputs = EXCLUDED.inputs,
+                        prediction = EXCLUDED.prediction,
+                        confidence = EXCLUDED.confidence,
+                        model_used = EXCLUDED.model_used,
+                        explanation = EXCLUDED.explanation,
+                        user_id = EXCLUDED.user_id
+                    """,
+                    (
+                        app_id,
+                        timestamp,
+                        raw_json,
+                        prediction,
+                        confidence_val,
+                        model,
+                        explanation_json or "{}",
+                        user_id,
+                    ),
+                )
+            else:
+                cursor.execute(
+                    """
+                    INSERT OR REPLACE INTO reports (
+                        application_id, timestamp, inputs, prediction, confidence, model_used, explanation, user_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        app_id,
+                        timestamp,
+                        raw_json,
+                        prediction,
+                        confidence_val,
+                        model,
+                        explanation_json or "{}",
+                        user_id,
+                    ),
+                )
 
             conn.commit()
-            return cursor.lastrowid
+
+            # Fetch last row id
+            if self.use_postgres:
+                cursor.execute("SELECT LASTVAL()")
+                last_id = cursor.fetchone()[0]
+            else:
+                last_id = cursor.lastrowid
+
+            cursor.close()
+            return last_id
 
     def get_predictions(
         self,
@@ -523,10 +740,11 @@ class DatabaseManager:
     ) -> list:
         """Retrieves history from database supporting filter, search, sorting."""
         query, params = self._build_predictions_query(limit, search, sort_by, order, decision, risk_level)
-        with self._get_connection() as conn:
+        with self._connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(query, tuple(params))
+            cursor.execute(self._prepare_query(query), tuple(params))
             rows = cursor.fetchall()
+            cursor.close()
             return [self._parse_prediction_row(row) for row in rows]
 
     def _build_predictions_query(self, limit, search, sort_by, order, decision, risk_level):
@@ -592,27 +810,29 @@ class DatabaseManager:
 
     def get_admin_stats(self) -> dict:
         """Calculates statistics for admin dashboard metrics."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
             cursor = conn.cursor()
 
             # Total Predictions
-            cursor.execute("SELECT COUNT(*) FROM prediction_history")
+            cursor.execute(self._prepare_query("SELECT COUNT(*) FROM prediction_history"))
             total = cursor.fetchone()[0] or 0
 
             # Approved Count
-            cursor.execute("SELECT COUNT(*) FROM prediction_history WHERE prediction = 'Approved'")
+            cursor.execute(self._prepare_query("SELECT COUNT(*) FROM prediction_history WHERE prediction = 'Approved'"))
             approved = cursor.fetchone()[0] or 0
 
             # Rejected Count
-            cursor.execute("SELECT COUNT(*) FROM prediction_history WHERE prediction = 'Rejected'")
+            cursor.execute(self._prepare_query("SELECT COUNT(*) FROM prediction_history WHERE prediction = 'Rejected'"))
             rejected = cursor.fetchone()[0] or 0
 
             # Averages
-            cursor.execute("SELECT AVG(income) FROM prediction_history")
+            cursor.execute(self._prepare_query("SELECT AVG(income) FROM prediction_history"))
             avg_income = cursor.fetchone()[0] or 0.0
 
-            cursor.execute("SELECT AVG(debt) FROM prediction_history")
+            cursor.execute(self._prepare_query("SELECT AVG(debt) FROM prediction_history"))
             avg_debt = cursor.fetchone()[0] or 0.0
+
+            cursor.close()
 
             # Calculate approval rate
             approval_rate = (approved / total * 100.0) if total > 0 else 0.0
@@ -628,34 +848,46 @@ class DatabaseManager:
 
     def clear_history(self):
         """Clears all logged history transactions."""
-        with self._get_connection() as conn:
-            conn.execute("DELETE FROM prediction_history")
-            conn.execute("DELETE FROM predictions")
-            conn.execute("DELETE FROM reports")
+        with self._connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(self._prepare_query("DELETE FROM prediction_history"))
+            cursor.execute(self._prepare_query("DELETE FROM predictions"))
+            cursor.execute(self._prepare_query("DELETE FROM reports"))
             conn.commit()
+            cursor.close()
 
     def delete_prediction(self, application_id, user_id) -> bool:
         """Deletes a specific prediction history entry and its associated report."""
-        with self._get_connection() as conn:
+        with self._connection() as conn:
+            cursor = conn.cursor()
             # Delete from history
-            cursor = conn.execute(
-                "DELETE FROM prediction_history WHERE application_id = ? AND user_id = ?",
+            cursor.execute(
+                self._prepare_query("DELETE FROM prediction_history WHERE application_id = ? AND user_id = ?"),
                 (application_id, user_id),
             )
+            rows_deleted = cursor.rowcount if not self.use_postgres else cursor.statusmessage.split()[-1]
+            try:
+                rows_deleted = int(rows_deleted)
+            except Exception:
+                rows_deleted = 1
+
             # Delete from reports
-            conn.execute(
-                "DELETE FROM reports WHERE application_id = ? AND user_id = ?",
+            cursor.execute(
+                self._prepare_query("DELETE FROM reports WHERE application_id = ? AND user_id = ?"),
                 (application_id, user_id),
             )
             conn.commit()
-            return cursor.rowcount > 0
+            cursor.close()
+            return rows_deleted > 0
 
     def clear_user_history(self, user_id) -> bool:
         """Clears all prediction history and reports for a specific user."""
-        with self._get_connection() as conn:
-            conn.execute("DELETE FROM prediction_history WHERE user_id = ?", (user_id,))
-            conn.execute("DELETE FROM reports WHERE user_id = ?", (user_id,))
+        with self._connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(self._prepare_query("DELETE FROM prediction_history WHERE user_id = ?"), (user_id,))
+            cursor.execute(self._prepare_query("DELETE FROM reports WHERE user_id = ?"), (user_id,))
             conn.commit()
+            cursor.close()
             return True
 
     def get_report_by_app_id(self, application_id, user_id=None) -> dict:
@@ -666,8 +898,12 @@ class DatabaseManager:
             query += " AND user_id = ?"
             params.append(user_id)
 
-        with self._get_connection() as conn:
-            row = conn.execute(query, tuple(params)).fetchone()
+        with self._connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(self._prepare_query(query), tuple(params))
+            row = cursor.fetchone()
+            cursor.close()
+
             if row:
                 row_dict = dict(row)
                 return {
