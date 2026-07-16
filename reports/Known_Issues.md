@@ -27,6 +27,6 @@ This document outlines the known system limitations and libraries warnings for t
 - **Status**: Resolved
 - **Description**: The rate limiter (`app/utils/limiter.py`) was refactored to support a shared Upstash Redis store via the `REDIS_URL` environment variable, with transparent fallback to in-memory when Redis is unavailable. Rate limit counters now persist across Vercel cold starts and container recycles.
 - **Verification**: A redeploy-interruption test confirmed the Redis counter survived a full production redeployment: 30 requests pre-redeploy + 31 post-redeploy = blocked at request #61. Vercel runtime logs confirm: `Rate limiter successfully initialized with shared Redis store.`
-- **Configuration**: `REDIS_URL` is set as a Sensitive environment variable in Vercel production, pointing to Upstash Redis (`nice-lamprey-162404.upstash.io`).
+- **Configuration**: `REDIS_URL` is set as a Sensitive environment variable in Vercel production, pointing to a shared Upstash Redis instance.
 
 

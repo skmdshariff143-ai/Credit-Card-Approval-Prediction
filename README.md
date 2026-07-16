@@ -27,7 +27,7 @@
 ## ✨ Key Features
 1. **Interactive Multi-Step Wizard**: Sleek 4-step wizard form with client-side parameter checks, progress bars, and animations.
 2. **Explainable AI (LIME Engine)**: Custom Ridge surrogate attributions breaking down low/high risk factors into clear positive and negative attributions.
-3. **Persisted Log Ledgers**: Searchable, filterable, and sortable prediction transaction tables connected to SQLite.
+3. **Persisted Log Ledgers**: Searchable, filterable, and sortable prediction transaction tables connected to persistent Supabase PostgreSQL (with automatic local SQLite fallback).
 4. **Operations Analytics Console**: Chart.js graphs mapping approval ratios, family status densities, and income trends.
 5. **Secure Authentication & RBAC**: Werkzeug `scrypt` hashing with role-based route constraints (Admin, Officer, User).
 6. **Print-Ready Assessments**: Browser-printable HTML decision summaries with verification QR codes and true server-side PDF generation/download capabilities.
@@ -61,7 +61,7 @@ Watch the full project walkthrough here: [Project Demo Video](https://youtu.be/z
 ---
 
 ## ⚙️ Technology Stack
-- **Backend Infrastructure**: Python 3.13, Flask 3.0, SQLite3, WSGI
+- **Backend Infrastructure**: Python 3.13, Flask 3.0, PostgreSQL (Supabase) with local SQLite3 fallback, WSGI
 - **Machine Learning Layer**: Multi-model comparison pipeline (Logistic Regression, Decision Tree, Random Forest, XGBoost) with SMOTE-balanced training and GridSearchCV optimization. The pipeline auto-selects the best candidate by minority-class F1-Score (with Logistic Regression currently winning).
 - **Explainability Engine**: Ridge Surrogate Coefficients (LIME-inspired Local Surrogate)
 - **User Interface**: HTML5, Vanilla CSS3 (Custom Glassmorphism Dark Futuristic design tokens), JavaScript (Chart.js)
@@ -156,7 +156,7 @@ flask run
 *Access the local UI at `http://127.0.0.1:5000`.*
 
 ### 5. Run Test Suite
-Verify that all 108 pytest test cases pass successfully:
+Verify that all 119 pytest test cases pass successfully:
 ```bash
 pytest 5_Project_Development_Phase/tests/ -v
 ```
@@ -199,7 +199,7 @@ pytest 5_Project_Development_Phase/tests/ -v
 
 ## 🔮 Future Scope
 1. **Explainability Upgrade**: Migrate local surrogate models to tree-native SHAP values for precise attributions.
-2. **Cloud Storage Integration**: Replace local SQLite file logs with Supabase PostgreSQL cloud clusters.
+2. **Real-time API Alerts**: Send Slack or Email notifications to loan officers when high-risk overrides are triggered.
 3. **Data Drift Audits**: Monitor input variances programmatically using automated pipelines.
 4. **Fairness checks**: Integrate AIF360 frameworks to prevent credit scoring biases.
 
