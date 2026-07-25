@@ -116,6 +116,19 @@
 
 <!-- 3D Conversational Wizard Container -->
 <div class="cg-assessment-container">
+  <!-- Multi-Step Wizard Progress Category Tracker -->
+  <div class="cg-wizard-category-nav" style="display:flex;justify-content:space-between;gap:var(--space-2);margin-bottom:var(--space-4);padding:var(--space-2) var(--space-3);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);">
+    <div class="cg-wizard-cat-item active" id="catStep1" style="flex:1;text-align:center;padding:var(--space-2);border-radius:var(--r-md);background:var(--primary-muted);color:var(--primary);font-size:var(--font-xs);font-weight:700;transition:all var(--t-fast) var(--ease);">
+      <i class="fa-solid fa-user"></i> 1. Demographics
+    </div>
+    <div class="cg-wizard-cat-item" id="catStep2" style="flex:1;text-align:center;padding:var(--space-2);border-radius:var(--r-md);color:var(--text-muted);font-size:var(--font-xs);font-weight:700;transition:all var(--t-fast) var(--ease);">
+      <i class="fa-solid fa-briefcase"></i> 2. Employment
+    </div>
+    <div class="cg-wizard-cat-item" id="catStep3" style="flex:1;text-align:center;padding:var(--space-2);border-radius:var(--r-md);color:var(--text-muted);font-size:var(--font-xs);font-weight:700;transition:all var(--t-fast) var(--ease);">
+      <i class="fa-solid fa-house"></i> 3. Assets & Debt
+    </div>
+  </div>
+
   <!-- Interactive Header -->
   <div class="cg-assessment-header">
     <span class="cg-assessment-counter" id="slideCounter">Assessment 1 of 12</span>
@@ -634,10 +647,39 @@
       hintEl.style.display = activeSlideIdx >= 13 ? 'none' : 'flex';
     }
 
-    // Update progress tracker
+    // Update progress tracker & category breadcrumbs (catStep1: 1-4, catStep2: 5-8, catStep3: 9-12)
+    const c1 = document.getElementById('catStep1');
+    const c2 = document.getElementById('catStep2');
+    const c3 = document.getElementById('catStep3');
+    if (c1 && c2 && c3) {
+      const isC1 = activeSlideIdx >= 1 && activeSlideIdx <= 4;
+      const isC2 = activeSlideIdx >= 5 && activeSlideIdx <= 8;
+      const isC3 = activeSlideIdx >= 9 && activeSlideIdx <= 12;
+
+      [c1, c2, c3].forEach(el => {
+        el.style.background = 'transparent';
+        el.style.color = 'var(--text-muted)';
+        el.classList.remove('active');
+      });
+
+      if (isC1) {
+        c1.style.background = 'var(--primary-muted)';
+        c1.style.color = 'var(--primary)';
+        c1.classList.add('active');
+      } else if (isC2) {
+        c2.style.background = 'var(--primary-muted)';
+        c2.style.color = 'var(--primary)';
+        c2.classList.add('active');
+      } else if (isC3) {
+        c3.style.background = 'var(--primary-muted)';
+        c3.style.color = 'var(--primary)';
+        c3.classList.add('active');
+      }
+    }
+
     if (activeSlideIdx <= 12) {
       document.getElementById('slideCounter').textContent = `Question ${activeSlideIdx} of 12`;
-      const pct = ((activeSlideIdx - 1) / 12) * 100;
+      const pct = (activeSlideIdx / 12) * 100;
       document.getElementById('progressBar').style.width = pct + '%';
       document.getElementById('slideCounter').style.display = 'inline-block';
       document.getElementById('progressBar').parentElement.style.display = 'block';
