@@ -111,7 +111,7 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 ## 🌐 Live Demo & Deployment Pipeline
 
 - **Live Production URL**: [https://credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app)
-- **Deployment Strategy**: **GitHub-Integrated Continuous Deployment**. Every push to `main` automatically runs Black/Flake8 linting, Pytest suite (119/119 tests), builds `api/index.py`, and promotes the deployment to the production `-lac.vercel.app` alias.
+- **Deployment Strategy**: Deploys automatically on push to main via Vercel's GitHub integration — do not deploy manually via CLI, it can create conflicting production deployments. Every push to `main` automatically runs Black/Flake8 linting, Pytest suite (119/119 tests), and updates the production alias.
 
 ---
 
