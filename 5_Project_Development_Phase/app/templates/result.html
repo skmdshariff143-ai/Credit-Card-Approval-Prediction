@@ -5,132 +5,138 @@
 
 {% block head %}
 <style>
-  /* ── Premium AI Decision Dashboard Styles ── */
+  /* ── Premium FinTech AI Decision Dashboard Styles ── */
   .cg-result-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: var(--space-6);
   }
   @media (min-width: 1024px) {
     .cg-result-grid {
-      grid-template-columns: 340px 1fr;
+      grid-template-columns: 360px 1fr;
     }
   }
 
-  /* Status Cards (Glassmorphism & animations) */
+  /* Premium Outcome Card */
   .cg-result-status-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--r-xl);
-    padding: 32px 24px;
+    padding: var(--space-6) var(--space-4);
     text-align: center;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
+    box-shadow: var(--shadow-md);
   }
-  .cg-result-status-card::before {
-    content: ''; position: absolute; inset: 0;
-    background: var(--gradient-card);
-    pointer-events: none;
-  }
-
-  /* Ambient Glows */
-  .cg-outcome-glow {
-    position: absolute;
-    top: -50px;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    filter: blur(60px);
-    opacity: 0.15;
-    pointer-events: none;
-  }
-  .cg-outcome-glow.approved { background: var(--success); }
-  .cg-outcome-glow.rejected { background: var(--danger); }
 
   .cg-status-icon-wrap {
-    width: 72px;
-    height: 72px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
-    margin-bottom: 20px;
+    font-size: var(--font-2xl);
+    margin-bottom: var(--space-4);
     position: relative;
   }
   .cg-status-icon-wrap.approved {
     background: var(--success-muted);
     color: var(--success);
-    border: 1px solid rgba(34,197,94,0.3);
-    animation: cg-pulse-success 2s infinite;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    box-shadow: var(--shadow-glow-success);
   }
   .cg-status-icon-wrap.rejected {
     background: var(--danger-muted);
     color: var(--danger);
-    border: 1px solid rgba(239,68,68,0.3);
-    animation: cg-pulse-danger 2s infinite;
-  }
-  @keyframes cg-pulse-success {
-    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
-    70% { box-shadow: 0 0 0 16px rgba(34,197,94,0); }
-    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
-  }
-  @keyframes cg-pulse-danger {
-    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
-    70% { box-shadow: 0 0 0 16px rgba(239,68,68,0); }
-    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    box-shadow: var(--shadow-glow-danger);
   }
 
-  /* SVG Radar Circular progress meter */
-  .cg-radar-gauge {
+  /* SVG Semi-Circle Arc Risk Gauge */
+  .cg-arc-gauge-wrap {
     position: relative;
-    width: 160px;
-    height: 160px;
-    margin-bottom: 24px;
+    width: 220px;
+    height: 120px;
+    margin: var(--space-2) 0 var(--space-4);
   }
-  .cg-radar-svg {
-    transform: rotate(-90deg);
+  .cg-arc-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
   }
-  .cg-radar-bg {
+  .cg-arc-bg {
     fill: none;
-    stroke: var(--border);
-    stroke-width: 6;
-  }
-  .cg-radar-fill {
-    fill: none;
-    stroke-width: 8;
+    stroke: var(--bg-input);
+    stroke-width: 12;
     stroke-linecap: round;
-    transition: stroke-dashoffset 1.5s var(--ease);
   }
-  .cg-radar-fill.approved { stroke: var(--success); }
-  .cg-radar-fill.rejected { stroke: var(--danger); }
-  
-  .cg-radar-label {
+  .cg-arc-fill {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.2s var(--ease);
+  }
+  .cg-arc-fill.approved { stroke: var(--success); }
+  .cg-arc-fill.rejected { stroke: var(--danger); }
+
+  .cg-arc-center-text {
     position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    bottom: 10px;
+    left: 0; right: 0;
+    text-align: center;
   }
-  .cg-radar-value {
-    font-size: 26px;
+  .cg-arc-val {
+    font-family: var(--font-mono);
+    font-size: var(--font-2xl);
     font-weight: 800;
-    letter-spacing: -1px;
+    line-height: 1;
     color: var(--text-primary);
   }
-  .cg-radar-sub {
-    font-size: 10px;
+  .cg-arc-sub {
+    font-size: var(--font-xs);
     color: var(--text-muted);
-    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    margin-top: 4px;
   }
 
-  /* Metric cards */
+  /* Distinct Plain-English Summary Feature Card */
+  .cg-narrative-card {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(37, 99, 235, 0.05) 100%);
+    border: 1px solid var(--border-active);
+    border-left: 5px solid var(--primary);
+    border-radius: var(--r-lg);
+    padding: var(--space-4) var(--space-6);
+    margin-bottom: var(--space-4);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .cg-narrative-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-sm);
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .cg-narrative-body {
+    font-size: var(--font-base);
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Metric Pill Row */
   .cg-metric-pill {
     background: var(--bg-input);
     border: 1px solid var(--border);
@@ -143,67 +149,28 @@
     margin-bottom: 8px;
   }
 
-  /* Timeline Audit Trail */
-  .cg-audit-timeline {
-    position: relative;
-    padding-left: 20px;
-    margin-top: 16px;
-  }
-  .cg-audit-timeline::before {
-    content: ''; position: absolute; left: 4px; top: 8px; bottom: 8px;
-    width: 2px; background: var(--border);
-  }
-  .cg-timeline-node {
-    position: relative;
-    padding-bottom: 16px;
-  }
-  .cg-timeline-node:last-child {
-    padding-bottom: 0;
-  }
-  .cg-timeline-dot {
-    position: absolute;
-    left: -20px; top: 4px;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--bg-app);
-    border: 2px solid var(--border);
-  }
-  .cg-timeline-dot.done {
-    border-color: var(--primary);
-    background: var(--primary);
-  }
-  .cg-timeline-title {
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-  .cg-timeline-desc {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: 2px;
-  }
-
-  /* Interactive contribution factors list */
-  .cg-factor-card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  /* SHAP Drivers Hierarchy Cards */
+  .cg-shap-card {
     background: var(--bg-input);
     border: 1px solid var(--border);
     border-radius: var(--r-md);
-    padding: 12px 16px;
-    margin-bottom: 8px;
-    transition: all var(--t-fast) var(--ease);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-3);
+    transition: transform var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease);
   }
-  .cg-factor-card:hover {
-    border-color: rgba(255,255,255,0.12);
+  .cg-shap-card:hover {
+    border-color: var(--border-hover);
     transform: translateX(4px);
   }
+
   .cg-factor-badge {
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: var(--r-full);
-    font-size: 10px;
+    font-size: var(--font-xs);
     font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
   }
   .cg-factor-badge.positive { background: var(--success-muted); color: var(--success); }
   .cg-factor-badge.negative { background: var(--danger-muted); color: var(--danger); }
@@ -217,76 +184,85 @@
     <span class="sep">›</span>
     <a href="{{ url_for('api.predict_get') }}">Assessment Wizard</a>
     <span class="sep">›</span>
-    <span class="current">AI Decision Dashboard</span>
+    <span class="current">Decision Dashboard</span>
   </div>
-  <h1 class="cg-page-title">AI Decision Dashboard</h1>
-  <p class="cg-page-desc">Automated prediction results and explainable AI risk assessments.</p>
+  <h1 class="cg-page-title">Underwriting Decision Dashboard</h1>
+  <p class="cg-page-desc">Automated prediction outcomes and explainable AI risk factors.</p>
 </div>
 
 <div class="cg-result-grid cg-fade-in" data-reveal="0s">
-  <!-- Left Side: Result Card, Gauge, Meta -->
+  <!-- Left Column: Outcome Card & Semi-Circle Gauge -->
   <div>
     <div class="cg-result-status-card">
-      <div class="cg-outcome-glow {% if result == 'Approved' %}approved{% else %}rejected{% endif %}"></div>
-
-      <!-- Pulse Icon -->
       <div class="cg-status-icon-wrap {% if result == 'Approved' %}approved{% else %}rejected{% endif %}">
         {% if result == 'Approved' %}
           <i class="fa-solid fa-circle-check"></i>
-          <!-- Approved -->
         {% else %}
           <i class="fa-solid fa-circle-exclamation"></i>
-          <!-- Rejected -->
         {% endif %}
       </div>
 
-      <h2 style="font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 12px; line-height: 1.4; padding: 0 10px;">
+      <h2 style="font-family:var(--font-heading);font-size:var(--font-lg);font-weight:800;margin-bottom:var(--space-1);">
         {% if result == 'Approved' %}
-          Application Approved — Calibrated Risk Score: {{ '%.2f'|format(risk_probability) }}%
+          Application Approved
         {% else %}
-          Application Declined — Calibrated Risk Score: {{ '%.2f'|format(risk_probability) }}%
+          Application Declined (Rejected)
         {% endif %}
       </h2>
-      <p class="cg-app-id cg-mb-md">{{ application_id }}</p>
+      <span class="cg-badge {% if result == 'Approved' %}success{% else %}danger{% endif %}" style="font-size:11px;margin-bottom:var(--space-2);">
+        Verdict: {{ result }}
+      </span>
+      <p style="font-size:var(--font-xs);color:var(--text-muted);margin-bottom:var(--space-4);font-family:var(--font-mono);">
+        ID: {{ application_id }}
+      </p>
 
-      <!-- SVG Circular progress meter -->
-      <div class="cg-radar-gauge">
-        <svg class="cg-radar-svg" width="160" height="160">
-          <circle class="cg-radar-bg" cx="80" cy="80" r="70"/>
-          <circle class="cg-radar-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" cx="80" cy="80" r="70" data-pct="{{ probability }}"/>
+      <!-- SVG Semi-Circle Arc Risk Gauge Component -->
+      <div class="cg-arc-gauge-wrap">
+        <svg class="cg-arc-svg" viewBox="0 0 200 120">
+          <!-- Background Arc (180deg semi-circle) -->
+          <path class="cg-arc-bg" d="M 20 100 A 80 80 0 0 1 180 100" />
+          <!-- Filled Arc Path (mapped to risk_probability) -->
+          {% set dash_array = 251.32 %}
+          {% set clamped_risk = risk_probability if risk_probability <= 100.0 else 100.0 %}
+          {% set dash_offset = dash_array * (1.0 - (clamped_risk / 100.0)) %}
+          <path class="cg-arc-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}"
+                d="M 20 100 A 80 80 0 0 1 180 100"
+                stroke-dasharray="251.32"
+                stroke-dashoffset="{{ '%.2f'|format(dash_offset) }}" />
+          <!-- 3.95% Threshold Line Indicator -->
+          <circle cx="26" cy="92" r="4" fill="#ffffff" stroke="var(--primary)" stroke-width="2" title="Policy Threshold: {{ threshold_percent }}%" />
         </svg>
-        <div class="cg-radar-label">
-          <span class="cg-radar-value">{{ '%.1f'|format(probability) }}%</span>
-          <span class="cg-radar-sub">Approval Confidence</span>
+
+        <div class="cg-arc-center-text">
+          <div class="cg-arc-val">{{ '%.2f'|format(risk_probability) }}%</div>
+          <div class="cg-arc-sub">Calibrated Default Risk</div>
         </div>
       </div>
 
-      <!-- Visual Risk Gauge Bar vs 3.95% Threshold -->
-      <div style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:12px;text-align:left;">
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;margin-bottom:6px;">
-          <span style="color:var(--text-muted);font-weight:600;">Calibrated Default Risk</span>
-          <span style="font-weight:700;color:{% if risk_probability >= threshold_percent %}var(--danger){% else %}var(--success){% endif %};">{{ '%.2f'|format(risk_probability) }}%</span>
+      <!-- Policy Cutoff Progress Marker Bar -->
+      <div style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--space-3);margin-bottom:var(--space-4);text-align:left;">
+        <div class="cg-flex-between" style="font-size:var(--font-xs);margin-bottom:var(--space-1);">
+          <span style="color:var(--text-muted);font-weight:600;">Policy Threshold Cutoff</span>
+          <span style="font-weight:700;color:var(--primary);">p* = {{ threshold_percent }}%</span>
         </div>
         
-        <!-- Risk Bar Container -->
-        <div style="position:relative;height:10px;background:var(--bg-app);border-radius:6px;overflow:hidden;margin-bottom:6px;">
-          <div style="height:100%;width:{{ risk_probability }}%;background:{% if risk_probability >= threshold_percent %}linear-gradient(90deg, #f59e0b, #ef4444){% else %}linear-gradient(90deg, #10b981, #3b82f6){% endif %};border-radius:6px;transition:width 1s var(--ease);"></div>
-          <!-- Threshold Marker Line -->
-          <div style="position:absolute;left:{{ threshold_percent }}%;top:0;bottom:0;width:2px;background:#f8fafc;z-index:2;" title="Policy Threshold: {{ threshold_percent }}%"></div>
+        <div style="position:relative;height:8px;background:var(--bg-app);border-radius:var(--r-full);overflow:hidden;margin-bottom:var(--space-1);">
+          <div style="height:100%;width:{{ '%.2f'|format(clamped_risk) }}%;background:{% if risk_probability >= threshold_percent %}var(--gradient-risk){% else %}var(--gradient-accent){% endif %};border-radius:var(--r-full);"></div>
+          <div style="position:absolute;left:{{ threshold_percent }}%;top:0;bottom:0;width:2px;background:#ffffff;z-index:2;"></div>
         </div>
 
-        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);">
-          <span>0.0% (Safe)</span>
-          <span style="color:var(--text-primary);font-weight:700;">Threshold: {{ threshold_percent }}%</span>
-          <span>100.0% (Risk)</span>
+        <div class="cg-flex-between" style="font-size:10px;color:var(--text-muted);">
+          <span>0.0% (Solvent)</span>
+          <span>Cutoff: 3.95%</span>
+          <span>100.0% (Default)</span>
         </div>
       </div>
 
       <!-- Metric Pills -->
       <div class="cg-metric-pill">
         <span class="cg-text-xs cg-text-muted">Risk Category</span>
-        <span class="cg-badge {% if risk_level == 'Low' %}success{% elif risk_level == 'High' %}danger{% else %}warning{% endif %}" style="font-size:10.5px;padding:2px 8px;">
-          {{ risk_level }}
+        <span class="cg-badge {% if risk_level == 'Low' %}success{% elif risk_level == 'High' %}danger{% else %}warning{% endif %}" style="font-size:10.5px;">
+          {{ risk_level }} Risk
         </span>
       </div>
 
@@ -296,46 +272,51 @@
       </div>
 
       <div class="cg-metric-pill">
-        <span class="cg-text-xs cg-text-muted">Time Index</span>
+        <span class="cg-text-xs cg-text-muted">Assessment Time</span>
         <span class="cg-text-xs cg-text-primary cg-mono">{{ date }}</span>
       </div>
     </div>
   </div>
 
-  <!-- Right Side: Explanations, Audit Timeline, Factors, Recommendations -->
+  <!-- Right Column: Plain-English Narrative Card & SHAP Drivers -->
   <div class="cg-grid cg-gap-md">
-    <!-- AI Explanation Card -->
+    <!-- Distinct Set-Apart Plain-English Narrative Summary Card -->
+    {% if plain_english_summary %}
+      <div class="cg-narrative-card">
+        <div class="cg-narrative-title">
+          <i class="fa-solid fa-circle-info"></i> Plain-English Underwriting Summary
+        </div>
+        <p class="cg-narrative-body">
+          {{ plain_english_summary }}
+        </p>
+      </div>
+    {% endif %}
+
+    <!-- Overview Details Card -->
     <div class="cg-card">
-      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
-        <i class="fa-solid fa-brain" style="color:var(--primary);margin-right:6px;"></i> Decision Interpretation & SHAP Summary
+      <h3 style="font-family:var(--font-heading);font-size:var(--font-md);font-weight:700;margin-bottom:var(--space-3);">
+        <i class="fa-solid fa-brain" style="color:var(--primary);margin-right:6px;"></i> Decision Rationale
       </h3>
       
-      <!-- Plain English Narrative Summary Box -->
-      {% if plain_english_summary %}
-        <div style="background:rgba(56,189,248,0.08);border-left:4px solid var(--primary);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;">
-          <p style="font-size:13px;color:var(--text-primary);line-height:1.5;margin:0;">
-            <i class="fa-solid fa-circle-info" style="color:var(--primary);margin-right:6px;"></i> {{ plain_english_summary }}
-          </p>
-        </div>
-      {% endif %}
-
-      <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
+      <p style="font-size:var(--font-sm);color:var(--text-secondary);line-height:1.6;margin-bottom:var(--space-4);">
         {% if result == 'Approved' %}
-          The model predicts a <strong>high likelihood of good credit repayment</strong> capacity. The socio-economic attributes and low default risk ({{ '%.2f'|format(risk_probability) }}% vs {{ threshold_percent }}% policy cutoff) indicate excellent risk coverage.
+          The applicant's calibrated default risk score ({{ '%.2f'|format(risk_probability) }}%) falls safely below the bank's <strong>3.95% cost-sensitive policy threshold cutoff</strong>. Financial stability metrics and historical solvency support immediate credit authorization.
         {% else %}
-          The model flags potential <strong>credit delinquency risk factors</strong>. The applicant risk score ({{ '%.2f'|format(risk_probability) }}%) exceeds the bank's {{ threshold_percent }}% decision policy cutoff.
+          The applicant's calibrated default risk score ({{ '%.2f'|format(risk_probability) }}%) exceeds the bank's <strong>3.95% policy threshold cutoff</strong>. Elevated risk telemetry requires secondary manual underwriting review.
         {% endif %}
       </p>
 
-      <!-- Business rules triggered -->
-      <h4 style="font-size:12px;font-weight:700;margin-bottom:10px;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;">Business Rules Triggered</h4>
-      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+      <!-- Business Rules -->
+      <span style="font-size:var(--font-xs);font-weight:700;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;display:block;margin-bottom:var(--space-2);">
+        Business Rules Evaluated
+      </span>
+      <div style="display:grid;grid-template-columns:1fr;gap:var(--space-2);">
         {% for reason in reasons %}
-          <div class="cg-flex" style="gap:10px;align-items:flex-start;font-size:13px;">
+          <div class="cg-flex" style="gap:var(--space-2);align-items:flex-start;font-size:var(--font-sm);">
             {% if result == 'Approved' %}
-              <i class="fa-solid fa-circle-check" style="color:var(--success);margin-top:3px;flex-shrink:0;"></i>
+              <i class="fa-solid fa-circle-check" style="color:var(--success);margin-top:3px;"></i>
             {% else %}
-              <i class="fa-solid fa-circle-xmark" style="color:var(--danger);margin-top:3px;flex-shrink:0;"></i>
+              <i class="fa-solid fa-circle-xmark" style="color:var(--danger);margin-top:3px;"></i>
             {% endif %}
             <span style="color:var(--text-secondary);">{{ reason }}</span>
           </div>
@@ -343,34 +324,35 @@
       </div>
     </div>
 
-    <!-- Top SHAP Feature Drivers Card (Plain-English Factor Labels) -->
+    <!-- Premium SHAP Key Decision Drivers Card -->
     {% if top_risk_drivers %}
       <div class="cg-card">
-        <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">
+        <h3 style="font-family:var(--font-heading);font-size:var(--font-md);font-weight:700;margin-bottom:var(--space-4);">
           <i class="fa-solid fa-chart-bar" style="color:var(--primary);margin-right:6px;"></i> Key Decision Drivers (SHAP Local Explainability)
         </h3>
-        <div style="display:grid;grid-template-columns:1fr;gap:10px;">
+
+        <div style="display:grid;grid-template-columns:1fr;gap:var(--space-2);">
           {% for driver in top_risk_drivers %}
-            <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-                <span style="font-size:13px;font-weight:600;color:var(--text-primary);">{{ driver.feature }}</span>
+            <div class="cg-shap-card">
+              <div class="cg-flex-between" style="margin-bottom:var(--space-2);">
+                <span style="font-size:var(--font-sm);font-weight:700;color:var(--text-primary);">{{ driver.feature }}</span>
                 <span class="cg-factor-badge {% if driver.is_risk %}negative{% else %}positive{% endif %}">
                   {% if driver.is_risk %}
-                    <i class="fa-solid fa-arrow-up" style="margin-right:3px;"></i> Increased Risk
+                    <i class="fa-solid fa-arrow-trend-up"></i> Increased Risk
                   {% else %}
-                    <i class="fa-solid fa-arrow-down" style="margin-right:3px;"></i> Decreased Risk
+                    <i class="fa-solid fa-arrow-trend-down"></i> Decreased Risk
                   {% endif %}
                 </span>
               </div>
               
-              <!-- Visual Weight Progress Bar -->
-              <div style="height:6px;background:var(--bg-app);border-radius:3px;overflow:hidden;margin-bottom:4px;">
-                <div style="height:100%;width:{{ driver.visual_weight }}%;background:{% if driver.is_risk %}var(--danger){% else %}var(--success){% endif %};border-radius:3px;"></div>
+              <!-- Weighted Magnitude Impact Bar -->
+              <div style="height:6px;background:var(--bg-app);border-radius:var(--r-full);overflow:hidden;margin-bottom:var(--space-2);">
+                <div style="height:100%;width:{{ driver.visual_weight }}%;background:{% if driver.is_risk %}var(--danger){% else %}var(--success){% endif %};border-radius:var(--r-full);"></div>
               </div>
               
-              <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-muted);">
-                <span>SHAP Value: {{ driver.shap_value }}</span>
-                <span>Relative Impact: {{ driver.visual_weight }}%</span>
+              <div class="cg-flex-between" style="font-size:var(--font-xs);color:var(--text-muted);">
+                <span>Direction: {{ driver.direction }}</span>
+                <span style="font-family:var(--font-mono);font-weight:600;">Impact Weight: {{ driver.visual_weight }}%</span>
               </div>
             </div>
           {% endfor %}
@@ -378,129 +360,34 @@
       </div>
     {% endif %}
 
-    <!-- Decision Audit Timeline -->
+    <!-- Audit Timeline -->
     <div class="cg-card">
-      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
-        <i class="fa-solid fa-timeline" style="color:var(--primary);margin-right:6px;"></i> Decision Audit Timeline
+      <h3 style="font-family:var(--font-heading);font-size:var(--font-md);font-weight:700;margin-bottom:var(--space-3);">
+        <i class="fa-solid fa-timeline" style="color:var(--primary);margin-right:6px;"></i> Underwriting Audit Trail
       </h3>
       <div class="cg-audit-timeline">
         <div class="cg-timeline-node">
           <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-title">Application Submitted</div>
-          <div class="cg-timeline-desc">Profile telemetry completed at {{ date }}</div>
+          <div class="cg-timeline-title">Telemetry Intake</div>
+          <div class="cg-timeline-desc">Demographics and income profile validated at {{ date }}</div>
         </div>
         <div class="cg-timeline-node">
           <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-title">Canonical Scale Normalization</div>
-          <div class="cg-timeline-desc">Demographics and financial features scaled via canonical pipeline.</div>
+          <div class="cg-timeline-title">ECOA Fair Lending Scrub</div>
+          <div class="cg-timeline-desc">Protected attributes (Gender) filtered from scoring features</div>
         </div>
         <div class="cg-timeline-node">
           <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-title">Calibrated Risk Scoring</div>
-          <div class="cg-timeline-desc">Scored via {{ model_used }} ({{ '%.2f'|format(risk_probability) }}% default risk) in {{ prediction_time }}ms.</div>
+          <div class="cg-timeline-title">Calibrated Model Inference</div>
+          <div class="cg-timeline-desc">Scored via {{ model_used }} (Default Risk: {{ '%.2f'|format(risk_probability) }}%)</div>
         </div>
         <div class="cg-timeline-node">
           <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-title">Decision Policy Threshold Evaluation</div>
-          <div class="cg-timeline-desc">Evaluated against 5:1 loss policy cutoff ({{ threshold_percent }}%).</div>
+          <div class="cg-timeline-title">Policy Threshold Evaluation</div>
+          <div class="cg-timeline-desc">Evaluated against 5:1 loss policy cutoff ({{ threshold_percent }}%)</div>
         </div>
       </div>
-    </div>
-
-    <!-- Feature Contributions (Positive/Negative LIME factors) -->
-    {% if support_factors or risk_factors %}
-      <div class="cg-grid cg-grid-2 cg-gap-sm">
-        <!-- Supporting -->
-        <div class="cg-card" style="padding:18px;">
-          <h3 style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--success);">
-            <i class="fa-solid fa-plus-circle" style="margin-right:6px;"></i> Support Indicators
-          </h3>
-          {% for f in support_factors %}
-            <div class="cg-factor-card">
-              <span class="cg-text-secondary" style="font-size:12.5px;">{{ f.feature }}</span>
-              <span class="cg-factor-badge positive">+{{ '%.1f'|format(f.impact * 100) }}%</span>
-            </div>
-          {% else %}
-            <span class="cg-text-xs cg-text-muted">No positive indicators computed.</span>
-          {% endfor %}
-        </div>
-
-        <!-- Risk factors -->
-        <div class="cg-card" style="padding:18px;">
-          <h3 style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--danger);">
-            <i class="fa-solid fa-minus-circle" style="margin-right:6px;"></i> Risk Indicators
-          </h3>
-          {% for f in risk_factors %}
-            <div class="cg-factor-card">
-              <span class="cg-text-secondary" style="font-size:12.5px;">{{ f.feature }}</span>
-              <span class="cg-factor-badge negative">-{{ '%.1f'|format(f.impact * 100) }}%</span>
-            </div>
-          {% else %}
-            <span class="cg-text-xs cg-text-muted">No risk factors computed.</span>
-          {% endfor %}
-        </div>
-      </div>
-    {% endif %}
-
-    <!-- Recommendations -->
-    <div class="cg-card">
-      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
-        <i class="fa-solid fa-lightbulb" style="color:var(--warning);margin-right:6px;"></i> Actionable Recommendations
-      </h3>
-      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
-        {% for rec in recommendations %}
-          <div class="cg-flex" style="gap:10px;align-items:flex-start;font-size:13px;">
-            <i class="fa-solid fa-arrow-right-long" style="color:var(--primary);margin-top:4px;flex-shrink:0;"></i>
-            <span style="color:var(--text-secondary);">{{ rec }}</span>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- Actions Row -->
-    <div class="cg-flex cg-gap-md cg-mt-md" style="flex-wrap:wrap;">
-      <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="cg-btn cg-btn-primary">
-        <i class="fa-solid fa-file-pdf"></i> Print / Save PDF
-      </a>
-      <button type="button" class="cg-btn cg-btn-secondary" onclick="shareDecisionLocal()">
-        <i class="fa-solid fa-share-nodes"></i> Share
-      </button>
-      <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-secondary">
-        <i class="fa-solid fa-rotate-right"></i> Predict Again
-      </a>
-      <a href="{{ url_for('api.history') }}" class="cg-btn cg-btn-ghost">
-        Dashboard
-      </a>
     </div>
   </div>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-  // Trigger gauge animations
-  document.addEventListener('DOMContentLoaded', () => {
-    const fill = document.querySelector('.cg-radar-fill');
-    if (fill) {
-      const pct = parseFloat(fill.dataset.pct || 0);
-      const circumference = 2 * Math.PI * 70;
-      fill.style.strokeDasharray = circumference;
-      fill.style.strokeDashoffset = circumference;
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          fill.style.strokeDashoffset = circumference - (circumference * pct / 100);
-        }, 300);
-      });
-    }
-  });
-
-  function shareDecisionLocal() {
-    const shareUrl = window.location.origin + "{{ url_for('api.get_report', application_id=application_id) }}";
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      CG.Toast.show("Report share link copied to clipboard!", "success");
-    }).catch(() => {
-      CG.Toast.show("Failed to copy share link.", "danger");
-    });
-  }
-</script>
 {% endblock %}

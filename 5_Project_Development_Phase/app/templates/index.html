@@ -1,139 +1,213 @@
 {% extends "base.html" %}
 
-{% block title %}CreditGuard AI — Next-Gen Credit Decisioning{% endblock %}
+{% block title %}CreditGuard AI — Enterprise Credit Decisioning Engine{% endblock %}
 {% block page_id %}page-landing{% endblock %}
 
 {% block head %}
 <style>
-  /* ── Premium Landing Page Visual Additions ── */
-  .cg-hero-grid {
+  /* ── Enterprise Product Landing Page Styles ── */
+  .cg-hero-section {
+    position: relative;
+    padding: var(--space-8) 0 var(--space-12);
+    overflow: hidden;
+  }
+
+  .cg-hero-layout {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 32px;
+    gap: var(--space-8);
     align-items: center;
-    position: relative;
   }
   @media (min-width: 1024px) {
-    .cg-hero-grid {
-      grid-template-columns: 1.2fr 0.8fr;
+    .cg-hero-layout {
+      grid-template-columns: 1.1fr 0.9fr;
     }
   }
 
-  /* Floating Particle System */
-  .cg-particle-container {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 0;
-  }
-  .cg-particle {
-    position: absolute;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 50%;
-    animation: cg-drift-up 8s infinite linear;
-  }
-  @keyframes cg-drift-up {
-    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-    50% { opacity: 0.8; }
-    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  .cg-badge-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-1) var(--space-3);
+    background: var(--primary-muted);
+    border: 1px solid var(--border-active);
+    border-radius: var(--r-full);
+    font-size: var(--font-xs);
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: var(--space-4);
   }
 
-  /* Robot Avatar Styling */
-  .cg-robot-wrap {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: var(--bg-surface);
-    border: 2px solid var(--border);
-    overflow: hidden;
-    box-shadow: var(--shadow-glow);
-    animation: cg-float 6s ease-in-out infinite;
-  }
-  .cg-robot-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  .cg-hero-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+    margin-bottom: var(--space-4);
   }
 
-  /* Interactive workflow cards */
-  .cg-workflow-step {
-    padding: 20px;
+  .cg-hero-subtitle {
+    font-size: var(--font-md);
+    line-height: 1.6;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin-bottom: var(--space-6);
+  }
+
+  /* Illustrative Data-Viz Card Graphic */
+  .cg-viz-hero-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: var(--r-md);
+    border-radius: var(--r-xl);
+    padding: var(--space-6);
     position: relative;
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
     overflow: hidden;
-    transition: all var(--t-base) var(--ease);
   }
-  .cg-workflow-step:hover {
-    border-color: var(--primary-hover);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-  }
-  .cg-workflow-step::before {
-    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-    width: 4px;
+
+  .cg-viz-hero-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
     background: var(--gradient-primary);
   }
 
-  /* Accuracy Card Grid */
-  .cg-accuracy-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
+  .cg-viz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border);
   }
-  .cg-accuracy-card {
-    background: var(--bg-card);
+
+  .cg-viz-badge {
+    background: var(--success-muted);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    padding: 2px 10px;
+    border-radius: var(--r-full);
+    font-size: var(--font-xs);
+    font-weight: 700;
+  }
+
+  .cg-viz-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-6);
+  }
+
+  .cg-viz-metric-box {
+    background: var(--bg-input);
     border: 1px solid var(--border);
     border-radius: var(--r-md);
-    padding: 18px;
+    padding: var(--space-3);
     text-align: center;
-    position: relative;
-    overflow: hidden;
-    transition: all var(--t-base) var(--ease);
   }
-  .cg-accuracy-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-3px);
+
+  .cg-viz-metric-label {
+    font-size: var(--font-xs);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-1);
   }
-  .cg-accuracy-val {
-    font-size: 24px;
-    font-weight: 800;
+
+  .cg-viz-metric-val {
     font-family: var(--font-mono);
+    font-size: var(--font-lg);
+    font-weight: 700;
     color: var(--primary);
-    margin: 8px 0;
+  }
+
+  /* 3-Step Visual How It Works Section */
+  .cg-steps-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+    margin-top: var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .cg-steps-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .cg-step-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: var(--space-6);
+    position: relative;
+    transition: transform var(--t-base) var(--ease), border-color var(--t-base) var(--ease);
+  }
+
+  .cg-step-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-md);
+  }
+
+  .cg-step-num {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--r-md);
+    background: var(--primary-muted);
+    border: 1px solid var(--border-active);
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: var(--font-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-4);
+  }
+
+  .cg-step-title {
+    font-family: var(--font-heading);
+    font-size: var(--font-md);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+  }
+
+  .cg-step-desc {
+    font-size: var(--font-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="cg-hero cg-fade-in" style="position:relative; overflow:hidden;">
-  <!-- Floating Particles Container -->
-  <div class="cg-particle-container" id="particleContainer"></div>
-
-  <div class="cg-hero-grid">
-    <!-- Left Hero content -->
-    <div data-reveal="0s" style="z-index: 1;">
-      <div class="cg-hero-eyebrow">
-        <i class="fa-solid fa-microchip"></i> Next-Gen Decision Intelligence
+<!-- Hero Section -->
+<section class="cg-hero-section">
+  <div class="cg-hero-layout">
+    <!-- Above-the-fold Value Proposition -->
+    <div>
+      <div class="cg-badge-pill">
+        <i class="fa-solid fa-shield-halved"></i> Institutional Risk Engine
       </div>
       <h1 class="cg-hero-title">
-        Intelligent Credit<br>
-        <span class="cg-gradient-text">Decision engine</span>
+        Real-Time Credit Decisioning & <span class="cg-gradient-text">Explainable Risk Scoring</span>
       </h1>
-      <p class="cg-hero-desc">
-        Perform institutional-grade credit card approval predictions instantly. Powered by advanced ensemble learning classifiers, explainable local surrogates, and secure rate-limited endpoints.
+      <p class="cg-hero-subtitle">
+        Automate underwriting with calibrated ensemble models, cost-sensitive 5:1 decision policies (3.95% risk threshold), and ECOA-compliant SHAP explainability.
       </p>
+
+      <!-- Prominent Un-buried CTAs -->
       <div class="cg-flex cg-gap-md" style="flex-wrap:wrap;">
         <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary cg-btn-lg">
-          <i class="fa-solid fa-bolt"></i> Run Assessment
+          <i class="fa-solid fa-bolt"></i> Start Credit Assessment
         </a>
         <a href="{{ url_for('api.about') }}" class="cg-btn cg-btn-secondary cg-btn-lg">
-          Model Insights
+          <i class="fa-solid fa-chart-line"></i> Model Insights
         </a>
         <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" target="_blank" class="cg-btn cg-btn-ghost cg-btn-lg">
           <i class="fa-brands fa-github"></i> Repository
@@ -141,171 +215,106 @@
       </div>
     </div>
 
-    <!-- Right Hero visuals (3D card + AI Robot avatar side-by-side flex) -->
-    <div class="cg-flex-center" style="flex-direction:column; gap:28px; z-index: 1;" data-reveal="0.2s">
-      <!-- Animated AI Robot -->
-      <div class="cg-robot-wrap">
-        <img src="{{ url_for('static', filename='images/ai_robot_avatar.png') }}" alt="AI FinTech Robot" class="cg-robot-img">
+    <!-- Clean Illustrative Data-Viz Hero Component -->
+    <div class="cg-viz-hero-card">
+      <div class="cg-viz-header">
+        <div>
+          <span style="font-size:var(--font-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;display:block;">Live Assessment Preview</span>
+          <span style="font-family:var(--font-heading);font-weight:700;font-size:var(--font-md);color:var(--text-primary);">Underwriting Decision Dashboard</span>
+        </div>
+        <span class="cg-viz-badge"><i class="fa-solid fa-circle-check"></i> 97.97% Accuracy</span>
       </div>
 
-      <!-- 3D Credit Card -->
-      <div class="cg-credit-card-wrap cg-float" style="perspective:1000px;">
-        <div class="cg-credit-card">
-          <div class="cg-flex-between" style="align-items:flex-start;margin-bottom:32px;">
-            <div>
-              <h4 style="font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:0.8;">CreditGuard AI</h4>
-              <span style="font-size:10px;color:rgba(255,255,255,0.6);">Enterprise Card</span>
-            </div>
-            <i class="fa-solid fa-sim-card" style="font-size:28px;color:#facc15;transform:rotate(90deg);"></i>
-          </div>
-          <div style="font-size:18px;font-weight:600;letter-spacing:2px;margin-bottom:24px;font-family:var(--font-mono);">
-            4892 •••• •••• 7431
-          </div>
-          <div class="cg-flex-between">
-            <div>
-              <span style="font-size:8px;text-transform:uppercase;display:block;opacity:0.6;">Cardholder</span>
-              <span style="font-size:12px;font-weight:500;">Sk Md Shariff</span>
-            </div>
-            <div style="text-align:right;">
-              <span style="font-size:8px;text-transform:uppercase;display:block;opacity:0.6;">Valid Thru</span>
-              <span style="font-size:12px;font-weight:500;">09/28</span>
-            </div>
-          </div>
+      <!-- Metrics Panel -->
+      <div class="cg-viz-metrics">
+        <div class="cg-viz-metric-box">
+          <div class="cg-viz-metric-label">Policy Cutoff</div>
+          <div class="cg-viz-metric-val">3.95%</div>
+        </div>
+        <div class="cg-viz-metric-box">
+          <div class="cg-viz-metric-label">Brier Improvement</div>
+          <div class="cg-viz-metric-val">+14.0%</div>
+        </div>
+        <div class="cg-viz-metric-box">
+          <div class="cg-viz-metric-label">Default Recall</div>
+          <div class="cg-viz-metric-val">35.77%</div>
+        </div>
+      </div>
+
+      <!-- Interactive Illustrative Gauge Card -->
+      <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-md);padding:var(--space-4);">
+        <div class="cg-flex-between" style="margin-bottom:var(--space-2);">
+          <span style="font-size:var(--font-xs);font-weight:700;color:var(--text-secondary);">Sample Applicant: #84920</span>
+          <span class="cg-badge success" style="font-size:11px;">Approved (Risk: 0.02%)</span>
+        </div>
+        
+        <!-- Risk Bar Graphic -->
+        <div style="position:relative;height:12px;background:var(--bg-input);border-radius:var(--r-full);overflow:hidden;margin-bottom:var(--space-3);">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:3.95%;background:var(--success);box-shadow:0 0 8px var(--success);"></div>
+          <div style="position:absolute;left:3.95%;top:0;bottom:0;width:2px;background:#ffffff;z-index:2;"></div>
+        </div>
+
+        <div class="cg-flex-between" style="font-size:var(--font-xs);color:var(--text-muted);">
+          <span>0% Risk</span>
+          <span style="color:var(--primary);font-weight:700;">Threshold: 3.95%</span>
+          <span>100% Risk</span>
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Project Overview Section -->
-<div class="cg-mt-xl" style="margin-top: 80px;" data-reveal="0.1s">
-  <div style="text-align:center;margin-bottom:40px;">
-    <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;">Platform Overview</h2>
-    <p style="color:var(--text-secondary);font-size:14.5px;">A summary of our production-quality credit decisioning layout.</p>
+<!-- Visual 3-Step "How It Works" Section -->
+<section style="margin-top:var(--space-12);">
+  <div style="text-align:center;max-width:600px;margin:0 auto var(--space-6);">
+    <span style="font-size:var(--font-xs);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:1px;">Simple 3-Step Process</span>
+    <h2 style="font-family:var(--font-heading);font-size:var(--font-2xl);font-weight:800;color:var(--text-primary);margin-top:var(--space-1);">
+      How CreditGuard Evaluates Risk
+    </h2>
   </div>
 
-  <div class="cg-grid cg-grid-3 cg-gap-md">
-    <div class="cg-card">
-      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-shield-halved" style="color:var(--primary);margin-right:6px;"></i> High Accuracy</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Leverages ensemble models training on demographic history tables with up to 98% scoring accuracy bounds.</p>
+  <div class="cg-steps-grid">
+    <!-- Step 1 -->
+    <div class="cg-step-card">
+      <div class="cg-step-num">01</div>
+      <h3 class="cg-step-title">Enter Applicant Telemetry</h3>
+      <p class="cg-step-desc">
+        Provide key applicant financial attributes including household income, employment duration, property ownership, and family size.
+      </p>
     </div>
-    <div class="cg-card">
-      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-chart-line" style="color:var(--primary);margin-right:6px;"></i> Explainable AI</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Understands classifications via local surrogates mapping specific features contributing to approval decisions.</p>
+
+    <!-- Step 2 -->
+    <div class="cg-step-card">
+      <div class="cg-step-num">02</div>
+      <h3 class="cg-step-title">AI Evaluates Risk Score</h3>
+      <p class="cg-step-desc">
+        Our calibrated Random Forest model scores default risk probability against a cost-sensitive 5:1 optimal threshold ($p^* = 0.0395$).
+      </p>
     </div>
-    <div class="cg-card">
-      <h3 style="font-size:15px;font-weight:700;margin-bottom:10px;"><i class="fa-solid fa-lock" style="color:var(--primary);margin-right:6px;"></i> Enterprise Controls</h3>
-      <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">Strict CSRF checks, secure scrypt user credentials hashing, and SQLite indexing structures protect all assets.</p>
+
+    <!-- Step 3 -->
+    <div class="cg-step-card">
+      <div class="cg-step-num">03</div>
+      <h3 class="cg-step-title">Receive Explained Decision</h3>
+      <p class="cg-step-desc">
+        Get instant decision outcomes accompanied by aggregated SHAP factor cards detailing exact feature drivers and directional impact.
+      </p>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Machine Learning Workflow -->
-<div class="cg-mt-xl" style="margin-top: 80px;" data-reveal="0.2s">
-  <div style="text-align:center;margin-bottom:40px;">
-    <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;">Machine Learning Workflow</h2>
-    <p style="color:var(--text-secondary);font-size:14.5px;">Step-by-step pipeline from data balance to live endpoints.</p>
+<!-- Un-buried Bottom CTA Banner -->
+<section style="margin-top:var(--space-12);padding:var(--space-8);background:var(--bg-card);border:1px solid var(--border-active);border-radius:var(--r-xl);text-align:center;position:relative;overflow:hidden;">
+  <div style="max-width:540px;margin:0 auto;position:relative;z-index:1;">
+    <h2 style="font-family:var(--font-heading);font-size:var(--font-xl);font-weight:800;color:var(--text-primary);margin-bottom:var(--space-2);">
+      Ready to run an underwriting assessment?
+    </h2>
+    <p style="font-size:var(--font-sm);color:var(--text-secondary);margin-bottom:var(--space-6);">
+      Experience institutional-grade credit risk scoring with explainable AI factors in under 10 milliseconds.
+    </p>
+    <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary cg-btn-lg">
+      <i class="fa-solid fa-bolt"></i> Launch Assessment Wizard
+    </a>
   </div>
-
-  <div class="cg-grid cg-grid-4 cg-gap-sm">
-    <div class="cg-workflow-step">
-      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">1. Balance</h4>
-      <p style="font-size:12px;color:var(--text-secondary);">SMOTE algorithms balance minority classes to minimize bias.</p>
-    </div>
-    <div class="cg-workflow-step">
-      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">2. Scale</h4>
-      <p style="font-size:12px;color:var(--text-secondary);">Robust scaler standards sanitize outlier limits.</p>
-    </div>
-    <div class="cg-workflow-step">
-      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">3. Tune</h4>
-      <p style="font-size:12px;color:var(--text-secondary);">GridSearch hyperparameter tuning locks metric targets.</p>
-    </div>
-    <div class="cg-workflow-step">
-      <h4 style="font-size:14px;font-weight:700;margin-bottom:8px;">4. Serve</h4>
-      <p style="font-size:12px;color:var(--text-secondary);">Stateless scoring endpoints serve predictions in sub-10ms.</p>
-    </div>
-  </div>
-</div>
-
-<!-- Accuracy Cards Section -->
-<div class="cg-mt-xl" style="margin-top: 80px;" data-reveal="0.3s">
-  <div style="text-align:center;margin-bottom:16px;">
-    <h2 style="font-size:26px;font-weight:800;letter-spacing:-0.5px;">Classifier Accuracy Targets</h2>
-    <p style="color:var(--text-secondary);font-size:14.5px;">Verified classification performance across trained models.</p>
-  </div>
-
-  <div class="cg-accuracy-grid">
-    <div class="cg-accuracy-card">
-      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">XGBOOST</h4>
-      <div class="cg-accuracy-val">98.7%</div>
-      <span class="cg-badge success" style="font-size:10px;">Primary active</span>
-    </div>
-    <div class="cg-accuracy-card">
-      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">RANDOM FOREST</h4>
-      <div class="cg-accuracy-val">96.5%</div>
-      <span class="cg-badge warning" style="font-size:10px;">Ensemble Layer</span>
-    </div>
-    <div class="cg-accuracy-card">
-      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">DECISION TREE</h4>
-      <div class="cg-accuracy-val">95.4%</div>
-      <span class="cg-badge warning" style="font-size:10px;">Ensemble Layer</span>
-    </div>
-    <div class="cg-accuracy-card">
-      <h4 style="font-size:12px;font-weight:700;color:var(--text-muted);">LOGISTIC REGRESSION</h4>
-      <div class="cg-accuracy-val">90.2%</div>
-      <span class="cg-badge warning" style="font-size:10px;">Ensemble Layer</span>
-    </div>
-  </div>
-</div>
-
-<!-- CTA Block -->
-<div class="cg-card cg-mt-xl cg-text-center" data-reveal="0.4s" style="margin-top: 80px;padding:48px 32px;background:var(--primary-muted);border-color:rgba(99,102,241,0.15);">
-  <h2 style="font-size:24px;font-weight:800;margin-bottom:8px;">Ready to evaluate?</h2>
-  <p style="color:var(--text-secondary);font-size:14.5px;max-width:480px;margin:0 auto 24px;">Experience next-gen credit assessment tools designed for modern financial applications.</p>
-  <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-primary cg-btn-lg">
-    Launch AI Wizard
-  </a>
-</div>
-
-<!-- Apple-Style Premium Footer -->
-<footer style="margin-top:100px;border-top:1px solid var(--border);padding:32px 0 64px;" data-reveal="0.1s">
-  <div class="cg-flex-between" style="flex-wrap:wrap;gap:16px;font-size:12.5px;color:var(--text-muted);">
-    <div>
-      <span>&copy; 2026 CreditGuard AI. All rights reserved.</span>
-    </div>
-    <div class="cg-flex" style="gap:20px;flex-wrap:wrap;">
-      <a href="{{ url_for('api.about') }}" style="color:var(--text-muted);transition:color var(--t-fast) var(--ease);">Model Insights</a>
-      <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" target="_blank" style="color:var(--text-muted);transition:color var(--t-fast) var(--ease);">GitHub Repository</a>
-      <a href="{{ url_for('api.index') }}" style="color:var(--text-muted);transition:color var(--t-fast) var(--ease);">Terms of Service</a>
-    </div>
-  </div>
-</footer>
-{% endblock %}
-
-{% block scripts %}
-<script>
-  // Simple CSS Floating Particles generator
-  document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('particleContainer');
-    if (container) {
-      const pCount = 15;
-      for (let i = 0; i < pCount; i++) {
-        const p = document.createElement('div');
-        p.className = 'cg-particle';
-        
-        // Random dimensions and layout
-        const size = Math.random() * 8 + 4;
-        p.style.width = size + 'px';
-        p.style.height = size + 'px';
-        p.style.left = Math.random() * 100 + 'vw';
-        
-        // Random delay and durations
-        p.style.animationDelay = Math.random() * 8 + 's';
-        p.style.animationDuration = Math.random() * 6 + 6 + 's';
-        
-        container.appendChild(p);
-      }
-    }
-  });
-</script>
+</section>
 {% endblock %}
