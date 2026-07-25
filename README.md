@@ -62,7 +62,7 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 | **F1-Score** | **0.3492** (Cost-sensitive at $p^*=0.0395$) | **0.0379** |
 | **Decision Threshold ($p^*$)** | **0.0395** (3.95% risk cutoff) | **0.5000** |
 
-*Note: Evaluated on holdout test dataset ($N=7,292$) reflecting real-world credit class imbalance (98.3% solvent / 1.7% default).*
+*Note: Evaluated on holdout test dataset ($N=7,292$) reflecting real-world credit class imbalance (98.3% solvent / 1.7% default). Random Forest is evaluated at its optimized cost-sensitive threshold ($p^*=0.0395$); Logistic Regression is shown at the standard 0.5 cutoff since it was not selected as the production model and did not undergo threshold optimization.*
 
 ---
 
