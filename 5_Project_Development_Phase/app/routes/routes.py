@@ -171,6 +171,10 @@ def predict_post():
             explanation = result.get("explanation", {})
             risk_factors = explanation.get("risk_factors", [])
             support_factors = explanation.get("support_factors", [])
+            top_risk_drivers = explanation.get("top_risk_drivers", [])
+            plain_english_summary = explanation.get("plain_english_summary", "")
+            risk_probability = result.get("risk_probability_percent", round(100.0 - probability, 2))
+            threshold_percent = result.get("decision_threshold_percent", 3.95)
 
             # Save predictions transaction to SQLite database using exact schema (Phase 11 spec)
             db_manager.add_prediction(
@@ -195,9 +199,13 @@ def predict_post():
                 "result.html",
                 result=decision,
                 probability=probability,
+                risk_probability=risk_probability,
+                threshold_percent=threshold_percent,
                 raw_data=form_data,
                 risk_factors=risk_factors,
                 support_factors=support_factors,
+                top_risk_drivers=top_risk_drivers,
+                plain_english_summary=plain_english_summary,
                 risk_level=risk_level,
                 prediction_time=prediction_time_ms,
                 model_used=predictor.get_model_name(),

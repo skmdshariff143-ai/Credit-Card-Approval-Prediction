@@ -620,7 +620,7 @@ def test_predictor_api(mock_exists, mock_load):
 
     mock_clf = MagicMock()
     mock_clf.predict.return_value = [0]
-    mock_clf.predict_proba.return_value = [[0.95, 0.05]]
+    mock_clf.predict_proba.return_value = [[0.98, 0.02]]
 
     mock_load.side_effect = [mock_pipeline, mock_clf]
 
@@ -739,7 +739,7 @@ def test_predict_methods_and_wrappers(mock_exists, mock_load):
 
     mock_clf = MagicMock()
     mock_clf.predict.return_value = [0]
-    mock_clf.predict_proba.return_value = np.array([[0.95, 0.05]])
+    mock_clf.predict_proba.return_value = np.array([[0.98, 0.02]])
 
     mock_load.side_effect = [mock_pipeline, mock_clf, mock_pipeline, mock_clf]
 
@@ -749,7 +749,7 @@ def test_predict_methods_and_wrappers(mock_exists, mock_load):
     # Test predict_probability
     df = pd.DataFrame([[0.5, 1.2]], columns=["feat_1", "feat_2"])
     probs = predictor.predict_probability(df)
-    assert probs == [0.05]
+    assert probs == [0.02]
 
     # Test functional wrappers
     from src.models.predict import _predictor
@@ -786,7 +786,7 @@ def test_predict_methods_and_wrappers(mock_exists, mock_load):
     assert preds["decision"] == "Approved"
 
     probs2 = predict_probability(df)
-    assert probs2 == [0.05]
+    assert probs2 == [0.02]
 
 
 def test_calculate_all_metrics_exceptions():

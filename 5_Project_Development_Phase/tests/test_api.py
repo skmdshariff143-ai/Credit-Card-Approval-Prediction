@@ -203,7 +203,7 @@ def test_health_endpoint_exception(client):
         response = client.get("/health")
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data["model_loaded"] in ["random_forest", "logistic_regression", "xgboost", "decision_tree"]
+        assert data["model_loaded"] in ["random_forest", "logistic_regression", "xgboost", "decision_tree", "Calibrated Random Forest", "calibrated_random_forest"]
 
 
 def test_export_history_csv_exception(client):

@@ -21,7 +21,7 @@ def test_inference_engine_scoring(mock_exists, mock_load):
     # Mock model
     mock_clf = MagicMock()
     mock_clf.predict.return_value = [0]  # Approved
-    mock_clf.predict_proba.return_value = [[0.95, 0.05]]
+    mock_clf.predict_proba.return_value = [[0.98, 0.02]]
 
     # Setup mock load side effect
     mock_load.side_effect = [mock_preprocessor, mock_clf]
@@ -31,4 +31,4 @@ def test_inference_engine_scoring(mock_exists, mock_load):
 
     assert "decision" in result
     assert result["decision"] == "Approved"
-    assert result["approval_probability_percent"] == 95.0
+    assert result["approval_probability_percent"] == 98.0

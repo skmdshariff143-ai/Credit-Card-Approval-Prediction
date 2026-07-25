@@ -242,9 +242,9 @@
 
       <h2 style="font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 12px; line-height: 1.4; padding: 0 10px;">
         {% if result == 'Approved' %}
-          Your application has a {{ '%.1f'|format(probability) }}% approval probability.
+          Application Approved — Calibrated Risk Score: {{ '%.2f'|format(risk_probability) }}%
         {% else %}
-          Your application has a {{ '%.1f'|format(100 - probability) }}% risk of delinquency.
+          Application Declined — Calibrated Risk Score: {{ '%.2f'|format(risk_probability) }}%
         {% endif %}
       </h2>
       <p class="cg-app-id cg-mb-md">{{ application_id }}</p>
@@ -257,7 +257,28 @@
         </svg>
         <div class="cg-radar-label">
           <span class="cg-radar-value">{{ '%.1f'|format(probability) }}%</span>
-          <span class="cg-radar-sub">Confidence</span>
+          <span class="cg-radar-sub">Approval Confidence</span>
+        </div>
+      </div>
+
+      <!-- Visual Risk Gauge Bar vs 3.95% Threshold -->
+      <div style="width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:12px;text-align:left;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11.5px;margin-bottom:6px;">
+          <span style="color:var(--text-muted);font-weight:600;">Calibrated Default Risk</span>
+          <span style="font-weight:700;color:{% if risk_probability >= threshold_percent %}var(--danger){% else %}var(--success){% endif %};">{{ '%.2f'|format(risk_probability) }}%</span>
+        </div>
+        
+        <!-- Risk Bar Container -->
+        <div style="position:relative;height:10px;background:var(--bg-app);border-radius:6px;overflow:hidden;margin-bottom:6px;">
+          <div style="height:100%;width:{{ risk_probability }}%;background:{% if risk_probability >= threshold_percent %}linear-gradient(90deg, #f59e0b, #ef4444){% else %}linear-gradient(90deg, #10b981, #3b82f6){% endif %};border-radius:6px;transition:width 1s var(--ease);"></div>
+          <!-- Threshold Marker Line -->
+          <div style="position:absolute;left:{{ threshold_percent }}%;top:0;bottom:0;width:2px;background:#f8fafc;z-index:2;" title="Policy Threshold: {{ threshold_percent }}%"></div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);">
+          <span>0.0% (Safe)</span>
+          <span style="color:var(--text-primary);font-weight:700;">Threshold: {{ threshold_percent }}%</span>
+          <span>100.0% (Risk)</span>
         </div>
       </div>
 
@@ -286,13 +307,23 @@
     <!-- AI Explanation Card -->
     <div class="cg-card">
       <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
-        <i class="fa-solid fa-brain" style="color:var(--primary);margin-right:6px;"></i> Decision Interpretation
+        <i class="fa-solid fa-brain" style="color:var(--primary);margin-right:6px;"></i> Decision Interpretation & SHAP Summary
       </h3>
+      
+      <!-- Plain English Narrative Summary Box -->
+      {% if plain_english_summary %}
+        <div style="background:rgba(56,189,248,0.08);border-left:4px solid var(--primary);border-radius:var(--r-sm);padding:12px 14px;margin-bottom:14px;">
+          <p style="font-size:13px;color:var(--text-primary);line-height:1.5;margin:0;">
+            <i class="fa-solid fa-circle-info" style="color:var(--primary);margin-right:6px;"></i> {{ plain_english_summary }}
+          </p>
+        </div>
+      {% endif %}
+
       <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
         {% if result == 'Approved' %}
-          The model predicts a <strong>high likelihood of good credit repayment</strong> capacity. The socio-economic attributes and low debt ratios indicate excellent risk coverage.
+          The model predicts a <strong>high likelihood of good credit repayment</strong> capacity. The socio-economic attributes and low default risk ({{ '%.2f'|format(risk_probability) }}% vs {{ threshold_percent }}% policy cutoff) indicate excellent risk coverage.
         {% else %}
-          The model flags potential <strong>credit delinquency risk factors</strong>. Key elements in the profile indicate cash flow instability or prior payment defaults.
+          The model flags potential <strong>credit delinquency risk factors</strong>. The applicant risk score ({{ '%.2f'|format(risk_probability) }}%) exceeds the bank's {{ threshold_percent }}% decision policy cutoff.
         {% endif %}
       </p>
 
@@ -312,6 +343,41 @@
       </div>
     </div>
 
+    <!-- Top SHAP Feature Drivers Card (Plain-English Factor Labels) -->
+    {% if top_risk_drivers %}
+      <div class="cg-card">
+        <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">
+          <i class="fa-solid fa-chart-bar" style="color:var(--primary);margin-right:6px;"></i> Key Decision Drivers (SHAP Local Explainability)
+        </h3>
+        <div style="display:grid;grid-template-columns:1fr;gap:10px;">
+          {% for driver in top_risk_drivers %}
+            <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                <span style="font-size:13px;font-weight:600;color:var(--text-primary);">{{ driver.feature }}</span>
+                <span class="cg-factor-badge {% if driver.is_risk %}negative{% else %}positive{% endif %}">
+                  {% if driver.is_risk %}
+                    <i class="fa-solid fa-arrow-up" style="margin-right:3px;"></i> Increased Risk
+                  {% else %}
+                    <i class="fa-solid fa-arrow-down" style="margin-right:3px;"></i> Decreased Risk
+                  {% endif %}
+                </span>
+              </div>
+              
+              <!-- Visual Weight Progress Bar -->
+              <div style="height:6px;background:var(--bg-app);border-radius:3px;overflow:hidden;margin-bottom:4px;">
+                <div style="height:100%;width:{{ driver.visual_weight }}%;background:{% if driver.is_risk %}var(--danger){% else %}var(--success){% endif %};border-radius:3px;"></div>
+              </div>
+              
+              <div style="display:flex;justify-content:space-between;font-size:10.5px;color:var(--text-muted);">
+                <span>SHAP Value: {{ driver.shap_value }}</span>
+                <span>Relative Impact: {{ driver.visual_weight }}%</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
     <!-- Decision Audit Timeline -->
     <div class="cg-card">
       <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
@@ -325,19 +391,18 @@
         </div>
         <div class="cg-timeline-node">
           <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-title">Robust Scale Normalization</div>
-          <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-desc">Demographics, experience, and DTI indicators scaled.</div>
+          <div class="cg-timeline-title">Canonical Scale Normalization</div>
+          <div class="cg-timeline-desc">Demographics and financial features scaled via canonical pipeline.</div>
         </div>
         <div class="cg-timeline-node">
           <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-title">ML Classifier Classification</div>
-          <div class="cg-timeline-desc">Inference scored via active {{ model_used }} module in {{ prediction_time }}ms.</div>
+          <div class="cg-timeline-title">Calibrated Risk Scoring</div>
+          <div class="cg-timeline-desc">Scored via {{ model_used }} ({{ '%.2f'|format(risk_probability) }}% default risk) in {{ prediction_time }}ms.</div>
         </div>
         <div class="cg-timeline-node">
           <div class="cg-timeline-dot done"></div>
-          <div class="cg-timeline-title">SQLite Ledger Log Saved</div>
-          <div class="cg-timeline-desc">Prediction committed and indexed under application ID {{ application_id }}.</div>
+          <div class="cg-timeline-title">Decision Policy Threshold Evaluation</div>
+          <div class="cg-timeline-desc">Evaluated against 5:1 loss policy cutoff ({{ threshold_percent }}%).</div>
         </div>
       </div>
     </div>
