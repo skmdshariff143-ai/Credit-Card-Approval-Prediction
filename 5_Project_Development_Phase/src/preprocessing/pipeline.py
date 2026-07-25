@@ -122,7 +122,8 @@ class PreprocessingPipeline:
                 "EMPLOYED_TO_AGE_RATIO",
                 "FINANCIAL_STABILITY_SCORE",
             ]
-            # Categorical features include original text categories and new binned categories (CODE_GENDER excluded for Fair Lending / ECOA compliance)
+            # Categorical features include original text categories and new binned categories
+            # (CODE_GENDER excluded for Fair Lending / ECOA compliance)
             self.cat_cols = [
                 "FLAG_OWN_CAR",
                 "FLAG_OWN_REALTY",

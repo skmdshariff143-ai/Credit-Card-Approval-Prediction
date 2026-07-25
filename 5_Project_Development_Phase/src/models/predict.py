@@ -196,7 +196,7 @@ class RiskPredictor:
             "explanation": explanation_res,
         }
 
-    def explain_prediction(self, applicant_data) -> dict:
+    def explain_prediction(self, applicant_data) -> dict:  # noqa: C901
         """
         Calculates local SHAP feature contributions for a specific applicant,
         grouping one-hot dummy columns back to parent features to prevent contradictory drivers.
