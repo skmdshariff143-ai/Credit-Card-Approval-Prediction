@@ -1,0 +1,13 @@
+============================================================
+EPIC 3 - STEP 1: DROP DUPLICATE FEATURES
+============================================================
+Input Dataset: application_record.csv
+Shape Before Duplicate Check: (438557, 18)
+Duplicate Record Count BEFORE: 0
+
+Running DuplicateHandler.remove_duplicates()...
+
+Shape After Duplicate Removal: (438557, 18)
+Duplicate Record Count AFTER:  0
+Status: PASSED - All duplicate records successfully removed.
+============================================================

@@ -1,0 +1,24 @@
+============================================================
+EPIC 4 - STEP 6: LOGISTIC REGRESSION MODEL
+============================================================
+Model: LogisticRegression(class_weight='balanced', max_iter=1000)
+
+Confusion Matrix:
+[[678 247]
+ [ 34  41]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+Approved (0)       0.95      0.73      0.83       925
+Rejected (1)       0.14      0.55      0.23        75
+
+    accuracy                           0.72      1000
+   macro avg       0.55      0.64      0.53      1000
+weighted avg       0.89      0.72      0.78      1000
+
+Minority Default Recall (Class 1): 0.5467 (54.67%)
+F1-Score:                         0.2259
+
+Status: PASSED - Model trained and evaluated cleanly.
+============================================================

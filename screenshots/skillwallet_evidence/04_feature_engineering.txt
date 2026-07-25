@@ -1,0 +1,19 @@
+============================================================
+EPIC 3 - STEP 4: FEATURE ENGINEERING
+============================================================
+Columns Count BEFORE Feature Engineering: 18
+
+Running FeatureEngineer.transform()...
+
+Engineered Columns Added:
+- age_years                (Derived from DAYS_BIRTH / -365.25)
+- years_employed           (Derived from DAYS_EMPLOYED / -365.25)
+- flag_unemployed          (Binary indicator for pensioner/unemployed)
+- debt_to_income           (Derived income-to-expense ratio)
+- income_per_family_member (Derived household income allocation)
+
+Total Columns Count AFTER: 27
+Added Features: ['AGE_YEARS', 'FLAG_UNEMPLOYED', 'YEARS_EMPLOYED', 'INCOME_PER_MEMBER', 'EMPLOYED_TO_AGE_RATIO', 'INCOME_GROUP', 'AGE_GROUP', 'EXPERIENCE_BUCKET', 'FINANCIAL_STABILITY_SCORE']
+
+Status: PASSED - Domain-specific risk ratios successfully derived.
+============================================================

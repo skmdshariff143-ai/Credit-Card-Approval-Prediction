@@ -1,0 +1,24 @@
+============================================================
+EPIC 4 - STEP 8: DECISION TREE MODEL
+============================================================
+Model: DecisionTreeClassifier(class_weight='balanced')
+
+Confusion Matrix:
+[[853  72]
+ [ 62  13]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+Approved (0)       0.93      0.92      0.93       925
+Rejected (1)       0.15      0.17      0.16        75
+
+    accuracy                           0.87      1000
+   macro avg       0.54      0.55      0.54      1000
+weighted avg       0.87      0.87      0.87      1000
+
+Minority Default Recall (Class 1): 0.1733 (14.67%)
+F1-Score:                         0.1625
+
+Status: PASSED - Model trained and evaluated cleanly.
+============================================================

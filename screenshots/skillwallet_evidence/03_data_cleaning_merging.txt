@@ -1,0 +1,19 @@
+============================================================
+EPIC 3 - STEP 3: DATA CLEANING AND MERGING
+============================================================
+Raw application_record.csv Shape: (438557, 18)
+Raw credit_record.csv shape:      (1048575, 3)
+
+Merging on Primary Key 'ID' with target derivation (STATUS_TARGET)...
+
+Merged Clean Dataset Shape:       (36457, 28)
+
+Merged DataFrame Sample Head:
+        ID CODE_GENDER  AMT_INCOME_TOTAL      NAME_INCOME_TYPE  STATUS_TARGET
+0  5008804           M          427500.0               Working              0
+1  5008805           M          427500.0               Working              0
+2  5008806           M          112500.0               Working              0
+3  5008808           F          270000.0  Commercial associate              0
+
+Status: PASSED - 36,457 unique linked applicant records created.
+============================================================

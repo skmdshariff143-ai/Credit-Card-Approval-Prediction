@@ -1,0 +1,24 @@
+============================================================
+EPIC 3 - STEP 5: HANDLING CATEGORICAL VALUES
+============================================================
+Categorical Columns BEFORE Encoding (11 columns):
+CODE_GENDER            object
+FLAG_OWN_CAR           object
+FLAG_OWN_REALTY        object
+NAME_INCOME_TYPE       object
+NAME_EDUCATION_TYPE    object
+
+Running CategoricalEncoder.fit() & transform()...
+(Binary Mapping & One-Hot Encoding applied)
+
+Non-Numeric Columns Count AFTER Encoding: 0 (All 0)
+Encoded DataFrame Shape: (36457, 72)
+
+Encoded Sample Head (Numerical Matrix):
+        ID  CNT_CHILDREN  AMT_INCOME_TOTAL  DAYS_BIRTH  DAYS_EMPLOYED
+0  5008804             0          427500.0      -12005          -4542
+1  5008805             0          427500.0      -12005          -4542
+2  5008806             0          112500.0      -21474          -1134
+
+Status: PASSED - Categorical features converted to numeric matrix.
+============================================================
