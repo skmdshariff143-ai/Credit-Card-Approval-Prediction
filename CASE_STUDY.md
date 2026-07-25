@@ -28,13 +28,13 @@ Enforcing standard scaling via `models/scaler.pkl` restored the true uncalibrate
 
 ---
 
-## 3. The Double-Scaler Architecture Bug & Linear Model Performance
+## 3. The Double-Scaler Architecture Bug
 
 Fixing the evaluation script surfaced a subtle architectural flaw: two separate `StandardScaler` instances were being fitted independently across the codebase. One scaler instance was fitted inside `PreprocessingPipeline`, while a second instance called `.fit_transform()` inside execution scripts during retraining.
 
-While tree ensembles (Random Forest and XGBoost) are invariant to monotonic scaling, the double-scaler bug severely impacted Logistic Regression. When evaluated on raw unscaled features, Logistic Regression accuracy collapsed. Fitting Logistic Regression on un-oversampled scaled features yielded 61.94% accuracy, while fitting on SMOTE-balanced training features reached 62.86% accuracy (and 60.27% under strict class-weighted un-resampled splits).
+While tree ensembles (such as Random Forest and XGBoost) are invariant to monotonic feature scaling, this double-scaling bug silently degraded scale-sensitive linear models. Re-fitting the scaler on execution subsets shifted feature distributions, causing Logistic Regression predictions to degrade.
 
-The architecture was consolidated so that `models/scaler.pkl`—fitted exclusively during the canonical preprocessing step—became the single source of truth. All downstream scoring modules and inference services were updated to call `scaler.transform()` only, preventing data leakage and distribution drift.
+The architecture was consolidated so that `models/scaler.pkl`—fitted exclusively during the canonical preprocessing step—became the single source of truth. All downstream scoring modules and inference services were updated to call `scaler.transform()` only, preventing data leakage and stabilizing Logistic Regression performance at **60.27%** accuracy (landing at 60.27% after final pipeline consolidation).
 
 ---
 
