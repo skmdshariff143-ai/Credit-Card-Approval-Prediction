@@ -6,10 +6,10 @@ This report compares and ranks candidate risk models based on F1-Score, ROC-AUC,
 
 | Rank | Model | F1-Score | ROC-AUC | Accuracy | Precision | Recall | Balanced_Accuracy | Log_Loss | Training_Time_Sec | Prediction_Time_Sec |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | logistic_regression | 0.2259 | 0.6885 | 0.7190 | 0.1424 | 0.5467 | 0.6398 | 0.5631 | 3.4038 | 0.0032 |
-| 2 | decision_tree | 0.1760 | 0.6535 | 0.8970 | 0.2200 | 0.1467 | 0.5523 | 1.4766 | 0.1962 | 0.0014 |
-| 3 | xgboost | 0.1400 | 0.6600 | 0.9140 | 0.2800 | 0.0933 | 0.5369 | 0.3032 | 0.4295 | 0.0331 |
-| 4 | random_forest | 0.0941 | 0.7080 | 0.9230 | 0.4000 | 0.0533 | 0.5234 | 0.2589 | 0.3208 | 0.1184 |
+| 1 | random_forest | 0.2562 | 0.8042 | 0.9793 | 0.3250 | 0.2114 | 0.6019 | 0.2293 | 1.2798 | 0.0655 |
+| 2 | xgboost | 0.2526 | 0.7090 | 0.9805 | 0.3582 | 0.1951 | 0.5946 | 0.0888 | 0.9796 | 0.0205 |
+| 3 | decision_tree | 0.2348 | 0.6878 | 0.9759 | 0.2523 | 0.2195 | 0.6042 | 0.5801 | 0.6860 | 0.0043 |
+| 4 | logistic_regression | 0.0336 | 0.5225 | 0.6140 | 0.0176 | 0.3984 | 0.5080 | 0.6332 | 15.1131 | 0.0069 |
 
 ## 2. Algorithm Strengths & Weaknesses Assessment
 
@@ -30,4 +30,4 @@ This report compares and ranks candidate risk models based on F1-Score, ROC-AUC,
 - **Weaknesses**: Hyperparameter space requires extensive tuning; complex to interpret visually.
 
 ## 3. Final Recommendation Summary
-The best model selected by F1-Score objective is **logistic_regression** (Rank 1).
+The best model selected by F1-Score objective is **random_forest** (Rank 1).

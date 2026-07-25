@@ -1,24 +1,26 @@
 ============================================================
-EPIC 4 - STEP 8: DECISION TREE MODEL
+EPIC 4 - STEP 8: DECISION TREE MODEL (REAL DATASET)
 ============================================================
 Model: DecisionTreeClassifier(class_weight='balanced')
+Holdout Test Set Support: 7292 samples (7,169 Class 0 / 123 Class 1)
 
 Confusion Matrix:
-[[853  72]
- [ 62  13]]
+[[7089   80]
+ [  96   27]]
 
 Classification Report:
               precision    recall  f1-score   support
 
-Approved (0)       0.93      0.92      0.93       925
-Rejected (1)       0.15      0.17      0.16        75
+Approved (0)       0.99      0.99      0.99      7169
+Rejected (1)       0.25      0.22      0.23       123
 
-    accuracy                           0.87      1000
-   macro avg       0.54      0.55      0.54      1000
-weighted avg       0.87      0.87      0.87      1000
+    accuracy                           0.98      7292
+   macro avg       0.62      0.60      0.61      7292
+weighted avg       0.97      0.98      0.98      7292
 
-Minority Default Recall (Class 1): 0.1733 (14.67%)
-F1-Score:                         0.1625
+Accuracy:                         0.9759 (97.59%)
+Minority Default Recall (Class 1): 0.2195 (21.95%)
+F1-Score:                         0.2348 (0.2348)
 
-Status: PASSED - Model trained and evaluated cleanly.
+Status: PASSED - Model trained and evaluated cleanly on real 7,292 test split.
 ============================================================
