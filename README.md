@@ -16,6 +16,8 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 4. **De-duplicated Local SHAP Explainability**: Grouped one-hot dummy columns back to parent features, guaranteeing zero contradictory drivers in per-applicant explanations ([`app/services/predict.py`](5_Project_Development_Phase/app/services/predict.py)).
 5. **Fair Lending Compliance (ECOA / Reg B)**: Explicitly excluded `CODE_GENDER` from the model feature set with zero accuracy cost (**97.97%** accuracy, **0.7865** ROC-AUC) and documented statutory age/marital status treatment against ECOA standards ([`reports/Decision_Policy.md`](reports/Decision_Policy.md)).
 
+📖 **[Read the full engineering case study](CASE_STUDY.md)** for a deep dive into the debugging, calibration, and compliance process.
+
 ---
 
 ## 🚀 Key Performance Metrics
