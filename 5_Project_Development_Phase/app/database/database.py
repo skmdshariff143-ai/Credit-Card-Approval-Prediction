@@ -189,12 +189,12 @@ class DatabaseManager:
     def _seed_default_users(self, cursor):
         from werkzeug.security import generate_password_hash
 
-        admin_email = os.getenv("ADMIN_EMAIL")
-        admin_pwd = os.getenv("ADMIN_PASSWORD")
-        officer_email = os.getenv("OFFICER_EMAIL")
-        officer_pwd = os.getenv("OFFICER_PASSWORD")
-        demo_email = os.getenv("DEMO_EMAIL")
-        demo_pwd = os.getenv("DEMO_PASSWORD")
+        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+        admin_pwd = os.getenv("ADMIN_PASSWORD", "Admin@123")
+        officer_email = os.getenv("OFFICER_EMAIL", "officer@creditguard.ai")
+        officer_pwd = os.getenv("OFFICER_PASSWORD", "Officer@123")
+        demo_email = os.getenv("DEMO_EMAIL", "demo@creditguard.ai")
+        demo_pwd = os.getenv("DEMO_PASSWORD", "Demo@123")
 
         default_users = []
         if admin_email and admin_pwd:
@@ -230,12 +230,12 @@ class DatabaseManager:
     def _seed_default_users_postgres(self):
         from werkzeug.security import generate_password_hash
 
-        admin_email = os.getenv("ADMIN_EMAIL")
-        admin_pwd = os.getenv("ADMIN_PASSWORD")
-        officer_email = os.getenv("OFFICER_EMAIL")
-        officer_pwd = os.getenv("OFFICER_PASSWORD")
-        demo_email = os.getenv("DEMO_EMAIL")
-        demo_pwd = os.getenv("DEMO_PASSWORD")
+        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
+        admin_pwd = os.getenv("ADMIN_PASSWORD", "Admin@123")
+        officer_email = os.getenv("OFFICER_EMAIL", "officer@creditguard.ai")
+        officer_pwd = os.getenv("OFFICER_PASSWORD", "Officer@123")
+        demo_email = os.getenv("DEMO_EMAIL", "demo@creditguard.ai")
+        demo_pwd = os.getenv("DEMO_PASSWORD", "Demo@123")
 
         default_users = []
         if admin_email and admin_pwd:
