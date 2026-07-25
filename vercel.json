@@ -1,8 +1,19 @@
 {
-  "rewrites": [
+  "version": 2,
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "api/index.py"
+      "src": "5_Project_Development_Phase/index.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "5_Project_Development_Phase/index.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "5_Project_Development_Phase/index.py"
     }
   ]
 }
