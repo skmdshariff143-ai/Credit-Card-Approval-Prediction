@@ -5,9 +5,16 @@
 > [!IMPORTANT]
 > **Deliberate Design Decision**: To comply strictly with the Equal Credit Opportunity Act (ECOA) and Consumer Financial Protection Bureau (CFPB) Regulation B guidelines, protected demographic characteristics—specifically **Gender (`CODE_GENDER`)**—have been **explicitly excluded from the machine learning model feature set** and training pipeline.
 
-While gender telemetry may be collected on application intake for mandatory regulatory demographic monitoring and fair-lending reporting, **it is never passed to or evaluated by the machine learning scoring engine or decision pipeline**. 
+While gender telemetry may be collected on application intake for mandatory regulatory demographic monitoring and fair-lending reporting, **it is never passed to or evaluated by the machine learning scoring engine or decision pipeline**. Empirical benchmarking confirmed that excluding `CODE_GENDER` resulted in zero performance degradation, maintaining high classification accuracy (**97.97%**) and strong ROC-AUC (**0.7865**).
 
-Additionally, marital status (`NAME_FAMILY_STATUS`) and housing type (`NAME_HOUSING_TYPE`) were audited to ensure they represent objective financial and household cash flow obligations rather than proxy discrimination. Empirical benchmarking confirmed that excluding `CODE_GENDER` resulted in zero performance degradation, maintaining high classification accuracy (**97.97%**) and strong ROC-AUC (**0.7865**).
+### Age Treatment (`AGE_YEARS` & `AGE_GROUP`)
+Age is included as a predictive model feature (`AGE_YEARS` and `AGE_GROUP_*`). The Equal Credit Opportunity Act (15 U.S.C. § 1691) explicitly permits the use of age in an **empirically derived, statistically sound credit scoring system**—unlike gender, which carries no statutory exception under federal law—provided age is not used as a blanket negative disqualifier and elderly applicants are not assigned negative scoring weights. The CreditGuard AI pipeline meets this statutory requirement as an empirically derived model trained on a real ~438,000-row credit dataset using cross-validated ensemble learning rather than arbitrary rule-based age cutoffs.
+
+### Marital Status (`NAME_FAMILY_STATUS`)
+Marital status (`NAME_FAMILY_STATUS`) is retained in the feature set because it directly correlates with objective household financial obligations, joint liability structures, and dependency burdens. Retaining marital status is a documented design tradeoff intended to capture real cash-flow capacity rather than serve as a proxy for protected-class discrimination.
+
+> [!NOTE]
+> **Production Compliance Disclaimer**: *This is a portfolio/demonstration project. A production deployment would require formal disparate-impact testing (e.g., adverse impact ratio analysis across protected classes) before use in real lending decisions.*
 
 ---
 
