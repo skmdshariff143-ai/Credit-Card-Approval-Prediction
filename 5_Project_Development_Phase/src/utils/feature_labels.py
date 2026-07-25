@@ -1,6 +1,7 @@
 """
 Central Feature Label Translation Registry
-Maps raw encoded column names to human-readable plain-English strings.
+Maps raw encoded column names to human-readable plain-English strings
+and handles parent feature grouping to prevent contradictory explanations.
 """
 
 FEATURE_LABEL_MAP = {
@@ -9,8 +10,6 @@ FEATURE_LABEL_MAP = {
     "FLAG_OWN_REALTY_Y": "Owns Real Estate Property",
     "FLAG_OWN_CAR_N": "Does Not Own Vehicle",
     "FLAG_OWN_CAR_Y": "Owns Personal Vehicle",
-    "CODE_GENDER_M": "Male Applicant",
-    "CODE_GENDER_F": "Female Applicant",
     "NAME_INCOME_TYPE_Working": "Employed (Working Salary)",
     "NAME_INCOME_TYPE_Commercial associate": "Commercial / Business Associate",
     "NAME_INCOME_TYPE_Pensioner": "Pensioner / Retiree",
@@ -77,6 +76,19 @@ FEATURE_LABEL_MAP = {
     "EXPERIENCE_BUCKET_senior": "Senior History (>10 yrs)",
 }
 
+PARENT_FEATURE_PREFIXES = [
+    ("FLAG_OWN_REALTY", "Property Ownership"),
+    ("FLAG_OWN_CAR", "Vehicle Ownership"),
+    ("NAME_INCOME_TYPE", "Income Sector"),
+    ("NAME_EDUCATION_TYPE", "Education Level"),
+    ("NAME_FAMILY_STATUS", "Marital / Family Status"),
+    ("NAME_HOUSING_TYPE", "Housing Type"),
+    ("OCCUPATION_TYPE", "Occupation Category"),
+    ("INCOME_GROUP", "Income Bracket"),
+    ("AGE_GROUP", "Age Bracket"),
+    ("EXPERIENCE_BUCKET", "Work Experience Bracket"),
+]
+
 
 def get_feature_label(raw_feature: str) -> str:
     """Returns human-readable plain English label for a raw feature name."""
@@ -84,3 +96,14 @@ def get_feature_label(raw_feature: str) -> str:
         return FEATURE_LABEL_MAP[raw_feature]
     cleaned = raw_feature.replace("_", " ").title()
     return cleaned
+
+
+def get_parent_feature_key(raw_col: str) -> tuple[str, str]:
+    """
+    Returns (parent_key, parent_label) for grouping one-hot dummies.
+    E.g. 'FLAG_OWN_REALTY_N' -> ('FLAG_OWN_REALTY', 'Property Ownership')
+    """
+    for prefix, label in PARENT_FEATURE_PREFIXES:
+        if raw_col.startswith(prefix + "_") or raw_col == prefix:
+            return prefix, label
+    return raw_col, get_feature_label(raw_col)

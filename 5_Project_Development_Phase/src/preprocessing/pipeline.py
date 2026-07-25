@@ -106,9 +106,9 @@ class PreprocessingPipeline:
             # 2. Stratified Split (80/20)
             X_train, X_test, y_train, y_test = perform_stratified_split(df_full)
 
-            # Drop ID metadata column
-            X_train = X_train.drop(columns=["ID"], errors="ignore")
-            X_test = X_test.drop(columns=["ID"], errors="ignore")
+            # Drop ID metadata column and protected attribute CODE_GENDER for Fair Lending (ECOA/Reg B) compliance
+            X_train = X_train.drop(columns=["ID", "CODE_GENDER"], errors="ignore")
+            X_test = X_test.drop(columns=["ID", "CODE_GENDER"], errors="ignore")
 
             # Identify columns for transformations
             # Numerical features include new stability score & engineered continuous fields
@@ -122,9 +122,8 @@ class PreprocessingPipeline:
                 "EMPLOYED_TO_AGE_RATIO",
                 "FINANCIAL_STABILITY_SCORE",
             ]
-            # Categorical features include original text categories and new binned categories
+            # Categorical features include original text categories and new binned categories (CODE_GENDER excluded for Fair Lending / ECOA compliance)
             self.cat_cols = [
-                "CODE_GENDER",
                 "FLAG_OWN_CAR",
                 "FLAG_OWN_REALTY",
                 "NAME_INCOME_TYPE",

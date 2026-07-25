@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from config.config import config
-from app.utils.feature_labels import get_feature_label
+from app.utils.feature_labels import get_feature_label, get_parent_feature_key
 from src.utils.helper import load_pkl
 from src.utils.logger import get_logger
 
@@ -15,6 +15,7 @@ class RiskPredictor:
     """
     Handles calibrated model predictions, feature standardizations,
     cost-sensitive decision thresholding (p* = 0.0395), and SHAP explainability.
+    Excludes protected demographic attributes (CODE_GENDER) for ECOA compliance.
     """
 
     def __init__(self):
@@ -194,7 +195,7 @@ class RiskPredictor:
     def explain_prediction(self, applicant_data) -> dict:
         """
         Calculates local SHAP feature contributions for a specific applicant,
-        mapping raw column names to human-readable plain-English labels.
+        grouping one-hot dummy columns back to parent features to prevent contradictory drivers.
         """
         pipeline = self.load_pipeline()
         model = self.load_model()
@@ -226,7 +227,7 @@ class RiskPredictor:
         risk_factors = []
         support_factors = []
 
-        if explainer is not None:
+        if explainer is not None and hasattr(X_trans, "columns") and len(X_trans.columns) > 0:
             try:
                 shap_res = explainer(X_trans, check_additivity=False)
                 if hasattr(shap_res, "values"):
@@ -241,46 +242,75 @@ class RiskPredictor:
                     else:
                         row_vals = shap_res[0]
 
-                abs_vals = np.abs(row_vals)
-                top_indices = np.argsort(abs_vals)[::-1][:5]
-                max_mag = float(np.max(abs_vals)) if np.max(abs_vals) > 0 else 1.0
-
-                for idx in top_indices:
-                    raw_feat_name = X_trans.columns[idx]
-                    plain_label = get_feature_label(raw_feat_name)
+                # Group SHAP values by parent feature to eliminate contradictory dummy drivers
+                grouped_shap = {}
+                for idx, col in enumerate(X_trans.columns):
+                    parent_key, parent_label = get_parent_feature_key(col)
                     s_val = float(row_vals[idx])
-                    mag = float(abs(s_val))
-                    visual_weight = float(round(min(100.0, (mag / max_mag) * 100.0), 1))
-                    is_risk = s_val > 0
-                    direction_str = "Pushed toward Rejection (Increased Risk)" if is_risk else "Pushed toward Approval (Decreased Risk)"
-                    f_val = float(X_trans.iloc[0, idx]) if raw_feat_name in X_trans else 0.0
+                    val_in = float(X_trans.iloc[0, idx])
 
-                    driver_item = {
-                        "raw_feature": raw_feat_name,
-                        "feature": plain_label,
-                        "shap_value": round(s_val, 4),
-                        "magnitude": round(mag, 4),
-                        "visual_weight": visual_weight,
-                        "is_risk": is_risk,
-                        "direction": direction_str,
-                        "impact": round(mag, 4),
-                        "feature_val": round(f_val, 4)
-                    }
-                    top_drivers.append(driver_item)
-                    if is_risk:
-                        risk_factors.append(driver_item)
+                    if parent_key not in grouped_shap:
+                        grouped_shap[parent_key] = {
+                            "parent_key": parent_key,
+                            "label": parent_label,
+                            "shap_sum": 0.0,
+                            "active_dummy_label": None,
+                            "max_active_val": -999.0
+                        }
+
+                    grouped_shap[parent_key]["shap_sum"] += s_val
+
+                    # If dummy indicator is active for applicant (> 0), record descriptive label
+                    if val_in > 0 and val_in > grouped_shap[parent_key]["max_active_val"]:
+                        grouped_shap[parent_key]["max_active_val"] = val_in
+                        grouped_shap[parent_key]["active_dummy_label"] = get_feature_label(col)
+
+                # Formulate distinct parent feature drivers list
+                driver_list = []
+                for p_key, item in grouped_shap.items():
+                    s_sum = item["shap_sum"]
+                    mag = abs(s_sum)
+                    if mag > 1e-6:
+                        display_label = item["active_dummy_label"] or item["label"]
+                        is_risk = s_sum > 0
+                        driver_list.append({
+                            "raw_feature": p_key,
+                            "feature": display_label,
+                            "shap_value": round(s_sum, 4),
+                            "magnitude": round(mag, 4),
+                            "is_risk": is_risk,
+                            "direction": "Pushed toward Rejection (Increased Risk)" if is_risk else "Pushed toward Approval (Decreased Risk)",
+                            "impact": round(mag, 4)
+                        })
+
+                # Sort by magnitude descending and take top 5
+                driver_list.sort(key=lambda x: x["magnitude"], reverse=True)
+                top_drivers_raw = driver_list[:5]
+
+                max_mag = top_drivers_raw[0]["magnitude"] if top_drivers_raw else 1.0
+                for d in top_drivers_raw:
+                    d["visual_weight"] = float(round(min(100.0, (d["magnitude"] / max_mag) * 100.0), 1))
+                    top_drivers.append(d)
+                    if d["is_risk"]:
+                        risk_factors.append(d)
                     else:
-                        support_factors.append(driver_item)
+                        support_factors.append(d)
+
             except Exception as e:
                 logger.warning(f"SHAP explanation calculation error: {str(e)}")
 
         # Fallback if SHAP drivers empty (e.g. inside mock tests)
         if not top_drivers:
             cols = list(X_trans.columns)[:5] if hasattr(X_trans, "columns") else ["Feature 1", "Feature 2"]
+            seen_parents = set()
             for col in cols:
+                parent_key, parent_label = get_parent_feature_key(col)
+                if parent_key in seen_parents:
+                    continue
+                seen_parents.add(parent_key)
                 plain_label = get_feature_label(col)
                 item = {
-                    "raw_feature": col,
+                    "raw_feature": parent_key,
                     "feature": plain_label,
                     "shap_value": 0.05,
                     "magnitude": 0.05,
@@ -288,7 +318,6 @@ class RiskPredictor:
                     "is_risk": True,
                     "direction": "Pushed toward Rejection (Increased Risk)",
                     "impact": 0.05,
-                    "feature_val": float(X_trans[col].iloc[0]) if hasattr(X_trans, "columns") and col in X_trans else 0.0
                 }
                 top_drivers.append(item)
                 risk_factors.append(item)
