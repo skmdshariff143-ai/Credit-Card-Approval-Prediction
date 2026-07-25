@@ -1,3 +1,15 @@
+"""
+⚠️ NOTICE: TEST & CI FIXTURE GENERATOR ONLY ⚠️
+
+This script generates synthetic mock datasets (5,000 lightweight records) EXCLUSIVELY for:
+1. Fast local unit test execution (`pytest`).
+2. Continuous Integration (CI/CD) automated testing pipelines.
+
+DO NOT USE THIS SCRIPT OR ITS OUTPUT TO TRAIN PRODUCTION MACHINE LEARNING MODELS.
+The canonical production models in `models/` are trained on the official Kaggle dataset
+(application_record.csv ~438,557 rows, credit_record.csv ~1,048,575 rows).
+"""
+
 import os
 
 import numpy as np
@@ -6,7 +18,7 @@ import pandas as pd
 
 def generate_data(num_applicants=5000, seed=42):
     np.random.seed(seed)
-    print("Generating synthetic Credit Card Approval Prediction dataset...")
+    print("Generating synthetic Credit Card Approval Prediction dataset (FIXTURES ONLY)...")
 
     # 1. Generate Application Records
     # IDs starting from 5008804 (matching Kaggle range)

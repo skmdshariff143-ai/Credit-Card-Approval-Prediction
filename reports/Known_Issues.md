@@ -27,6 +27,12 @@ This document outlines the known system limitations and libraries warnings for t
 - **Status**: Resolved
 - **Description**: The rate limiter (`app/utils/limiter.py`) was refactored to support a shared Upstash Redis store via the `REDIS_URL` environment variable, with transparent fallback to in-memory when Redis is unavailable. Rate limit counters now persist across Vercel cold starts and container recycles.
 - **Verification**: A redeploy-interruption test confirmed the Redis counter survived a full production redeployment: 30 requests pre-redeploy + 31 post-redeploy = blocked at request #61. Vercel runtime logs confirm: `Rate limiter successfully initialized with shared Redis store.`
-- **Configuration**: `REDIS_URL` is set as a Sensitive environment variable in Vercel production, pointing to a shared Upstash Redis instance.
+---
+
+## 5. Synthetic Mock Data Generator vs. Production Kaggle Dataset
+- **Status**: Clarified & Isolated
+- **Description**: `generate_mock_data.py` (which produces 5,000 synthetic mock rows) exists **exclusively** for fast unit test execution (`pytest`) and lightweight CI pipeline verification.
+- **Clarification**: All production ML models in `models/` (`best_model.pkl`, `preprocessing_pipeline.pkl`, `model_metrics.json`) are trained on the real Kaggle credit card approval dataset (`application_record.csv` with 438,557 records and `credit_record.csv` with 1,048,575 records, yielding 36,457 unique linked applicant records). `generate_mock_data.py` must never be used to train production models.
+
 
 

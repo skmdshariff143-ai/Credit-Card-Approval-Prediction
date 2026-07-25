@@ -1,5 +1,25 @@
 [
     {
+        "timestamp": "2026-07-25 06:29:07",
+        "input": {
+            "age_years": 35.0,
+            "amt_income_total": 180000.0,
+            "cnt_children": 0,
+            "cnt_fam_members": 2,
+            "code_gender": "M",
+            "flag_own_car": "Y",
+            "flag_own_realty": "Y",
+            "flag_unemployed": 0,
+            "name_education_type": "Higher education",
+            "name_family_status": "Married",
+            "name_housing_type": "House / apartment",
+            "name_income_type": "Working",
+            "years_employed": 8.0
+        },
+        "decision": "Approved",
+        "probability_percent": 58.13
+    },
+    {
         "timestamp": "2026-07-13 23:45:02",
         "input": {
             "code_gender": "M",
