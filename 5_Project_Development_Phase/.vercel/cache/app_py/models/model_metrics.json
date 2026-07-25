@@ -1,0 +1,14 @@
+[
+    {
+        "Model": "test_model",
+        "Accuracy": 0.8,
+        "Precision": 0.7,
+        "Recall": 0.9,
+        "F1-Score": 0.79,
+        "ROC-AUC": 0.85,
+        "Balanced_Accuracy": 0.8,
+        "Log_Loss": 0.3,
+        "Training_Time_Sec": 1.2,
+        "Prediction_Time_Sec": 0.05
+    }
+]

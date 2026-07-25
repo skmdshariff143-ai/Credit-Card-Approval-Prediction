@@ -10,7 +10,7 @@
 
 | Metric | Before Audit | After Fixes |
 |--------|-------------|-------------|
-| Pytest suite | 108 passed | **108 passed** |
+| Pytest suite | 119 passed | **119 passed** |
 | Flask startup | OK | **OK** |
 | `/api/predict` REST | OK | **OK** |
 | Form prediction → result page | **Broken** (500/template crash) | **Fixed** |
@@ -161,7 +161,7 @@ Inference pipeline failure: type Undefined doesn't define __round__ method
 | Profile update via `/auth/profile/edit` | ✓ |
 | Password change via profile form | ✓ |
 | Reset password form action includes token | ✓ |
-| Pytest 108/108 | ✓ |
+| Pytest 119/119 | ✓ |
 | Seaborn deprecation warning | ✓ Resolved (38 warnings remain — sklearn/numpy only) |
 
 ---

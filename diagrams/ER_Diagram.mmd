@@ -1,0 +1,48 @@
+erDiagram
+    Users {
+        int UserID PK
+        string Username
+        string Email
+        string PasswordHash
+        string Role
+    }
+
+    Applicant_Details {
+        int ApplicantID PK
+        int UserID FK
+        string IncomeType
+        string EducationType
+        string FamilyStatus
+        string HousingType
+        int EmploymentDays
+    }
+
+    Credit_History {
+        int HistoryID PK
+        int ApplicantID FK
+        int MonthsBalance
+        string PaymentStatus
+        string OverdueStatus
+    }
+
+    ML_Model {
+        int ModelID PK
+        string ModelName
+        string AlgorithmType
+        datetime TrainingDate
+        float F1Score
+    }
+
+    Approval_Prediction {
+        int PredictionID PK
+        int ApplicantID FK
+        int ModelID FK
+        string Prediction
+        float Probability
+        string RiskLevel
+    }
+
+    Users ||--o{ Applicant_Details : "submits"
+    Applicant_Details ||--|| Credit_History : "has"
+    Applicant_Details ||--o{ Approval_Prediction : "receives"
+    ML_Model ||--o{ Approval_Prediction : "generates"

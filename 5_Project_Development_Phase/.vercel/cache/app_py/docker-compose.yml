@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: credit-card-approval-prediction:latest
+    container_name: credit_card_approval_container
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - ./logs:/app/logs
+      - ./models:/app/models

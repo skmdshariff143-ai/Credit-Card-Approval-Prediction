@@ -1,0 +1,157 @@
+Metadata-Version: 2.4
+Name: credit_card_approval_prediction
+Version: 1.0.0
+Summary: Enterprise Machine Learning project for predicting credit card approval status.
+Author: Mahammad Shariff Shaik
+Author-email: Mahammad Shariff Shaik <sk.md.shariff143@gmail.com>
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: flask>=3.0.0
+Requires-Dist: pandas>=2.1.0
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: scikit-learn>=1.3.0
+Requires-Dist: xgboost>=2.0.0
+Requires-Dist: joblib>=1.3.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pyyaml>=6.0.0
+Requires-Dist: requests>=2.31.0
+Dynamic: author
+Dynamic: license-file
+Dynamic: requires-python
+
+# 🚀 CreditCard Approval Prediction (CreditGuard AI)
+
+<div align="center">
+
+  [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?logo=python&logoColor=white)](https://www.python.org/)
+  [![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.3%2B-orange.svg?logo=scikit-learn&logoColor=white)](https://scikit-learn.org/)
+  [![XGBoost](https://img.shields.io/badge/XGBoost-2.0%2B-green.svg?logo=xgboost&logoColor=white)](https://xgboost.ai/)
+  [![Flask](https://img.shields.io/badge/Flask-3.0%2B-black.svg?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+  [![Docker](https://img.shields.io/badge/Docker-Container-blue.svg?logo=docker&logoColor=white)](https://www.docker.com/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+</div>
+
+## 📌 Project Overview
+**CreditGuard AI** is a production-grade, end-to-end Machine Learning pipeline that predicts credit card application approvals. The system automates credit risk evaluation by analyzing applicant demographics and socio-economic profiles.
+
+---
+
+## 📂 Folder Structure
+
+```
+Credit-Card-Approval-Prediction/
+├── .github/workflows/
+│   ├── python-app.yml            # Pytest CI validation
+│   ├── docker.yml                # Docker build validation
+│   └── lint.yml                  # Flake8 & Black linting check
+├── configs/
+│   ├── config.py                 # YAML and env config loader
+│   ├── logging.yaml              # Logger handlers configuration
+│   └── constants.py              # Column and algorithm constants
+├── data/
+│   ├── raw/                      # Raw datasets
+│   ├── processed/                # Preprocessed dataset splits
+│   ├── external/                 # External reference datasets
+│   └── interim/                  # Intermediate datasets
+├── notebooks/                    # Ingestion & training Jupyter notebooks
+├── src/
+│   ├── data/                     # Loaders, splitters, validators
+│   ├── preprocessing/            # Imputer, scaler, capper, encoders
+│   ├── features/                 # Engineers, selectors
+│   ├── models/                   # Trainers, evaluators, predictors, comparators
+│   ├── visualization/            # Stats & heatmaps visualizers
+│   ├── api/                      # Blueprints, routes, WTForms
+│   ├── deployment/               # Watson WML deployers & scorers
+│   ├── utils/                    # Logs, exceptions, helpers, metrics
+│   └── main.py                   # Ingestion & training entrypoint
+├── app/
+│   ├── static/                   # Visual styles (CSS), scripts (JS)
+│   ├── templates/                # Bootstrap views templates
+│   └── app.py                    # Flask application factory runner
+├── models/                       # Fitted preprocessors & model binaries
+├── reports/                      # Visual confusion matrix & reports
+├── diagrams/                     # Mermaid flowcharts & layout diagrams
+├── screenshots/                  # Application runtime snapshots
+├── demo/
+│   └── Demo_Script.md            # Script for project video
+├── tests/                        # Pytest unit testing modules
+├── logs/                         # File logging directory
+├── requirements.txt              # Project package requirements
+├── environment.yml               # Conda environment specifications
+├── Dockerfile                    # Multi-stage production container setup
+├── docker-compose.yml            # Compose service mapping
+├── LICENSE                       # MIT License
+├── .gitignore                    # Git file ignore list
+├── .env.example                  # Environment credentials template
+├── setup.py                      # Package configuration script
+└── pyproject.toml                # Black & build configuration
+```
+
+---
+
+## 💻 Installation
+
+### Option 1: Virtual Environment (venv)
+#### Windows:
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+pip install -e .
+```
+
+#### Linux / macOS:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
+
+### Option 2: Anaconda / Miniconda
+```bash
+conda env create -f environment.yml
+conda activate credit-card-approval
+pip install -e .
+```
+
+---
+
+## ⚙️ Usage
+
+1. **Train Model Pipeline**:
+   ```bash
+   python src/main.py --tune
+   ```
+2. **Start Flask Web Application**:
+   ```bash
+   python app/app.py
+   ```
+   *Access dashboard at `http://localhost:5000`*
+
+3. **Run Unit Tests**:
+   ```bash
+   pytest tests/ -v
+   ```
+
+---
+
+## 🗺️ Roadmap & Future Work
+- **RAG Explanations**: Integrate LLM agents to provide natural language justifications for approvals/rejections.
+- **Deep Learning**: Benchmarking tabular Deep Learning networks (TabNet/MLPs).
+- **Drift Monitoring**: Automated data validation dashboard reporting using Evidently AI.
+
+---
+
+## 🤝 Contributors
+- **Mahammad Shariff Shaik** - [skmdshariff143-ai](https://github.com/skmdshariff143-ai)
+
+---
+
+## 📄 License
+Licensed under the [MIT License](LICENSE).

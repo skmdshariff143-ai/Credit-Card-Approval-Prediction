@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | CreditGuard AI</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body id="page-register">
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div data-flash="{{ category }}" style="display:none;">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <div class="cg-auth-page">
+    <div class="cg-auth-card cg-fade-in" style="max-width:440px;">
+      <div class="cg-auth-header">
+        <div class="cg-auth-logo"><i class="fa-solid fa-shield-halved"></i></div>
+        <h1 style="font-size:22px;font-weight:800;letter-spacing:-0.5px;">Get started</h1>
+        <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Create your CreditGuard AI developer account</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('auth.register') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="cg-input-group">
+          {{ form.full_name.label }}
+          {{ form.full_name(class='cg-input', placeholder='Sk Md Shariff', required=True) }}
+        </div>
+
+        <div class="cg-grid cg-grid-2 cg-gap-sm">
+          <div class="cg-input-group">
+            {{ form.username.label }}
+            {{ form.username(class='cg-input', placeholder='shariff', required=True) }}
+          </div>
+          <div class="cg-input-group">
+            {{ form.email.label }}
+            {{ form.email(class='cg-input', placeholder='name@domain.com', required=True) }}
+          </div>
+        </div>
+
+        <div class="cg-grid cg-grid-2 cg-gap-sm">
+          <div class="cg-input-group">
+            {{ form.password.label }}
+            {{ form.password(class='cg-input', placeholder='••••••••', required=True) }}
+          </div>
+          <div class="cg-input-group">
+            {{ form.confirm_password.label }}
+            {{ form.confirm_password(class='cg-input', placeholder='••••••••', required=True) }}
+          </div>
+        </div>
+
+        {{ form.submit(class='cg-btn cg-btn-primary cg-w-full', style='margin-top:8px;') }}
+      </form>
+
+      <div class="cg-auth-footer">
+        Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

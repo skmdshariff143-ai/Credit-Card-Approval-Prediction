@@ -1,0 +1,31 @@
+{
+    "model_name": "logistic_regression",
+    "registration_date": "2026-07-03 09:22:29",
+    "parameters": {
+        "C": "1.0",
+        "class_weight": "balanced",
+        "dual": "False",
+        "fit_intercept": "True",
+        "intercept_scaling": "1",
+        "l1_ratio": "None",
+        "max_iter": "1000",
+        "multi_class": "deprecated",
+        "n_jobs": "None",
+        "penalty": "l2",
+        "random_state": "42",
+        "solver": "lbfgs",
+        "tol": "0.0001",
+        "verbose": "0",
+        "warm_start": "False"
+    },
+    "metrics": {
+        "Accuracy": 0.719,
+        "Precision": 0.1423611111111111,
+        "Recall": 0.5466666666666666,
+        "F1-Score": 0.22589531680440772,
+        "Balanced_Accuracy": 0.6398198198198197,
+        "Matthews_Correlation_Coefficient": 0.1626537165650121,
+        "ROC-AUC": 0.6885333333333334,
+        "Log_Loss": 0.563060423173979
+    }
+}

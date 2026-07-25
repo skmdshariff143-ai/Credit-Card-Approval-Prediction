@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}500 Internal Server Error | CreditGuard AI{% endblock %}
+{% block page_id %}page-500{% endblock %}
+
+{% block content %}
+<div class="cg-flex-center cg-fade-in" style="min-height:60vh;flex-direction:column;text-align:center;padding:40px 20px;">
+  <div style="font-size:96px;font-weight:900;line-height:1;letter-spacing:-4px;color:var(--text-faint);margin-bottom:16px;">
+    500
+  </div>
+  <h1 style="font-size:24px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;">Server Error</h1>
+  <p style="color:var(--text-secondary);font-size:14px;max-width:360px;margin-bottom:24px;line-height:1.6;">
+    An internal validation failure or scoring pipeline exception occurred. Please resubmit form or contact administration.
+  </p>
+  <a href="{{ url_for('api.index') }}" class="cg-btn cg-btn-primary">
+    <i class="fa-solid fa-house"></i> Return Home
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+# Model Evaluation Report
+
+The best registered model is **logistic_regression**.
+
+## 1. Classification Metrics Summary
+```text
+              precision    recall  f1-score   support
+
+    Approved       0.95      0.73      0.83       925
+    Rejected       0.14      0.55      0.23        75
+
+    accuracy                           0.72      1000
+   macro avg       0.55      0.64      0.53      1000
+weighted avg       0.89      0.72      0.78      1000
+
+```

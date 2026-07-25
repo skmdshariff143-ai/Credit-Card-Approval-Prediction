@@ -28,7 +28,7 @@ The CreditGuard AI codebase has successfully transitioned from a broken, untrust
 ## Issue 4: sklearn Monkeypatch & Version Pinning
 - **Root Cause**: The scikit-learn tags patch was defined inline as a global monkeypatch at the top of the main training pipeline `src/main.py`. Dependencies in `requirements.txt` used relaxed matching bounds (e.g. `>=`), risking environment drift.
 - **Fix**: Pinned exact compatible versions of `scikit-learn==1.6.0`, `xgboost==2.1.3`, and `imbalanced-learn==0.14.2` in `requirements.txt`. Refactored the monkeypatch into a clean compatibility utility module `src/utils/sklearn_compat.py` with clear documentation of target versions and a `# TODO` marker. Safely imported this utility in `src/main.py` and `app/app.py` (with fallback handlers for serverless runtimes).
-- **Verification Evidence**: Ran the full pytest test suite (115 tests) after decoupling the patch and isolating test-suite database writes. All tests passed successfully.
+- **Verification Evidence**: Ran the full pytest test suite (119 tests) after decoupling the patch and isolating test-suite database writes. All tests passed successfully.
 
 ## Issue 5: Database Migration to Supabase Postgres (RESOLVED)
 - **Root Cause**: SQLite database stored in Vercel's `/tmp` directory was ephemeral and would reset on cold starts.
@@ -43,7 +43,7 @@ The CreditGuard AI codebase has successfully transitioned from a broken, untrust
 ## Issue 7: Replace Vanity Test Coverage
 - **Root Cause**: The test suite contained a vanity test (`test_app_main` inside `tests/test_coverage_boost.py`) which called `runpy.run_path` just to execute `app.py` under the `__main__` entrypoint to artificially inflate code coverage statistics.
 - **Fix**: Audited all tests in `test_coverage_boost.py`. Removed the `runpy` dependency and deleted `test_app_main`. Confirmed that the remaining 35 test cases in the file are actual valuable behavioral tests with real assertions verifying business logic constraints (e.g., debt-to-income and bad credit rejections).
-- **Verification Evidence**: Re-ran the test suite with coverage tracking. Verified that all 114 test cases pass cleanly, reporting an honest and genuine code coverage of 86% overall (with an 81% baseline code coverage excluding rules and boundary checks). Updated `reports/Testing_Report.md` with these honest statistics.
+- **Verification Evidence**: Re-ran the test suite with coverage tracking. Verified that all 119 test cases pass cleanly, reporting an honest and genuine code coverage of 86% overall (with an 81% baseline code coverage excluding rules and boundary checks). Updated `reports/Testing_Report.md` with these honest statistics.
 
 ## Issue 8: Consolidate Duplicated Documentation
 - **Root Cause**: The repository contained multiple copies of the phase documentation directories under `Project Documentation/`, duplicates of `Interview_QA.md` inside `interview/`, and separate overlapping deployment report files.

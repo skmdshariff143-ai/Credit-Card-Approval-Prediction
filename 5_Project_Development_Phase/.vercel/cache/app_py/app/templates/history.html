@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History | CreditGuard AI{% endblock %}
+{% block page_id %}page-history{% endblock %}
+
+{% block content %}
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <span class="current">Prediction History</span>
+  </div>
+  <h1 class="cg-page-title">Prediction History</h1>
+  <p class="cg-page-desc">Track, filter, and review all credit card evaluation records.</p>
+</div>
+
+<!-- History table panel -->
+<div class="cg-table-wrap cg-fade-in" data-reveal="0s">
+  <!-- Table Toolbar -->
+  <div class="cg-table-toolbar">
+    <!-- Search form -->
+    <form method="GET" action="{{ url_for('api.history') }}" class="cg-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" name="search" value="{{ search or '' }}" placeholder="Search by Application ID...">
+      {% if decision != 'All' %}<input type="hidden" name="decision" value="{{ decision }}">{% endif %}
+      {% if risk_level != 'All' %}<input type="hidden" name="risk_level" value="{{ risk_level }}">{% endif %}
+    </form>
+
+    <!-- Filters and Exports -->
+    <div class="cg-flex cg-gap-sm" style="align-items:center;">
+      <a href="{{ url_for('api.history', decision='All', risk_level=risk_level, search=search) }}" class="cg-chip {% if decision == 'All' %}active{% endif %}">All</a>
+      <a href="{{ url_for('api.history', decision='Approved', risk_level=risk_level, search=search) }}" class="cg-chip {% if decision == 'Approved' %}active{% endif %}">Approved</a>
+      <a href="{{ url_for('api.history', decision='Rejected', risk_level=risk_level, search=search) }}" class="cg-chip {% if decision == 'Rejected' %}active{% endif %}">Rejected</a>
+      
+      <a href="{{ url_for('api.export_history_csv') }}" class="cg-btn cg-btn-secondary cg-btn-sm" title="Export CSV">
+        <i class="fa-solid fa-file-csv"></i> Export CSV
+      </a>
+      <a href="{{ url_for('api.export_history_json') }}" class="cg-btn cg-btn-secondary cg-btn-sm" title="Export JSON">
+        <i class="fa-solid fa-file-code"></i> Export JSON
+      </a>
+    </div>
+  </div>
+
+  <!-- Table Element -->
+  <table class="cg-table">
+    <thead>
+      <tr>
+        <th>Application ID</th>
+        <th>Date</th>
+        <th>Annual Income</th>
+        <th>Sector</th>
+        <th>Decision</th>
+        <th>Confidence</th>
+        <th>Risk Level</th>
+        <th style="text-align:right;">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in history %}
+        <tr>
+          <td class="cg-mono cg-font-bold">{{ item.application_id }}</td>
+          <td>{{ item.timestamp[:10] }}</td>
+          <td class="cg-mono">${{ '{:,.0f}'.format(item.income|float) }}</td>
+          <td class="cg-text-sm">{{ item.employment }}</td>
+          <td>
+            <span class="cg-badge {% if item.prediction == 'Approved' %}success{% else %}danger{% endif %}">
+              {{ item.prediction }}
+            </span>
+          </td>
+          <td class="cg-mono">{{ '%.1f'|format(item.probability) }}%</td>
+          <td>
+            <span class="cg-badge {% if item.risk_level == 'Low' %}success{% elif item.risk_level == 'High' %}danger{% else %}warning{% endif %}">
+              {{ item.risk_level }}
+            </span>
+          </td>
+          <td style="text-align:right;">
+            <div class="cg-flex cg-gap-sm" style="justify-content:flex-end;align-items:center;">
+              <a href="{{ url_for('api.get_report', application_id=item.application_id) }}" class="cg-btn cg-btn-ghost cg-btn-sm">
+                View Report
+              </a>
+              <form method="POST" action="{{ url_for('api.delete_history_entry', application_id=item.application_id) }}" style="display:inline;" onsubmit="return confirm('Delete this record permanently?');">
+                <button type="submit" class="cg-btn cg-btn-danger cg-btn-sm cg-btn-icon" aria-label="Delete entry">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr>
+          <td colspan="8" class="cg-text-center cg-text-muted" style="padding:40px;">
+            <i class="fa-solid fa-folder-open" style="font-size:24px;margin-bottom:12px;display:block;"></i>
+            No history logs found. Run a new credit evaluation wizard first.
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Pagination footer -->
+  <div class="cg-table-footer">
+    <div>Page {{ page }} of {{ total_pages or 1 }}</div>
+    <div class="cg-pagination">
+      {% if page > 1 %}
+        <a href="{{ url_for('api.history', page=page-1, search=search, decision=decision, risk_level=risk_level) }}" class="cg-page-btn">
+          <i class="fa-solid fa-angle-left"></i>
+        </a>
+      {% endif %}
+      
+      {% for p in range(1, total_pages + 1) %}
+        {% if p == page %}
+          <span class="cg-page-btn active">{{ p }}</span>
+        {% else %}
+          <a href="{{ url_for('api.history', page=p, search=search, decision=decision, risk_level=risk_level) }}" class="cg-page-btn">{{ p }}</a>
+        {% endif %}
+      {% endfor %}
+
+      {% if page < total_pages %}
+        <a href="{{ url_for('api.history', page=page+1, search=search, decision=decision, risk_level=risk_level) }}" class="cg-page-btn">
+          <i class="fa-solid fa-angle-right"></i>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Clear history block -->
+{% if history %}
+  <div class="cg-flex-between cg-mt-lg" data-reveal="0.1s">
+    <div></div>
+    <form method="POST" action="{{ url_for('api.clear_user_history') }}" onsubmit="return confirm('WARNING: This will delete ALL assessment history logs. Continue?');">
+      <button type="submit" class="cg-btn cg-btn-danger">
+        <i class="fa-solid fa-trash-can"></i> Clear All History Logs
+      </button>
+    </form>
+  </div>
+{% endif %}
+{% endblock %}

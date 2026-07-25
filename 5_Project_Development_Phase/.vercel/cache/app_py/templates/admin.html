@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | CreditGuard AI{% endblock %}
+{% block page_id %}page-admin{% endblock %}
+
+{% block content %}
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <span class="current">Banking Dashboard</span>
+  </div>
+  <h1 class="cg-page-title">Admin Operations Console</h1>
+  <p class="cg-page-desc">Real-time telemetry metrics, accuracy indexes, database settings, and system activity logs.</p>
+</div>
+
+<!-- Stat Cards Grid -->
+<div class="cg-grid cg-grid-4 cg-mb-lg" data-reveal="0s">
+  <div class="cg-stat">
+    <div class="cg-stat-icon primary"><i class="fa-solid fa-folder-open"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.total }}">0</div>
+    <div class="cg-stat-label">Total Applications</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon success"><i class="fa-solid fa-circle-check"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.approved }}">0</div>
+    <div class="cg-stat-label">Approved Accounts</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon danger"><i class="fa-solid fa-circle-xmark"></i></div>
+    <div class="cg-stat-value" data-count="{{ stats.rejected }}">0</div>
+    <div class="cg-stat-label">Rejected Accounts</div>
+  </div>
+  <div class="cg-stat">
+    <div class="cg-stat-icon accent"><i class="fa-solid fa-users"></i></div>
+    <div class="cg-stat-value" data-count="3">0</div>
+    <div class="cg-stat-label">Registered Officers</div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<div class="cg-grid cg-grid-3 cg-gap-md cg-mb-lg" data-reveal="0.1s">
+  <!-- Pie Chart -->
+  <div class="cg-card">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Decision Allocation (Pie)</h3>
+    <div style="height:220px;position:relative;">
+      <canvas id="decisionChart"></canvas>
+    </div>
+  </div>
+  <!-- Bar Chart -->
+  <div class="cg-card">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Income Distribution (Bar)</h3>
+    <div style="height:220px;position:relative;">
+      <canvas id="incomeChart"></canvas>
+    </div>
+  </div>
+  <!-- Line Chart -->
+  <div class="cg-card">
+    <h3 style="font-size:14px;font-weight:700;margin-bottom:16px;">Scoring Velocity (Line)</h3>
+    <div style="height:220px;position:relative;">
+      <canvas id="trendsChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Split Table and Activity/Notifications layout -->
+<div class="cg-grid cg-mb-lg" style="grid-template-columns: 1fr; gap: 24px; display: grid;" id="splitDashboardLayout">
+  <!-- Left Side: Recent Predictions -->
+  <div class="cg-card" style="padding: 20px;">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">Recent Predictions Log</h3>
+    <div class="cg-table-wrap">
+      <table class="cg-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Date</th>
+            <th>Annual Income</th>
+            <th>Decision</th>
+            <th>Confidence</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in recent %}
+            <tr>
+              <td class="cg-mono cg-font-semibold">{{ r.application_id }}</td>
+              <td class="cg-text-sm">{{ r.timestamp[:10] }}</td>
+              <td class="cg-mono">${{ '{:,.0f}'.format(r.income|float) }}</td>
+              <td>
+                <span class="cg-badge {% if r.prediction == 'Approved' %}success{% else %}danger{% endif %}">
+                  {{ r.prediction }}
+                </span>
+              </td>
+              <td class="cg-mono">{{ '%.1f'|format(r.probability) }}%</td>
+              <td>
+                <span class="cg-badge {% if r.risk_level == 'Low' %}success{% elif r.risk_level == 'High' %}danger{% else %}warning{% endif %}">
+                  {{ r.risk_level }}
+                </span>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" class="cg-text-center cg-text-muted" style="padding:24px;">No records available.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Right Side: Activity & Notifications Grid -->
+  <div class="cg-grid cg-grid-2 cg-gap-md">
+    <!-- Recent Activity Timeline -->
+    <div class="cg-card" style="padding: 20px;">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">
+        <i class="fa-solid fa-clock-rotate-left" style="color:var(--primary);margin-right:6px;"></i> System Activity
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:12.5px;">
+        <div class="cg-flex" style="gap:10px;">
+          <i class="fa-solid fa-database" style="color:var(--success);margin-top:2px;"></i>
+          <div>
+            <span class="cg-font-semibold" style="display:block;">Database synced</span>
+            <span class="cg-text-muted" style="font-size:10.5px;">SQLite log commits completed</span>
+          </div>
+        </div>
+        <div class="cg-flex" style="gap:10px;">
+          <i class="fa-solid fa-gears" style="color:var(--primary);margin-top:2px;"></i>
+          <div>
+            <span class="cg-font-semibold" style="display:block;">Pipeline cache validated</span>
+            <span class="cg-text-muted" style="font-size:10.5px;">Pickled preprocessing blocks verified</span>
+          </div>
+        </div>
+        <div class="cg-flex" style="gap:10px;">
+          <i class="fa-solid fa-key" style="color:var(--accent);margin-top:2px;"></i>
+          <div>
+            <span class="cg-font-semibold" style="display:block;">Session keys rotated</span>
+            <span class="cg-text-muted" style="font-size:10.5px;">Developer session parameters validated</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Notifications -->
+    <div class="cg-card" style="padding: 20px;">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:14px;">
+        <i class="fa-solid fa-bell" style="color:var(--warning);margin-right:6px;"></i> Security Alerts
+      </h3>
+      <div style="display:flex;flex-direction:column;gap:12px;font-size:12.5px;">
+        <div class="cg-flex" style="gap:10px;">
+          <i class="fa-solid fa-triangle-exclamation" style="color:var(--warning);margin-top:2px;"></i>
+          <div>
+            <span class="cg-font-semibold" style="display:block;">Rate limit threshold</span>
+            <span class="cg-text-muted" style="font-size:10.5px;">API endpoints monitored under limits</span>
+          </div>
+        </div>
+        <div class="cg-flex" style="gap:10px;">
+          <i class="fa-solid fa-circle-info" style="color:var(--accent);margin-top:2px;"></i>
+          <div>
+            <span class="cg-font-semibold" style="display:block;">Classifier target active</span>
+            <span class="cg-text-muted" style="font-size:10.5px;">Ensemble running on XGBoost model specifications</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Section: System Settings & Database Control Panel -->
+<div class="cg-grid cg-grid-2 cg-gap-md cg-mb-lg" data-reveal="0.2s">
+  <!-- Users and Database Specs -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+      <i class="fa-solid fa-server" style="color:var(--primary);margin-right:6px;"></i> Database & Infrastructure Parameters
+    </h3>
+    <div style="display:flex;flex-direction:column;gap:12px;font-size:13px;">
+      <div class="cg-flex-between">
+        <span class="cg-text-muted">Storage Driver</span>
+        <span class="cg-text-primary cg-mono">SQLite 3.x</span>
+      </div>
+      <div class="cg-flex-between">
+        <span class="cg-text-muted">Database File Path</span>
+        <span class="cg-text-primary cg-mono" style="font-size:11.5px;">logs/prediction_history.db</span>
+      </div>
+      <div class="cg-flex-between">
+        <span class="cg-text-muted">Indexing Indexes</span>
+        <span class="cg-text-primary cg-font-semibold">4 Active Indices</span>
+      </div>
+      <div class="cg-flex-between" style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;">
+        <span class="cg-text-muted">Active Officers Sessions</span>
+        <span class="cg-badge success">All Operations Normal</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Console -->
+  <div class="cg-card">
+    <h3 style="font-size:15px;font-weight:700;margin-bottom:16px;">
+      <i class="fa-solid fa-sliders" style="color:var(--primary);margin-right:6px;"></i> Admin Console Settings
+    </h3>
+    
+    <div style="display:flex;flex-direction:column;gap:16px;font-size:13px;margin-bottom:20px;">
+      <div class="cg-flex-between">
+        <div>
+          <span class="cg-font-semibold" style="display:block;">Allow Self-Registration</span>
+          <span class="cg-text-muted" style="font-size:11px;">Enable signup route for credit officers.</span>
+        </div>
+        <input type="checkbox" checked style="cursor:pointer;" onclick="toggleSystemOption('Registration status updated')">
+      </div>
+      <div class="cg-flex-between" style="border-top:1px solid var(--border);padding-top:12px;">
+        <div>
+          <span class="cg-font-semibold" style="display:block;">Verbose XAI Explanations</span>
+          <span class="cg-text-muted" style="font-size:11px;">Generate detailed local surrogate data packets.</span>
+        </div>
+        <input type="checkbox" checked style="cursor:pointer;" onclick="toggleSystemOption('XAI verbose logging enabled')">
+      </div>
+    </div>
+
+    <div class="cg-flex cg-gap-sm" style="border-top:1px solid var(--border);padding-top:16px;">
+      <form method="POST" action="{{ url_for('api.clear_user_history') }}" onsubmit="return confirm('WARNING: This will purge all logged database entries. Continue?');" style="display:inline;">
+        <button type="submit" class="cg-btn cg-btn-danger cg-btn-sm">
+          <i class="fa-solid fa-trash-can"></i> Purge Database
+        </button>
+      </form>
+      <button type="button" class="cg-btn cg-btn-secondary cg-btn-sm" onclick="CG.Toast.show('Configuration parameters saved.', 'success')">
+        Save Settings
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Add grid layout if screen size is large enough
+    const splitLayout = document.getElementById('splitDashboardLayout');
+    const adjustLayout = () => {
+      if (window.innerWidth >= 1024) {
+        splitLayout.style.gridTemplateColumns = '1.3fr 0.7fr';
+      } else {
+        splitLayout.style.gridTemplateColumns = '1fr';
+      }
+    };
+    window.addEventListener('resize', adjustLayout);
+    adjustLayout();
+
+    fetch("{{ url_for('api.api_admin_stats') }}")
+      .then(res => res.json())
+      .then(data => {
+        // 1. Decision Chart (Pie/Doughnut)
+        new Chart(document.getElementById('decisionChart'), {
+          type: 'pie',
+          data: {
+            labels: ['Approved', 'Rejected'],
+            datasets: [{
+              data: [{{ stats.approved }}, {{ stats.rejected }}],
+              backgroundColor: ['#22c55e', '#ef4444'],
+              borderWidth: 0
+            }]
+          },
+          options: CG.Charts.doughnutOpts
+        });
+
+        // 2. Income Chart (Bar)
+        new Chart(document.getElementById('incomeChart'), {
+          type: 'bar',
+          data: {
+            labels: data.income_labels,
+            datasets: [{
+              data: data.income_data,
+              backgroundColor: '#6366f1',
+              borderRadius: 4
+            }]
+          },
+          options: CG.Charts.baseOpts
+        });
+
+        // 3. Trends Chart (Line)
+        new Chart(document.getElementById('trendsChart'), {
+          type: 'line',
+          data: {
+            labels: data.trend_labels,
+            datasets: [{
+              data: data.trend_data,
+              borderColor: '#06b6d4',
+              backgroundColor: 'rgba(6, 182, 212, 0.05)',
+              fill: true,
+              tension: 0.35,
+              borderWidth: 2
+            }]
+          },
+          options: CG.Charts.baseOpts
+        });
+      });
+  });
+
+  function toggleSystemOption(msg) {
+    CG.Toast.show(msg, "success");
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,441 @@
+{% extends "base.html" %}
+
+{% block title %}Decision Dashboard | CreditGuard AI{% endblock %}
+{% block page_id %}page-result{% endblock %}
+
+{% block head %}
+<style>
+  /* ── Premium AI Decision Dashboard Styles ── */
+  .cg-result-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+  @media (min-width: 1024px) {
+    .cg-result-grid {
+      grid-template-columns: 340px 1fr;
+    }
+  }
+
+  /* Status Cards (Glassmorphism & animations) */
+  .cg-result-status-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: 32px 24px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .cg-result-status-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: var(--gradient-card);
+    pointer-events: none;
+  }
+
+  /* Ambient Glows */
+  .cg-outcome-glow {
+    position: absolute;
+    top: -50px;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.15;
+    pointer-events: none;
+  }
+  .cg-outcome-glow.approved { background: var(--success); }
+  .cg-outcome-glow.rejected { background: var(--danger); }
+
+  .cg-status-icon-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .cg-status-icon-wrap.approved {
+    background: var(--success-muted);
+    color: var(--success);
+    border: 1px solid rgba(34,197,94,0.3);
+    animation: cg-pulse-success 2s infinite;
+  }
+  .cg-status-icon-wrap.rejected {
+    background: var(--danger-muted);
+    color: var(--danger);
+    border: 1px solid rgba(239,68,68,0.3);
+    animation: cg-pulse-danger 2s infinite;
+  }
+  @keyframes cg-pulse-success {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+    70% { box-shadow: 0 0 0 16px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+  }
+  @keyframes cg-pulse-danger {
+    0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    70% { box-shadow: 0 0 0 16px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+  }
+
+  /* SVG Radar Circular progress meter */
+  .cg-radar-gauge {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin-bottom: 24px;
+  }
+  .cg-radar-svg {
+    transform: rotate(-90deg);
+  }
+  .cg-radar-bg {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 6;
+  }
+  .cg-radar-fill {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s var(--ease);
+  }
+  .cg-radar-fill.approved { stroke: var(--success); }
+  .cg-radar-fill.rejected { stroke: var(--danger); }
+  
+  .cg-radar-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .cg-radar-value {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    color: var(--text-primary);
+  }
+  .cg-radar-sub {
+    font-size: 10px;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Metric cards */
+  .cg-metric-pill {
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  /* Timeline Audit Trail */
+  .cg-audit-timeline {
+    position: relative;
+    padding-left: 20px;
+    margin-top: 16px;
+  }
+  .cg-audit-timeline::before {
+    content: ''; position: absolute; left: 4px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--border);
+  }
+  .cg-timeline-node {
+    position: relative;
+    padding-bottom: 16px;
+  }
+  .cg-timeline-node:last-child {
+    padding-bottom: 0;
+  }
+  .cg-timeline-dot {
+    position: absolute;
+    left: -20px; top: 4px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--bg-app);
+    border: 2px solid var(--border);
+  }
+  .cg-timeline-dot.done {
+    border-color: var(--primary);
+    background: var(--primary);
+  }
+  .cg-timeline-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  .cg-timeline-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* Interactive contribution factors list */
+  .cg-factor-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    transition: all var(--t-fast) var(--ease);
+  }
+  .cg-factor-card:hover {
+    border-color: rgba(255,255,255,0.12);
+    transform: translateX(4px);
+  }
+  .cg-factor-badge {
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .cg-factor-badge.positive { background: var(--success-muted); color: var(--success); }
+  .cg-factor-badge.negative { background: var(--danger-muted); color: var(--danger); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="cg-page-header">
+  <div class="cg-breadcrumb">
+    <a href="{{ url_for('api.index') }}">Home</a>
+    <span class="sep">›</span>
+    <a href="{{ url_for('api.predict_get') }}">Assessment Wizard</a>
+    <span class="sep">›</span>
+    <span class="current">AI Decision Dashboard</span>
+  </div>
+  <h1 class="cg-page-title">AI Decision Dashboard</h1>
+  <p class="cg-page-desc">Automated prediction results and explainable AI risk assessments.</p>
+</div>
+
+<div class="cg-result-grid cg-fade-in" data-reveal="0s">
+  <!-- Left Side: Result Card, Gauge, Meta -->
+  <div>
+    <div class="cg-result-status-card">
+      <div class="cg-outcome-glow {% if result == 'Approved' %}approved{% else %}rejected{% endif %}"></div>
+
+      <!-- Pulse Icon -->
+      <div class="cg-status-icon-wrap {% if result == 'Approved' %}approved{% else %}rejected{% endif %}">
+        {% if result == 'Approved' %}
+          <i class="fa-solid fa-circle-check"></i>
+          <!-- Approved -->
+        {% else %}
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <!-- Rejected -->
+        {% endif %}
+      </div>
+
+      <h2 style="font-size: 15px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 12px; line-height: 1.4; padding: 0 10px;">
+        {% if result == 'Approved' %}
+          Your application has a {{ '%.1f'|format(probability) }}% approval probability.
+        {% else %}
+          Your application has a {{ '%.1f'|format(100 - probability) }}% risk of delinquency.
+        {% endif %}
+      </h2>
+      <p class="cg-app-id cg-mb-md">{{ application_id }}</p>
+
+      <!-- SVG Circular progress meter -->
+      <div class="cg-radar-gauge">
+        <svg class="cg-radar-svg" width="160" height="160">
+          <circle class="cg-radar-bg" cx="80" cy="80" r="70"/>
+          <circle class="cg-radar-fill {% if result == 'Approved' %}approved{% else %}rejected{% endif %}" cx="80" cy="80" r="70" data-pct="{{ probability }}"/>
+        </svg>
+        <div class="cg-radar-label">
+          <span class="cg-radar-value">{{ '%.1f'|format(probability) }}%</span>
+          <span class="cg-radar-sub">Confidence</span>
+        </div>
+      </div>
+
+      <!-- Metric Pills -->
+      <div class="cg-metric-pill">
+        <span class="cg-text-xs cg-text-muted">Risk Category</span>
+        <span class="cg-badge {% if risk_level == 'Low' %}success{% elif risk_level == 'High' %}danger{% else %}warning{% endif %}" style="font-size:10.5px;padding:2px 8px;">
+          {{ risk_level }}
+        </span>
+      </div>
+
+      <div class="cg-metric-pill">
+        <span class="cg-text-xs cg-text-muted">Model Classifier</span>
+        <span class="cg-text-xs cg-text-primary cg-font-semibold">{{ model_used }}</span>
+      </div>
+
+      <div class="cg-metric-pill">
+        <span class="cg-text-xs cg-text-muted">Time Index</span>
+        <span class="cg-text-xs cg-text-primary cg-mono">{{ date }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side: Explanations, Audit Timeline, Factors, Recommendations -->
+  <div class="cg-grid cg-gap-md">
+    <!-- AI Explanation Card -->
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
+        <i class="fa-solid fa-brain" style="color:var(--primary);margin-right:6px;"></i> Decision Interpretation
+      </h3>
+      <p style="font-size:13.5px;color:var(--text-secondary);line-height:1.6;margin-bottom:16px;">
+        {% if result == 'Approved' %}
+          The model predicts a <strong>high likelihood of good credit repayment</strong> capacity. The socio-economic attributes and low debt ratios indicate excellent risk coverage.
+        {% else %}
+          The model flags potential <strong>credit delinquency risk factors</strong>. Key elements in the profile indicate cash flow instability or prior payment defaults.
+        {% endif %}
+      </p>
+
+      <!-- Business rules triggered -->
+      <h4 style="font-size:12px;font-weight:700;margin-bottom:10px;text-transform:uppercase;color:var(--text-muted);letter-spacing:0.5px;">Business Rules Triggered</h4>
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+        {% for reason in reasons %}
+          <div class="cg-flex" style="gap:10px;align-items:flex-start;font-size:13px;">
+            {% if result == 'Approved' %}
+              <i class="fa-solid fa-circle-check" style="color:var(--success);margin-top:3px;flex-shrink:0;"></i>
+            {% else %}
+              <i class="fa-solid fa-circle-xmark" style="color:var(--danger);margin-top:3px;flex-shrink:0;"></i>
+            {% endif %}
+            <span style="color:var(--text-secondary);">{{ reason }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Decision Audit Timeline -->
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
+        <i class="fa-solid fa-timeline" style="color:var(--primary);margin-right:6px;"></i> Decision Audit Timeline
+      </h3>
+      <div class="cg-audit-timeline">
+        <div class="cg-timeline-node">
+          <div class="cg-timeline-dot done"></div>
+          <div class="cg-timeline-title">Application Submitted</div>
+          <div class="cg-timeline-desc">Profile telemetry completed at {{ date }}</div>
+        </div>
+        <div class="cg-timeline-node">
+          <div class="cg-timeline-dot done"></div>
+          <div class="cg-timeline-title">Robust Scale Normalization</div>
+          <div class="cg-timeline-dot done"></div>
+          <div class="cg-timeline-desc">Demographics, experience, and DTI indicators scaled.</div>
+        </div>
+        <div class="cg-timeline-node">
+          <div class="cg-timeline-dot done"></div>
+          <div class="cg-timeline-title">ML Classifier Classification</div>
+          <div class="cg-timeline-desc">Inference scored via active {{ model_used }} module in {{ prediction_time }}ms.</div>
+        </div>
+        <div class="cg-timeline-node">
+          <div class="cg-timeline-dot done"></div>
+          <div class="cg-timeline-title">SQLite Ledger Log Saved</div>
+          <div class="cg-timeline-desc">Prediction committed and indexed under application ID {{ application_id }}.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature Contributions (Positive/Negative LIME factors) -->
+    {% if support_factors or risk_factors %}
+      <div class="cg-grid cg-grid-2 cg-gap-sm">
+        <!-- Supporting -->
+        <div class="cg-card" style="padding:18px;">
+          <h3 style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--success);">
+            <i class="fa-solid fa-plus-circle" style="margin-right:6px;"></i> Support Indicators
+          </h3>
+          {% for f in support_factors %}
+            <div class="cg-factor-card">
+              <span class="cg-text-secondary" style="font-size:12.5px;">{{ f.feature }}</span>
+              <span class="cg-factor-badge positive">+{{ '%.1f'|format(f.contribution * 100) }}%</span>
+            </div>
+          {% else %}
+            <span class="cg-text-xs cg-text-muted">No positive indicators computed.</span>
+          {% endfor %}
+        </div>
+
+        <!-- Risk factors -->
+        <div class="cg-card" style="padding:18px;">
+          <h3 style="font-size:13.5px;font-weight:700;margin-bottom:12px;color:var(--danger);">
+            <i class="fa-solid fa-minus-circle" style="margin-right:6px;"></i> Risk Indicators
+          </h3>
+          {% for f in risk_factors %}
+            <div class="cg-factor-card">
+              <span class="cg-text-secondary" style="font-size:12.5px;">{{ f.feature }}</span>
+              <span class="cg-factor-badge negative">-{{ '%.1f'|format(f.contribution * 100) }}%</span>
+            </div>
+          {% else %}
+            <span class="cg-text-xs cg-text-muted">No risk factors computed.</span>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Recommendations -->
+    <div class="cg-card">
+      <h3 style="font-size:15px;font-weight:700;margin-bottom:12px;">
+        <i class="fa-solid fa-lightbulb" style="color:var(--warning);margin-right:6px;"></i> Actionable Recommendations
+      </h3>
+      <div style="display:grid;grid-template-columns:1fr;gap:8px;">
+        {% for rec in recommendations %}
+          <div class="cg-flex" style="gap:10px;align-items:flex-start;font-size:13px;">
+            <i class="fa-solid fa-arrow-right-long" style="color:var(--primary);margin-top:4px;flex-shrink:0;"></i>
+            <span style="color:var(--text-secondary);">{{ rec }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Actions Row -->
+    <div class="cg-flex cg-gap-md cg-mt-md" style="flex-wrap:wrap;">
+      <a href="{{ url_for('api.get_report', application_id=application_id) }}" class="cg-btn cg-btn-primary">
+        <i class="fa-solid fa-file-pdf"></i> Download PDF
+      </a>
+      <button type="button" class="cg-btn cg-btn-secondary" onclick="shareDecisionLocal()">
+        <i class="fa-solid fa-share-nodes"></i> Share
+      </button>
+      <a href="{{ url_for('api.predict_get') }}" class="cg-btn cg-btn-secondary">
+        <i class="fa-solid fa-rotate-right"></i> Predict Again
+      </a>
+      <a href="{{ url_for('api.history') }}" class="cg-btn cg-btn-ghost">
+        Dashboard
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Trigger gauge animations
+  document.addEventListener('DOMContentLoaded', () => {
+    const fill = document.querySelector('.cg-radar-fill');
+    if (fill) {
+      const pct = parseFloat(fill.dataset.pct || 0);
+      const circumference = 2 * Math.PI * 70;
+      fill.style.strokeDasharray = circumference;
+      fill.style.strokeDashoffset = circumference;
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          fill.style.strokeDashoffset = circumference - (circumference * pct / 100);
+        }, 300);
+      });
+    }
+  });
+
+  function shareDecisionLocal() {
+    const shareUrl = window.location.origin + "{{ url_for('api.get_report', application_id=application_id) }}";
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      CG.Toast.show("Report share link copied to clipboard!", "success");
+    }).catch(() => {
+      CG.Toast.show("Failed to copy share link.", "danger");
+    });
+  }
+</script>
+{% endblock %}

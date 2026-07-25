@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_7G2oLiSpO0Wgyoi39etry0Py1WZE",
+  "orgId": "team_J1DYhRPYmArh3STLVOFj38nB",
+  "projectName": "credit-card-approval-prediction",
+  "settings": {
+    "createdAt": 1783099098674,
+    "framework": null,
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}

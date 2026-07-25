@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CreditGuard AI - Portfolio Website</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="index.html">
+                <i class="bi bi-shield-check text-primary fs-3 me-2"></i>
+                <span class="fw-bold">CreditGuard AI</span>
+            </a>
+            <div class="d-flex align-items-center gap-2 order-lg-last">
+                <button class="btn btn-outline-secondary btn-sm" id="themeToggle" aria-label="Toggle dark mode">
+                    <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+                </button>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto gap-2">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link" href="project.html">Project Details</a></li>
+                    <li class="nav-item"><a class="nav-link active fw-bold" href="architecture.html">Architecture</a></li>
+                    <li class="nav-item"><a class="nav-link" href="results.html">Results</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <h1 class="fw-bold mb-4">System Architecture & Diagrams</h1>
+        <hr class="mb-5">
+        
+        <div class="row g-5">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                    <div class="card-body p-4 text-center">
+                        <h4 class="fw-bold mb-3">System Architecture</h4>
+                        <img src="assets/images/Architecture_Diagram.png" alt="Architecture Diagram" class="img-fluid rounded mb-3 shadow-sm">
+                        <p class="text-muted text-start sm">Illustrates the system layers: data loading, preprocessing pipelines, model training registry, and the Gunicorn flask application backed by SQLite persistent history storage.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                    <div class="card-body p-4 text-center">
+                        <h4 class="fw-bold mb-3">Entity-Relationship Model</h4>
+                        <img src="assets/images/ER_Diagram.png" alt="ER Diagram" class="img-fluid rounded mb-3 shadow-sm">
+                        <p class="text-muted text-start sm">Documents dataset table schemas, primary keys, and data relationships linking demographic profiles with credit records.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100 bg-body-tertiary">
+                    <div class="card-body p-4 text-center">
+                        <h4 class="fw-bold mb-3">ML Execution Flowchart</h4>
+                        <img src="assets/images/Flowchart.png" alt="Execution Flowchart" class="img-fluid rounded mb-3 shadow-sm">
+                        <p class="text-muted text-start sm">Outlines the processing steps: data cleansing, outlier capping, feature selection metrics, model training, cross-validation, and production serialization.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer py-5 mt-auto">
+        <div class="container text-center">
+            <p class="mb-2"><strong>CreditGuard AI</strong> — Enterprise Credit Risk Scoring System</p>
+            <p class="text-muted mb-4">Developed by Mahammad Shariff Shaik (skmdshariff143-ai)</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" class="text-muted text-decoration-none fs-4"><i class="bi bi-github"></i></a>
+                <a href="#" class="text-muted text-decoration-none fs-4"><i class="bi bi-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="assets/js/script.js"></script>
+</body>
+</html>

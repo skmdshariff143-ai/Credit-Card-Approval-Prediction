@@ -1,0 +1,562 @@
+2026-06-29 15:53:28,600 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 15:53:51,579 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 15:57:40,726 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 16:00:06,008 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 16:00:20,088 - __main__ - INFO - ml_pipeline.py:27 - ==========================================
+2026-06-29 16:00:20,089 - __main__ - INFO - ml_pipeline.py:28 - STARTING CREDIT CARD APPROVAL ML PIPELINE
+2026-06-29 16:00:20,089 - __main__ - INFO - ml_pipeline.py:29 - ==========================================
+2026-06-29 16:00:20,090 - __main__ - INFO - ml_pipeline.py:33 - --- Step 1: Ingesting Data ---
+2026-06-29 16:00:20,107 - src.data.data_loader - INFO - data_loader.py:32 - Loading application records from: e:/Credit-Card-Approval-Prediction/data/raw/application_record.csv
+2026-06-29 16:00:20,154 - src.data.data_loader - INFO - data_loader.py:39 - Successfully loaded application records with shape: (5000, 18)
+2026-06-29 16:00:20,154 - src.data.data_loader - INFO - data_loader.py:49 - Loading credit records from: e:/Credit-Card-Approval-Prediction/data/raw/credit_record.csv
+2026-06-29 16:00:20,268 - src.data.data_loader - INFO - data_loader.py:56 - Successfully loaded credit records with shape: (163037, 3)
+2026-06-29 16:00:20,269 - __main__ - INFO - ml_pipeline.py:38 - --- Step 2: Validating Data ---
+2026-06-29 16:00:20,269 - src.data.data_validator - INFO - data_validator.py:43 - Validating application record schema...
+2026-06-29 16:00:20,275 - src.data.data_validator - INFO - data_validator.py:55 - Unique IDs in application record: 5000 out of 5000
+2026-06-29 16:00:20,277 - src.data.data_validator - INFO - data_validator.py:65 - Application record validation passed successfully.
+2026-06-29 16:00:20,277 - src.data.data_validator - INFO - data_validator.py:72 - Validating credit record schema...
+2026-06-29 16:00:20,301 - src.data.data_validator - INFO - data_validator.py:90 - Credit record validation passed successfully.
+2026-06-29 16:00:20,301 - src.data.data_validator - INFO - data_validator.py:97 - Checking merge compatibility between datasets...
+2026-06-29 16:00:20,348 - src.data.data_validator - INFO - data_validator.py:102 - Overlapping IDs between application and credit: 5000
+2026-06-29 16:00:20,349 - src.data.data_validator - INFO - data_validator.py:108 - Merge compatibility check passed.
+2026-06-29 16:00:20,350 - __main__ - INFO - ml_pipeline.py:45 - --- Step 3: Cleaning and Merging Data ---
+2026-06-29 16:00:20,368 - src.data.data_cleaner - INFO - data_cleaner.py:97 - Starting clean and merge process...
+2026-06-29 16:00:20,368 - src.data.data_cleaner - INFO - data_cleaner.py:50 - Cleaning application records...
+2026-06-29 16:00:20,502 - src.data.data_cleaner - INFO - data_cleaner.py:77 - Missing values in OCCUPATION_TYPE: 2162 (43.24%)
+2026-06-29 16:00:20,509 - src.data.data_cleaner - INFO - data_cleaner.py:87 - Application records cleaned.
+2026-06-29 16:00:20,510 - src.data.data_cleaner - INFO - data_cleaner.py:26 - Aggregating credit records to label customers...
+2026-06-29 16:00:20,665 - src.data.data_cleaner - INFO - data_cleaner.py:40 - Credit aggregation complete. Good (0): 4625, Bad (1): 375
+2026-06-29 16:00:20,673 - src.data.data_cleaner - INFO - data_cleaner.py:107 - Merged dataset shape: (5000, 22)
+2026-06-29 16:00:20,786 - src.data.data_cleaner - INFO - data_cleaner.py:112 - Cleaned and merged dataset saved to: e:/Credit-Card-Approval-Prediction/data/processed/cleaned_merged.csv
+2026-06-29 16:00:20,787 - __main__ - INFO - ml_pipeline.py:50 - --- Step 4: Engineering Features ---
+2026-06-29 16:00:20,806 - src.features.feature_engineer - INFO - feature_engineer.py:57 - Starting feature engineering pipeline...
+2026-06-29 16:00:20,806 - src.features.feature_engineer - INFO - feature_engineer.py:41 - Creating custom features...
+2026-06-29 16:00:20,832 - src.features.feature_engineer - INFO - feature_engineer.py:73 - Train split shape: (4000, 20), Test split shape: (1000, 20)
+2026-06-29 16:00:20,832 - src.features.feature_engineer - INFO - feature_engineer.py:76 - Encoding categorical features...
+2026-06-29 16:00:20,877 - src.features.feature_engineer - INFO - feature_engineer.py:83 - Scaling numerical features...
+2026-06-29 16:00:20,898 - src.features.feature_engineer - INFO - feature_engineer.py:99 - Applying Random Oversampling to balance classes on the training set...
+2026-06-29 16:00:20,899 - src.features.feature_engineer - INFO - feature_engineer.py:100 - Class distribution before balancing: [3700  300]
+2026-06-29 16:00:20,931 - src.features.feature_engineer - INFO - feature_engineer.py:117 - Class distribution after balancing: [3700 3700]
+2026-06-29 16:00:20,945 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/scaler.joblib
+2026-06-29 16:00:20,960 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/encoder.joblib
+2026-06-29 16:00:20,970 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/feature_names.joblib
+2026-06-29 16:00:21,410 - src.features.feature_engineer - INFO - feature_engineer.py:141 - Feature engineering and artifact saving completed successfully.
+2026-06-29 16:00:21,414 - __main__ - INFO - ml_pipeline.py:55 - --- Step 5: Feature Selection Analysis ---
+2026-06-29 16:00:21,422 - src.features.feature_selector - INFO - feature_selector.py:20 - Running feature importance analysis using Random Forest...
+2026-06-29 16:00:21,831 - src.features.feature_selector - INFO - feature_selector.py:41 - Top 15 Features by Importance:
+2026-06-29 16:00:21,831 - src.features.feature_selector - INFO - feature_selector.py:43 - AMT_INCOME_TOTAL: 0.2139
+2026-06-29 16:00:21,832 - src.features.feature_selector - INFO - feature_selector.py:43 - INCOME_PER_MEMBER: 0.1758
+2026-06-29 16:00:21,832 - src.features.feature_selector - INFO - feature_selector.py:43 - EMPLOYED_TO_AGE_RATIO: 0.0816
+2026-06-29 16:00:21,832 - src.features.feature_selector - INFO - feature_selector.py:43 - AGE_YEARS: 0.0715
+2026-06-29 16:00:21,832 - src.features.feature_selector - INFO - feature_selector.py:43 - YEARS_EMPLOYED: 0.0707
+2026-06-29 16:00:21,832 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_FAM_MEMBERS: 0.0395
+2026-06-29 16:00:21,833 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_CHILDREN: 0.0301
+2026-06-29 16:00:21,833 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_INCOME_TYPE_Pensioner: 0.0180
+2026-06-29 16:00:21,833 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Higher education: 0.0172
+2026-06-29 16:00:21,833 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_F: 0.0165
+2026-06-29 16:00:21,833 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Secondary / secondary special: 0.0147
+2026-06-29 16:00:21,834 - src.features.feature_selector - INFO - feature_selector.py:43 - OCCUPATION_TYPE_Unknown: 0.0140
+2026-06-29 16:00:21,834 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_M: 0.0131
+2026-06-29 16:00:21,834 - src.features.feature_selector - INFO - feature_selector.py:43 - FLAG_OWN_CAR_N: 0.0128
+2026-06-29 16:00:21,834 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Lower secondary: 0.0123
+2026-06-29 16:00:21,835 - __main__ - INFO - ml_pipeline.py:60 - --- Step 6: Model Training & Hyperparameter Tuning ---
+2026-06-29 16:00:21,852 - src.models.model_trainer - INFO - model_trainer.py:28 - Training Logistic Regression...
+2026-06-29 16:00:22,013 - src.models.model_trainer - INFO - model_trainer.py:42 - Logistic Regression training complete.
+2026-06-29 16:00:22,013 - src.models.model_trainer - INFO - model_trainer.py:53 - Training Decision Tree Classifier...
+2026-06-29 16:00:22,088 - src.models.model_trainer - INFO - model_trainer.py:66 - Decision Tree training complete.
+2026-06-29 16:00:22,088 - src.models.model_trainer - INFO - model_trainer.py:77 - Training Random Forest Classifier...
+2026-06-29 16:00:22,426 - src.models.model_trainer - INFO - model_trainer.py:92 - Random Forest training complete.
+2026-06-29 16:00:22,426 - src.models.model_trainer - INFO - model_trainer.py:103 - Training XGBoost Classifier...
+2026-06-29 16:00:22,722 - src.models.model_trainer - INFO - model_trainer.py:119 - XGBoost training complete.
+2026-06-29 16:00:22,723 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for logistic_regression with CV=3...
+2026-06-29 16:00:27,572 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for logistic_regression: {'C': 0.1}
+2026-06-29 16:00:27,572 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for logistic_regression: 0.7083
+2026-06-29 16:00:27,573 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for decision_tree with CV=3...
+2026-06-29 16:00:28,357 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for decision_tree: {'max_depth': None, 'min_samples_split': 2}
+2026-06-29 16:00:28,358 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for decision_tree: 0.9496
+2026-06-29 16:00:28,358 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for random_forest with CV=3...
+2026-06-29 16:00:32,700 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for random_forest: {'max_depth': 20, 'n_estimators': 100}
+2026-06-29 16:00:32,700 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for random_forest: 0.9820
+2026-06-29 16:00:32,700 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for xgboost with CV=3...
+2026-06-29 16:00:32,719 - src.models.hyperparameter_tuner - ERROR - hyperparameter_tuner.py:44 - Hyperparameter tuning failed for xgboost: 'super' object has no attribute '__sklearn_tags__'
+2026-06-29 16:00:32,719 - __main__ - ERROR - ml_pipeline.py:104 - Pipeline failed with exception:
+Traceback (most recent call last):
+  File "e:\Credit-Card-Approval-Prediction\src\pipeline\ml_pipeline.py", line 71, in run
+    tuned_model = tuner.tune_model(name, model, X_train, y_train, cv=3) # Use 3-fold for speed/efficiency
+  File "E:\Credit-Card-Approval-Prediction\src\models\hyperparameter_tuner.py", line 37, in tune_model
+    grid_search.fit(X_train, y_train)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\sklearn\base.py", line 1389, in wrapper
+    return fit_method(estimator, *args, **kwargs)
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\sklearn\model_selection\_search.py", line 932, in fit
+    cv_orig = check_cv(self.cv, y, classifier=is_classifier(estimator))
+                                              ~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\sklearn\base.py", line 1237, in is_classifier
+    return get_tags(estimator).estimator_type == "classifier"
+           ~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\sklearn\utils\_tags.py", line 405, in get_tags
+    sklearn_tags_provider[klass] = klass.__sklearn_tags__(estimator)  # type: ignore[attr-defined]
+                                   ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\sklearn\base.py", line 540, in __sklearn_tags__
+    tags = super().__sklearn_tags__()
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'super' object has no attribute '__sklearn_tags__'. Did you mean: '__sklearn_clone__'?
+2026-06-29 16:00:50,302 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 16:00:53,932 - __main__ - INFO - ml_pipeline.py:27 - ==========================================
+2026-06-29 16:00:53,933 - __main__ - INFO - ml_pipeline.py:28 - STARTING CREDIT CARD APPROVAL ML PIPELINE
+2026-06-29 16:00:53,933 - __main__ - INFO - ml_pipeline.py:29 - ==========================================
+2026-06-29 16:00:53,933 - __main__ - INFO - ml_pipeline.py:33 - --- Step 1: Ingesting Data ---
+2026-06-29 16:00:53,940 - src.data.data_loader - INFO - data_loader.py:32 - Loading application records from: e:/Credit-Card-Approval-Prediction/data/raw/application_record.csv
+2026-06-29 16:00:53,956 - src.data.data_loader - INFO - data_loader.py:39 - Successfully loaded application records with shape: (5000, 18)
+2026-06-29 16:00:53,956 - src.data.data_loader - INFO - data_loader.py:49 - Loading credit records from: e:/Credit-Card-Approval-Prediction/data/raw/credit_record.csv
+2026-06-29 16:00:54,000 - src.data.data_loader - INFO - data_loader.py:56 - Successfully loaded credit records with shape: (163037, 3)
+2026-06-29 16:00:54,000 - __main__ - INFO - ml_pipeline.py:38 - --- Step 2: Validating Data ---
+2026-06-29 16:00:54,000 - src.data.data_validator - INFO - data_validator.py:43 - Validating application record schema...
+2026-06-29 16:00:54,001 - src.data.data_validator - INFO - data_validator.py:55 - Unique IDs in application record: 5000 out of 5000
+2026-06-29 16:00:54,002 - src.data.data_validator - INFO - data_validator.py:65 - Application record validation passed successfully.
+2026-06-29 16:00:54,002 - src.data.data_validator - INFO - data_validator.py:72 - Validating credit record schema...
+2026-06-29 16:00:54,013 - src.data.data_validator - INFO - data_validator.py:90 - Credit record validation passed successfully.
+2026-06-29 16:00:54,014 - src.data.data_validator - INFO - data_validator.py:97 - Checking merge compatibility between datasets...
+2026-06-29 16:00:54,035 - src.data.data_validator - INFO - data_validator.py:102 - Overlapping IDs between application and credit: 5000
+2026-06-29 16:00:54,036 - src.data.data_validator - INFO - data_validator.py:108 - Merge compatibility check passed.
+2026-06-29 16:00:54,036 - __main__ - INFO - ml_pipeline.py:45 - --- Step 3: Cleaning and Merging Data ---
+2026-06-29 16:00:54,046 - src.data.data_cleaner - INFO - data_cleaner.py:97 - Starting clean and merge process...
+2026-06-29 16:00:54,046 - src.data.data_cleaner - INFO - data_cleaner.py:50 - Cleaning application records...
+2026-06-29 16:00:54,079 - src.data.data_cleaner - INFO - data_cleaner.py:77 - Missing values in OCCUPATION_TYPE: 2162 (43.24%)
+2026-06-29 16:00:54,082 - src.data.data_cleaner - INFO - data_cleaner.py:87 - Application records cleaned.
+2026-06-29 16:00:54,082 - src.data.data_cleaner - INFO - data_cleaner.py:26 - Aggregating credit records to label customers...
+2026-06-29 16:00:54,142 - src.data.data_cleaner - INFO - data_cleaner.py:40 - Credit aggregation complete. Good (0): 4625, Bad (1): 375
+2026-06-29 16:00:54,145 - src.data.data_cleaner - INFO - data_cleaner.py:107 - Merged dataset shape: (5000, 22)
+2026-06-29 16:00:54,214 - src.data.data_cleaner - INFO - data_cleaner.py:112 - Cleaned and merged dataset saved to: e:/Credit-Card-Approval-Prediction/data/processed/cleaned_merged.csv
+2026-06-29 16:00:54,215 - __main__ - INFO - ml_pipeline.py:50 - --- Step 4: Engineering Features ---
+2026-06-29 16:00:54,221 - src.features.feature_engineer - INFO - feature_engineer.py:57 - Starting feature engineering pipeline...
+2026-06-29 16:00:54,221 - src.features.feature_engineer - INFO - feature_engineer.py:41 - Creating custom features...
+2026-06-29 16:00:54,228 - src.features.feature_engineer - INFO - feature_engineer.py:73 - Train split shape: (4000, 20), Test split shape: (1000, 20)
+2026-06-29 16:00:54,229 - src.features.feature_engineer - INFO - feature_engineer.py:76 - Encoding categorical features...
+2026-06-29 16:00:54,247 - src.features.feature_engineer - INFO - feature_engineer.py:83 - Scaling numerical features...
+2026-06-29 16:00:54,255 - src.features.feature_engineer - INFO - feature_engineer.py:99 - Applying Random Oversampling to balance classes on the training set...
+2026-06-29 16:00:54,255 - src.features.feature_engineer - INFO - feature_engineer.py:100 - Class distribution before balancing: [3700  300]
+2026-06-29 16:00:54,269 - src.features.feature_engineer - INFO - feature_engineer.py:117 - Class distribution after balancing: [3700 3700]
+2026-06-29 16:00:54,275 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/scaler.joblib
+2026-06-29 16:00:54,282 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/encoder.joblib
+2026-06-29 16:00:54,288 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/feature_names.joblib
+2026-06-29 16:00:54,761 - src.features.feature_engineer - INFO - feature_engineer.py:141 - Feature engineering and artifact saving completed successfully.
+2026-06-29 16:00:54,764 - __main__ - INFO - ml_pipeline.py:55 - --- Step 5: Feature Selection Analysis ---
+2026-06-29 16:00:54,775 - src.features.feature_selector - INFO - feature_selector.py:20 - Running feature importance analysis using Random Forest...
+2026-06-29 16:00:55,207 - src.features.feature_selector - INFO - feature_selector.py:41 - Top 15 Features by Importance:
+2026-06-29 16:00:55,208 - src.features.feature_selector - INFO - feature_selector.py:43 - AMT_INCOME_TOTAL: 0.2139
+2026-06-29 16:00:55,209 - src.features.feature_selector - INFO - feature_selector.py:43 - INCOME_PER_MEMBER: 0.1758
+2026-06-29 16:00:55,209 - src.features.feature_selector - INFO - feature_selector.py:43 - EMPLOYED_TO_AGE_RATIO: 0.0816
+2026-06-29 16:00:55,209 - src.features.feature_selector - INFO - feature_selector.py:43 - AGE_YEARS: 0.0715
+2026-06-29 16:00:55,209 - src.features.feature_selector - INFO - feature_selector.py:43 - YEARS_EMPLOYED: 0.0707
+2026-06-29 16:00:55,209 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_FAM_MEMBERS: 0.0395
+2026-06-29 16:00:55,209 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_CHILDREN: 0.0301
+2026-06-29 16:00:55,209 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_INCOME_TYPE_Pensioner: 0.0180
+2026-06-29 16:00:55,210 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Higher education: 0.0172
+2026-06-29 16:00:55,210 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_F: 0.0165
+2026-06-29 16:00:55,210 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Secondary / secondary special: 0.0147
+2026-06-29 16:00:55,210 - src.features.feature_selector - INFO - feature_selector.py:43 - OCCUPATION_TYPE_Unknown: 0.0140
+2026-06-29 16:00:55,210 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_M: 0.0131
+2026-06-29 16:00:55,210 - src.features.feature_selector - INFO - feature_selector.py:43 - FLAG_OWN_CAR_N: 0.0128
+2026-06-29 16:00:55,210 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Lower secondary: 0.0123
+2026-06-29 16:00:55,211 - __main__ - INFO - ml_pipeline.py:60 - --- Step 6: Model Training & Hyperparameter Tuning ---
+2026-06-29 16:00:55,223 - src.models.model_trainer - INFO - model_trainer.py:28 - Training Logistic Regression...
+2026-06-29 16:00:55,302 - src.models.model_trainer - INFO - model_trainer.py:42 - Logistic Regression training complete.
+2026-06-29 16:00:55,302 - src.models.model_trainer - INFO - model_trainer.py:53 - Training Decision Tree Classifier...
+2026-06-29 16:00:55,364 - src.models.model_trainer - INFO - model_trainer.py:66 - Decision Tree training complete.
+2026-06-29 16:00:55,364 - src.models.model_trainer - INFO - model_trainer.py:77 - Training Random Forest Classifier...
+2026-06-29 16:00:55,714 - src.models.model_trainer - INFO - model_trainer.py:92 - Random Forest training complete.
+2026-06-29 16:00:55,714 - src.models.model_trainer - INFO - model_trainer.py:103 - Training XGBoost Classifier...
+2026-06-29 16:00:56,010 - src.models.model_trainer - INFO - model_trainer.py:119 - XGBoost training complete.
+2026-06-29 16:00:56,010 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for logistic_regression with CV=3...
+2026-06-29 16:01:01,109 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for logistic_regression: {'C': 0.1}
+2026-06-29 16:01:01,109 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for logistic_regression: 0.7083
+2026-06-29 16:01:01,110 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for decision_tree with CV=3...
+2026-06-29 16:01:01,835 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for decision_tree: {'max_depth': None, 'min_samples_split': 2}
+2026-06-29 16:01:01,836 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for decision_tree: 0.9496
+2026-06-29 16:01:01,836 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for random_forest with CV=3...
+2026-06-29 16:01:06,223 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for random_forest: {'max_depth': 20, 'n_estimators': 100}
+2026-06-29 16:01:06,223 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for random_forest: 0.9820
+2026-06-29 16:01:06,223 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for xgboost with CV=3...
+2026-06-29 16:01:06,226 - src.models.hyperparameter_tuner - WARNING - hyperparameter_tuner.py:44 - Hyperparameter tuning failed for xgboost due to library compatibility: 'super' object has no attribute '__sklearn_tags__'. Falling back to base model.
+2026-06-29 16:01:06,226 - __main__ - INFO - ml_pipeline.py:77 - --- Step 7: Evaluating Models ---
+2026-06-29 16:01:06,233 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'logistic_regression' on test split...
+2026-06-29 16:01:06,259 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for logistic_regression:
+2026-06-29 16:01:06,259 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.6610
+2026-06-29 16:01:06,259 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1393
+2026-06-29 16:01:06,259 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.6800
+2026-06-29 16:01:06,260 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.2313
+2026-06-29 16:01:06,260 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.7265
+2026-06-29 16:01:08,573 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for logistic_regression to e:/Credit-Card-Approval-Prediction/reports/figures/logistic_regression_confusion_matrix.png
+2026-06-29 16:01:08,574 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'decision_tree' on test split...
+2026-06-29 16:01:08,598 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for decision_tree:
+2026-06-29 16:01:08,599 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.8720
+2026-06-29 16:01:08,599 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1467
+2026-06-29 16:01:08,599 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.1467
+2026-06-29 16:01:08,599 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.1467
+2026-06-29 16:01:08,599 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.5387
+2026-06-29 16:01:09,409 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for decision_tree to e:/Credit-Card-Approval-Prediction/reports/figures/decision_tree_confusion_matrix.png
+2026-06-29 16:01:09,409 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'random_forest' on test split...
+2026-06-29 16:01:09,580 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for random_forest:
+2026-06-29 16:01:09,581 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.9170
+2026-06-29 16:01:09,581 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.3333
+2026-06-29 16:01:09,581 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.1067
+2026-06-29 16:01:09,582 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.1616
+2026-06-29 16:01:09,590 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.7037
+2026-06-29 16:01:10,366 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for random_forest to e:/Credit-Card-Approval-Prediction/reports/figures/random_forest_confusion_matrix.png
+2026-06-29 16:01:10,367 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'xgboost' on test split...
+2026-06-29 16:01:10,443 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for xgboost:
+2026-06-29 16:01:10,443 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.8630
+2026-06-29 16:01:10,444 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1961
+2026-06-29 16:01:10,444 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.2667
+2026-06-29 16:01:10,444 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.2260
+2026-06-29 16:01:10,444 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.6916
+2026-06-29 16:01:11,274 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for xgboost to e:/Credit-Card-Approval-Prediction/reports/figures/xgboost_confusion_matrix.png
+2026-06-29 16:01:11,274 - src.models.model_evaluator - INFO - model_evaluator.py:114 - Plotting combined ROC curves...
+2026-06-29 16:01:12,392 - src.models.model_evaluator - INFO - model_evaluator.py:142 - Combined ROC curve plot saved to e:/Credit-Card-Approval-Prediction/reports/figures/combined_roc_curves.png
+2026-06-29 16:01:12,392 - src.models.model_evaluator - INFO - model_evaluator.py:151 - Saving model comparison report...
+2026-06-29 16:01:12,413 - src.models.model_evaluator - INFO - model_evaluator.py:155 - Model comparison report saved to: e:/Credit-Card-Approval-Prediction/reports/model_comparison.csv
+2026-06-29 16:01:12,416 - src.models.model_evaluator - ERROR - model_evaluator.py:163 - Failed to save model comparison report: Missing optional dependency 'tabulate'.  Use pip or conda to install tabulate.
+2026-06-29 16:01:12,416 - __main__ - ERROR - ml_pipeline.py:104 - Pipeline failed with exception:
+Traceback (most recent call last):
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\compat\_optional.py", line 135, in import_optional_dependency
+    module = importlib.import_module(name)
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\importlib\__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1395, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'tabulate'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\Credit-Card-Approval-Prediction\src\models\model_evaluator.py", line 159, in save_comparison_report
+    print(df.to_markdown(index=False))
+          ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\util\_decorators.py", line 333, in wrapper
+    return func(*args, **kwargs)
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\frame.py", line 2983, in to_markdown
+    tabulate = import_optional_dependency("tabulate")
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\compat\_optional.py", line 138, in import_optional_dependency
+    raise ImportError(msg)
+ImportError: Missing optional dependency 'tabulate'.  Use pip or conda to install tabulate.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "e:\Credit-Card-Approval-Prediction\src\pipeline\ml_pipeline.py", line 86, in run
+    evaluator.save_comparison_report()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "E:\Credit-Card-Approval-Prediction\src\models\model_evaluator.py", line 164, in save_comparison_report
+    raise ModelEvaluationError(f"Saving comparison report failed: {str(e)}")
+src.utils.exceptions.ModelEvaluationError: Saving comparison report failed: Missing optional dependency 'tabulate'.  Use pip or conda to install tabulate.
+2026-06-29 16:01:27,799 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 16:01:31,504 - __main__ - INFO - ml_pipeline.py:27 - ==========================================
+2026-06-29 16:01:31,504 - __main__ - INFO - ml_pipeline.py:28 - STARTING CREDIT CARD APPROVAL ML PIPELINE
+2026-06-29 16:01:31,505 - __main__ - INFO - ml_pipeline.py:29 - ==========================================
+2026-06-29 16:01:31,505 - __main__ - INFO - ml_pipeline.py:33 - --- Step 1: Ingesting Data ---
+2026-06-29 16:01:31,510 - src.data.data_loader - INFO - data_loader.py:32 - Loading application records from: e:/Credit-Card-Approval-Prediction/data/raw/application_record.csv
+2026-06-29 16:01:31,528 - src.data.data_loader - INFO - data_loader.py:39 - Successfully loaded application records with shape: (5000, 18)
+2026-06-29 16:01:31,528 - src.data.data_loader - INFO - data_loader.py:49 - Loading credit records from: e:/Credit-Card-Approval-Prediction/data/raw/credit_record.csv
+2026-06-29 16:01:31,573 - src.data.data_loader - INFO - data_loader.py:56 - Successfully loaded credit records with shape: (163037, 3)
+2026-06-29 16:01:31,574 - __main__ - INFO - ml_pipeline.py:38 - --- Step 2: Validating Data ---
+2026-06-29 16:01:31,574 - src.data.data_validator - INFO - data_validator.py:43 - Validating application record schema...
+2026-06-29 16:01:31,574 - src.data.data_validator - INFO - data_validator.py:55 - Unique IDs in application record: 5000 out of 5000
+2026-06-29 16:01:31,575 - src.data.data_validator - INFO - data_validator.py:65 - Application record validation passed successfully.
+2026-06-29 16:01:31,575 - src.data.data_validator - INFO - data_validator.py:72 - Validating credit record schema...
+2026-06-29 16:01:31,584 - src.data.data_validator - INFO - data_validator.py:90 - Credit record validation passed successfully.
+2026-06-29 16:01:31,584 - src.data.data_validator - INFO - data_validator.py:97 - Checking merge compatibility between datasets...
+2026-06-29 16:01:31,600 - src.data.data_validator - INFO - data_validator.py:102 - Overlapping IDs between application and credit: 5000
+2026-06-29 16:01:31,601 - src.data.data_validator - INFO - data_validator.py:108 - Merge compatibility check passed.
+2026-06-29 16:01:31,601 - __main__ - INFO - ml_pipeline.py:45 - --- Step 3: Cleaning and Merging Data ---
+2026-06-29 16:01:31,607 - src.data.data_cleaner - INFO - data_cleaner.py:97 - Starting clean and merge process...
+2026-06-29 16:01:31,607 - src.data.data_cleaner - INFO - data_cleaner.py:50 - Cleaning application records...
+2026-06-29 16:01:31,634 - src.data.data_cleaner - INFO - data_cleaner.py:77 - Missing values in OCCUPATION_TYPE: 2162 (43.24%)
+2026-06-29 16:01:31,637 - src.data.data_cleaner - INFO - data_cleaner.py:87 - Application records cleaned.
+2026-06-29 16:01:31,637 - src.data.data_cleaner - INFO - data_cleaner.py:26 - Aggregating credit records to label customers...
+2026-06-29 16:01:31,696 - src.data.data_cleaner - INFO - data_cleaner.py:40 - Credit aggregation complete. Good (0): 4625, Bad (1): 375
+2026-06-29 16:01:31,699 - src.data.data_cleaner - INFO - data_cleaner.py:107 - Merged dataset shape: (5000, 22)
+2026-06-29 16:01:31,755 - src.data.data_cleaner - INFO - data_cleaner.py:112 - Cleaned and merged dataset saved to: e:/Credit-Card-Approval-Prediction/data/processed/cleaned_merged.csv
+2026-06-29 16:01:31,755 - __main__ - INFO - ml_pipeline.py:50 - --- Step 4: Engineering Features ---
+2026-06-29 16:01:31,765 - src.features.feature_engineer - INFO - feature_engineer.py:57 - Starting feature engineering pipeline...
+2026-06-29 16:01:31,765 - src.features.feature_engineer - INFO - feature_engineer.py:41 - Creating custom features...
+2026-06-29 16:01:31,777 - src.features.feature_engineer - INFO - feature_engineer.py:73 - Train split shape: (4000, 20), Test split shape: (1000, 20)
+2026-06-29 16:01:31,777 - src.features.feature_engineer - INFO - feature_engineer.py:76 - Encoding categorical features...
+2026-06-29 16:01:31,800 - src.features.feature_engineer - INFO - feature_engineer.py:83 - Scaling numerical features...
+2026-06-29 16:01:31,807 - src.features.feature_engineer - INFO - feature_engineer.py:99 - Applying Random Oversampling to balance classes on the training set...
+2026-06-29 16:01:31,808 - src.features.feature_engineer - INFO - feature_engineer.py:100 - Class distribution before balancing: [3700  300]
+2026-06-29 16:01:31,820 - src.features.feature_engineer - INFO - feature_engineer.py:117 - Class distribution after balancing: [3700 3700]
+2026-06-29 16:01:31,832 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/scaler.joblib
+2026-06-29 16:01:31,839 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/encoder.joblib
+2026-06-29 16:01:31,845 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/feature_names.joblib
+2026-06-29 16:01:32,173 - src.features.feature_engineer - INFO - feature_engineer.py:141 - Feature engineering and artifact saving completed successfully.
+2026-06-29 16:01:32,176 - __main__ - INFO - ml_pipeline.py:55 - --- Step 5: Feature Selection Analysis ---
+2026-06-29 16:01:32,184 - src.features.feature_selector - INFO - feature_selector.py:20 - Running feature importance analysis using Random Forest...
+2026-06-29 16:01:32,620 - src.features.feature_selector - INFO - feature_selector.py:41 - Top 15 Features by Importance:
+2026-06-29 16:01:32,622 - src.features.feature_selector - INFO - feature_selector.py:43 - AMT_INCOME_TOTAL: 0.2139
+2026-06-29 16:01:32,623 - src.features.feature_selector - INFO - feature_selector.py:43 - INCOME_PER_MEMBER: 0.1758
+2026-06-29 16:01:32,624 - src.features.feature_selector - INFO - feature_selector.py:43 - EMPLOYED_TO_AGE_RATIO: 0.0816
+2026-06-29 16:01:32,625 - src.features.feature_selector - INFO - feature_selector.py:43 - AGE_YEARS: 0.0715
+2026-06-29 16:01:32,627 - src.features.feature_selector - INFO - feature_selector.py:43 - YEARS_EMPLOYED: 0.0707
+2026-06-29 16:01:32,627 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_FAM_MEMBERS: 0.0395
+2026-06-29 16:01:32,628 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_CHILDREN: 0.0301
+2026-06-29 16:01:32,629 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_INCOME_TYPE_Pensioner: 0.0180
+2026-06-29 16:01:32,630 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Higher education: 0.0172
+2026-06-29 16:01:32,630 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_F: 0.0165
+2026-06-29 16:01:32,630 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Secondary / secondary special: 0.0147
+2026-06-29 16:01:32,632 - src.features.feature_selector - INFO - feature_selector.py:43 - OCCUPATION_TYPE_Unknown: 0.0140
+2026-06-29 16:01:32,633 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_M: 0.0131
+2026-06-29 16:01:32,633 - src.features.feature_selector - INFO - feature_selector.py:43 - FLAG_OWN_CAR_N: 0.0128
+2026-06-29 16:01:32,634 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Lower secondary: 0.0123
+2026-06-29 16:01:32,636 - __main__ - INFO - ml_pipeline.py:60 - --- Step 6: Model Training & Hyperparameter Tuning ---
+2026-06-29 16:01:32,658 - src.models.model_trainer - INFO - model_trainer.py:28 - Training Logistic Regression...
+2026-06-29 16:01:32,751 - src.models.model_trainer - INFO - model_trainer.py:42 - Logistic Regression training complete.
+2026-06-29 16:01:32,752 - src.models.model_trainer - INFO - model_trainer.py:53 - Training Decision Tree Classifier...
+2026-06-29 16:01:32,810 - src.models.model_trainer - INFO - model_trainer.py:66 - Decision Tree training complete.
+2026-06-29 16:01:32,810 - src.models.model_trainer - INFO - model_trainer.py:77 - Training Random Forest Classifier...
+2026-06-29 16:01:33,134 - src.models.model_trainer - INFO - model_trainer.py:92 - Random Forest training complete.
+2026-06-29 16:01:33,135 - src.models.model_trainer - INFO - model_trainer.py:103 - Training XGBoost Classifier...
+2026-06-29 16:01:33,403 - src.models.model_trainer - INFO - model_trainer.py:119 - XGBoost training complete.
+2026-06-29 16:01:33,403 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for logistic_regression with CV=3...
+2026-06-29 16:01:38,811 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for logistic_regression: {'C': 0.1}
+2026-06-29 16:01:38,811 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for logistic_regression: 0.7083
+2026-06-29 16:01:38,812 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for decision_tree with CV=3...
+2026-06-29 16:01:39,606 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for decision_tree: {'max_depth': None, 'min_samples_split': 2}
+2026-06-29 16:01:39,607 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for decision_tree: 0.9496
+2026-06-29 16:01:39,607 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for random_forest with CV=3...
+2026-06-29 16:01:44,126 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for random_forest: {'max_depth': 20, 'n_estimators': 100}
+2026-06-29 16:01:44,127 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for random_forest: 0.9820
+2026-06-29 16:01:44,127 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for xgboost with CV=3...
+2026-06-29 16:01:44,129 - src.models.hyperparameter_tuner - WARNING - hyperparameter_tuner.py:44 - Hyperparameter tuning failed for xgboost due to library compatibility: 'super' object has no attribute '__sklearn_tags__'. Falling back to base model.
+2026-06-29 16:01:44,129 - __main__ - INFO - ml_pipeline.py:77 - --- Step 7: Evaluating Models ---
+2026-06-29 16:01:44,137 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'logistic_regression' on test split...
+2026-06-29 16:01:44,155 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for logistic_regression:
+2026-06-29 16:01:44,156 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.6610
+2026-06-29 16:01:44,156 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1393
+2026-06-29 16:01:44,156 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.6800
+2026-06-29 16:01:44,156 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.2313
+2026-06-29 16:01:44,156 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.7265
+2026-06-29 16:01:45,110 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for logistic_regression to e:/Credit-Card-Approval-Prediction/reports/figures/logistic_regression_confusion_matrix.png
+2026-06-29 16:01:45,111 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'decision_tree' on test split...
+2026-06-29 16:01:45,138 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for decision_tree:
+2026-06-29 16:01:45,138 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.8720
+2026-06-29 16:01:45,138 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1467
+2026-06-29 16:01:45,139 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.1467
+2026-06-29 16:01:45,139 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.1467
+2026-06-29 16:01:45,139 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.5387
+2026-06-29 16:01:46,174 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for decision_tree to e:/Credit-Card-Approval-Prediction/reports/figures/decision_tree_confusion_matrix.png
+2026-06-29 16:01:46,175 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'random_forest' on test split...
+2026-06-29 16:01:46,380 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for random_forest:
+2026-06-29 16:01:46,381 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.9170
+2026-06-29 16:01:46,381 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.3333
+2026-06-29 16:01:46,381 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.1067
+2026-06-29 16:01:46,382 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.1616
+2026-06-29 16:01:46,382 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.7037
+2026-06-29 16:01:47,708 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for random_forest to e:/Credit-Card-Approval-Prediction/reports/figures/random_forest_confusion_matrix.png
+2026-06-29 16:01:47,709 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'xgboost' on test split...
+2026-06-29 16:01:47,806 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for xgboost:
+2026-06-29 16:01:47,807 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.8630
+2026-06-29 16:01:47,807 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1961
+2026-06-29 16:01:47,808 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.2667
+2026-06-29 16:01:47,808 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.2260
+2026-06-29 16:01:47,808 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.6916
+2026-06-29 16:01:49,287 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for xgboost to e:/Credit-Card-Approval-Prediction/reports/figures/xgboost_confusion_matrix.png
+2026-06-29 16:01:49,288 - src.models.model_evaluator - INFO - model_evaluator.py:114 - Plotting combined ROC curves...
+2026-06-29 16:01:50,789 - src.models.model_evaluator - INFO - model_evaluator.py:142 - Combined ROC curve plot saved to e:/Credit-Card-Approval-Prediction/reports/figures/combined_roc_curves.png
+2026-06-29 16:01:50,790 - src.models.model_evaluator - INFO - model_evaluator.py:151 - Saving model comparison report...
+2026-06-29 16:01:50,819 - src.models.model_evaluator - INFO - model_evaluator.py:155 - Model comparison report saved to: e:/Credit-Card-Approval-Prediction/reports/model_comparison.csv
+2026-06-29 16:01:50,837 - __main__ - INFO - ml_pipeline.py:89 - --- Step 8: Registering Models in Registry ---
+2026-06-29 16:01:50,853 - src.models.model_registry - INFO - model_registry.py:21 - Registering model 'logistic_regression' in model registry...
+2026-06-29 16:01:50,864 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/trained/logistic_regression.joblib
+2026-06-29 16:01:50,864 - src.models.model_registry - ERROR - model_registry.py:44 - Failed to register model 'logistic_regression': name 'np' is not defined
+2026-06-29 16:01:50,865 - __main__ - ERROR - ml_pipeline.py:104 - Pipeline failed with exception:
+Traceback (most recent call last):
+  File "e:\Credit-Card-Approval-Prediction\src\pipeline\ml_pipeline.py", line 94, in run
+    registry.register_model(name, model, metrics_results[name], params)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Credit-Card-Approval-Prediction\src\models\model_registry.py", line 34, in register_model
+    "metrics": {k: float(v) if isinstance(v, (int, float, np.integer, np.floating)) else str(v) for k, v in metrics.items()}
+                                                          ^^
+NameError: name 'np' is not defined
+2026-06-29 16:02:08,975 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 16:02:12,872 - __main__ - INFO - ml_pipeline.py:27 - ==========================================
+2026-06-29 16:02:12,872 - __main__ - INFO - ml_pipeline.py:28 - STARTING CREDIT CARD APPROVAL ML PIPELINE
+2026-06-29 16:02:12,872 - __main__ - INFO - ml_pipeline.py:29 - ==========================================
+2026-06-29 16:02:12,872 - __main__ - INFO - ml_pipeline.py:33 - --- Step 1: Ingesting Data ---
+2026-06-29 16:02:12,878 - src.data.data_loader - INFO - data_loader.py:32 - Loading application records from: e:/Credit-Card-Approval-Prediction/data/raw/application_record.csv
+2026-06-29 16:02:12,894 - src.data.data_loader - INFO - data_loader.py:39 - Successfully loaded application records with shape: (5000, 18)
+2026-06-29 16:02:12,894 - src.data.data_loader - INFO - data_loader.py:49 - Loading credit records from: e:/Credit-Card-Approval-Prediction/data/raw/credit_record.csv
+2026-06-29 16:02:12,936 - src.data.data_loader - INFO - data_loader.py:56 - Successfully loaded credit records with shape: (163037, 3)
+2026-06-29 16:02:12,937 - __main__ - INFO - ml_pipeline.py:38 - --- Step 2: Validating Data ---
+2026-06-29 16:02:12,937 - src.data.data_validator - INFO - data_validator.py:43 - Validating application record schema...
+2026-06-29 16:02:12,937 - src.data.data_validator - INFO - data_validator.py:55 - Unique IDs in application record: 5000 out of 5000
+2026-06-29 16:02:12,938 - src.data.data_validator - INFO - data_validator.py:65 - Application record validation passed successfully.
+2026-06-29 16:02:12,938 - src.data.data_validator - INFO - data_validator.py:72 - Validating credit record schema...
+2026-06-29 16:02:12,943 - src.data.data_validator - INFO - data_validator.py:90 - Credit record validation passed successfully.
+2026-06-29 16:02:12,944 - src.data.data_validator - INFO - data_validator.py:97 - Checking merge compatibility between datasets...
+2026-06-29 16:02:12,970 - src.data.data_validator - INFO - data_validator.py:102 - Overlapping IDs between application and credit: 5000
+2026-06-29 16:02:12,970 - src.data.data_validator - INFO - data_validator.py:108 - Merge compatibility check passed.
+2026-06-29 16:02:12,971 - __main__ - INFO - ml_pipeline.py:45 - --- Step 3: Cleaning and Merging Data ---
+2026-06-29 16:02:12,987 - src.data.data_cleaner - INFO - data_cleaner.py:97 - Starting clean and merge process...
+2026-06-29 16:02:12,987 - src.data.data_cleaner - INFO - data_cleaner.py:50 - Cleaning application records...
+2026-06-29 16:02:13,028 - src.data.data_cleaner - INFO - data_cleaner.py:77 - Missing values in OCCUPATION_TYPE: 2162 (43.24%)
+2026-06-29 16:02:13,030 - src.data.data_cleaner - INFO - data_cleaner.py:87 - Application records cleaned.
+2026-06-29 16:02:13,030 - src.data.data_cleaner - INFO - data_cleaner.py:26 - Aggregating credit records to label customers...
+2026-06-29 16:02:13,085 - src.data.data_cleaner - INFO - data_cleaner.py:40 - Credit aggregation complete. Good (0): 4625, Bad (1): 375
+2026-06-29 16:02:13,088 - src.data.data_cleaner - INFO - data_cleaner.py:107 - Merged dataset shape: (5000, 22)
+2026-06-29 16:02:13,136 - src.data.data_cleaner - INFO - data_cleaner.py:112 - Cleaned and merged dataset saved to: e:/Credit-Card-Approval-Prediction/data/processed/cleaned_merged.csv
+2026-06-29 16:02:13,136 - __main__ - INFO - ml_pipeline.py:50 - --- Step 4: Engineering Features ---
+2026-06-29 16:02:13,142 - src.features.feature_engineer - INFO - feature_engineer.py:57 - Starting feature engineering pipeline...
+2026-06-29 16:02:13,143 - src.features.feature_engineer - INFO - feature_engineer.py:41 - Creating custom features...
+2026-06-29 16:02:13,150 - src.features.feature_engineer - INFO - feature_engineer.py:73 - Train split shape: (4000, 20), Test split shape: (1000, 20)
+2026-06-29 16:02:13,151 - src.features.feature_engineer - INFO - feature_engineer.py:76 - Encoding categorical features...
+2026-06-29 16:02:13,169 - src.features.feature_engineer - INFO - feature_engineer.py:83 - Scaling numerical features...
+2026-06-29 16:02:13,175 - src.features.feature_engineer - INFO - feature_engineer.py:99 - Applying Random Oversampling to balance classes on the training set...
+2026-06-29 16:02:13,176 - src.features.feature_engineer - INFO - feature_engineer.py:100 - Class distribution before balancing: [3700  300]
+2026-06-29 16:02:13,188 - src.features.feature_engineer - INFO - feature_engineer.py:117 - Class distribution after balancing: [3700 3700]
+2026-06-29 16:02:13,194 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/scaler.joblib
+2026-06-29 16:02:13,201 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/encoder.joblib
+2026-06-29 16:02:13,208 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/artifacts/feature_names.joblib
+2026-06-29 16:02:13,575 - src.features.feature_engineer - INFO - feature_engineer.py:141 - Feature engineering and artifact saving completed successfully.
+2026-06-29 16:02:13,579 - __main__ - INFO - ml_pipeline.py:55 - --- Step 5: Feature Selection Analysis ---
+2026-06-29 16:02:13,588 - src.features.feature_selector - INFO - feature_selector.py:20 - Running feature importance analysis using Random Forest...
+2026-06-29 16:02:14,009 - src.features.feature_selector - INFO - feature_selector.py:41 - Top 15 Features by Importance:
+2026-06-29 16:02:14,010 - src.features.feature_selector - INFO - feature_selector.py:43 - AMT_INCOME_TOTAL: 0.2139
+2026-06-29 16:02:14,011 - src.features.feature_selector - INFO - feature_selector.py:43 - INCOME_PER_MEMBER: 0.1758
+2026-06-29 16:02:14,011 - src.features.feature_selector - INFO - feature_selector.py:43 - EMPLOYED_TO_AGE_RATIO: 0.0816
+2026-06-29 16:02:14,012 - src.features.feature_selector - INFO - feature_selector.py:43 - AGE_YEARS: 0.0715
+2026-06-29 16:02:14,012 - src.features.feature_selector - INFO - feature_selector.py:43 - YEARS_EMPLOYED: 0.0707
+2026-06-29 16:02:14,013 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_FAM_MEMBERS: 0.0395
+2026-06-29 16:02:14,013 - src.features.feature_selector - INFO - feature_selector.py:43 - CNT_CHILDREN: 0.0301
+2026-06-29 16:02:14,013 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_INCOME_TYPE_Pensioner: 0.0180
+2026-06-29 16:02:14,014 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Higher education: 0.0172
+2026-06-29 16:02:14,014 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_F: 0.0165
+2026-06-29 16:02:14,014 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Secondary / secondary special: 0.0147
+2026-06-29 16:02:14,014 - src.features.feature_selector - INFO - feature_selector.py:43 - OCCUPATION_TYPE_Unknown: 0.0140
+2026-06-29 16:02:14,015 - src.features.feature_selector - INFO - feature_selector.py:43 - CODE_GENDER_M: 0.0131
+2026-06-29 16:02:14,015 - src.features.feature_selector - INFO - feature_selector.py:43 - FLAG_OWN_CAR_N: 0.0128
+2026-06-29 16:02:14,015 - src.features.feature_selector - INFO - feature_selector.py:43 - NAME_EDUCATION_TYPE_Lower secondary: 0.0123
+2026-06-29 16:02:14,018 - __main__ - INFO - ml_pipeline.py:60 - --- Step 6: Model Training & Hyperparameter Tuning ---
+2026-06-29 16:02:14,034 - src.models.model_trainer - INFO - model_trainer.py:28 - Training Logistic Regression...
+2026-06-29 16:02:14,114 - src.models.model_trainer - INFO - model_trainer.py:42 - Logistic Regression training complete.
+2026-06-29 16:02:14,115 - src.models.model_trainer - INFO - model_trainer.py:53 - Training Decision Tree Classifier...
+2026-06-29 16:02:14,180 - src.models.model_trainer - INFO - model_trainer.py:66 - Decision Tree training complete.
+2026-06-29 16:02:14,180 - src.models.model_trainer - INFO - model_trainer.py:77 - Training Random Forest Classifier...
+2026-06-29 16:02:14,503 - src.models.model_trainer - INFO - model_trainer.py:92 - Random Forest training complete.
+2026-06-29 16:02:14,503 - src.models.model_trainer - INFO - model_trainer.py:103 - Training XGBoost Classifier...
+2026-06-29 16:02:14,838 - src.models.model_trainer - INFO - model_trainer.py:119 - XGBoost training complete.
+2026-06-29 16:02:14,839 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for logistic_regression with CV=3...
+2026-06-29 16:02:20,399 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for logistic_regression: {'C': 0.1}
+2026-06-29 16:02:20,399 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for logistic_regression: 0.7083
+2026-06-29 16:02:20,399 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for decision_tree with CV=3...
+2026-06-29 16:02:21,137 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for decision_tree: {'max_depth': None, 'min_samples_split': 2}
+2026-06-29 16:02:21,138 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for decision_tree: 0.9496
+2026-06-29 16:02:21,138 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for random_forest with CV=3...
+2026-06-29 16:02:25,408 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:39 - Best parameters for random_forest: {'max_depth': 20, 'n_estimators': 100}
+2026-06-29 16:02:25,408 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:40 - Best cross-validation F1-score for random_forest: 0.9820
+2026-06-29 16:02:25,408 - src.models.hyperparameter_tuner - INFO - hyperparameter_tuner.py:26 - Tuning hyperparameters for xgboost with CV=3...
+2026-06-29 16:02:25,412 - src.models.hyperparameter_tuner - WARNING - hyperparameter_tuner.py:44 - Hyperparameter tuning failed for xgboost due to library compatibility: 'super' object has no attribute '__sklearn_tags__'. Falling back to base model.
+2026-06-29 16:02:25,412 - __main__ - INFO - ml_pipeline.py:77 - --- Step 7: Evaluating Models ---
+2026-06-29 16:02:25,424 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'logistic_regression' on test split...
+2026-06-29 16:02:25,439 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for logistic_regression:
+2026-06-29 16:02:25,440 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.6610
+2026-06-29 16:02:25,440 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1393
+2026-06-29 16:02:25,440 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.6800
+2026-06-29 16:02:25,440 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.2313
+2026-06-29 16:02:25,440 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.7265
+2026-06-29 16:02:26,181 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for logistic_regression to e:/Credit-Card-Approval-Prediction/reports/figures/logistic_regression_confusion_matrix.png
+2026-06-29 16:02:26,181 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'decision_tree' on test split...
+2026-06-29 16:02:26,207 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for decision_tree:
+2026-06-29 16:02:26,208 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.8720
+2026-06-29 16:02:26,208 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1467
+2026-06-29 16:02:26,208 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.1467
+2026-06-29 16:02:26,208 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.1467
+2026-06-29 16:02:26,209 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.5387
+2026-06-29 16:02:27,116 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for decision_tree to e:/Credit-Card-Approval-Prediction/reports/figures/decision_tree_confusion_matrix.png
+2026-06-29 16:02:27,116 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'random_forest' on test split...
+2026-06-29 16:02:27,331 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for random_forest:
+2026-06-29 16:02:27,331 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.9170
+2026-06-29 16:02:27,332 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.3333
+2026-06-29 16:02:27,332 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.1067
+2026-06-29 16:02:27,332 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.1616
+2026-06-29 16:02:27,332 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.7037
+2026-06-29 16:02:28,247 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for random_forest to e:/Credit-Card-Approval-Prediction/reports/figures/random_forest_confusion_matrix.png
+2026-06-29 16:02:28,247 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'xgboost' on test split...
+2026-06-29 16:02:28,324 - src.models.model_evaluator - INFO - model_evaluator.py:51 - Metrics for xgboost:
+2026-06-29 16:02:28,324 - src.models.model_evaluator - INFO - model_evaluator.py:52 -   Accuracy:  0.8630
+2026-06-29 16:02:28,324 - src.models.model_evaluator - INFO - model_evaluator.py:53 -   Precision: 0.1961
+2026-06-29 16:02:28,325 - src.models.model_evaluator - INFO - model_evaluator.py:54 -   Recall:    0.2667
+2026-06-29 16:02:28,325 - src.models.model_evaluator - INFO - model_evaluator.py:55 -   F1-Score:  0.2260
+2026-06-29 16:02:28,325 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   ROC-AUC:   0.6916
+2026-06-29 16:02:29,250 - src.models.model_evaluator - INFO - model_evaluator.py:106 - Confusion matrix plot saved for xgboost to e:/Credit-Card-Approval-Prediction/reports/figures/xgboost_confusion_matrix.png
+2026-06-29 16:02:29,250 - src.models.model_evaluator - INFO - model_evaluator.py:114 - Plotting combined ROC curves...
+2026-06-29 16:02:30,500 - src.models.model_evaluator - INFO - model_evaluator.py:142 - Combined ROC curve plot saved to e:/Credit-Card-Approval-Prediction/reports/figures/combined_roc_curves.png
+2026-06-29 16:02:30,500 - src.models.model_evaluator - INFO - model_evaluator.py:151 - Saving model comparison report...
+2026-06-29 16:02:30,531 - src.models.model_evaluator - INFO - model_evaluator.py:155 - Model comparison report saved to: e:/Credit-Card-Approval-Prediction/reports/model_comparison.csv
+2026-06-29 16:02:30,541 - __main__ - INFO - ml_pipeline.py:89 - --- Step 8: Registering Models in Registry ---
+2026-06-29 16:02:30,559 - src.models.model_registry - INFO - model_registry.py:21 - Registering model 'logistic_regression' in model registry...
+2026-06-29 16:02:30,571 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/trained/logistic_regression.joblib
+2026-06-29 16:02:30,580 - src.models.model_registry - INFO - model_registry.py:42 - Model 'logistic_regression' and metadata registered successfully at: e:/Credit-Card-Approval-Prediction/models/trained/
+2026-06-29 16:02:30,581 - src.models.model_registry - INFO - model_registry.py:21 - Registering model 'decision_tree' in model registry...
+2026-06-29 16:02:30,596 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/trained/decision_tree.joblib
+2026-06-29 16:02:30,604 - src.models.model_registry - INFO - model_registry.py:42 - Model 'decision_tree' and metadata registered successfully at: e:/Credit-Card-Approval-Prediction/models/trained/
+2026-06-29 16:02:30,605 - src.models.model_registry - INFO - model_registry.py:21 - Registering model 'random_forest' in model registry...
+2026-06-29 16:02:30,732 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/trained/random_forest.joblib
+2026-06-29 16:02:30,745 - src.models.model_registry - INFO - model_registry.py:42 - Model 'random_forest' and metadata registered successfully at: e:/Credit-Card-Approval-Prediction/models/trained/
+2026-06-29 16:02:30,746 - src.models.model_registry - INFO - model_registry.py:21 - Registering model 'xgboost' in model registry...
+2026-06-29 16:02:30,788 - src.utils.helpers - INFO - helpers.py:34 - Saved artifact to: e:/Credit-Card-Approval-Prediction/models/trained/xgboost.joblib
+2026-06-29 16:02:30,799 - src.models.model_registry - INFO - model_registry.py:42 - Model 'xgboost' and metadata registered successfully at: e:/Credit-Card-Approval-Prediction/models/trained/
+2026-06-29 16:02:30,800 - src.models.model_evaluator - INFO - model_evaluator.py:174 - Auto-selected Best Model: logistic_regression (F1-Score: 0.2313)
+2026-06-29 16:02:30,801 - __main__ - INFO - ml_pipeline.py:98 - Pipeline executed successfully. Best model: 'logistic_regression'
+2026-06-29 16:02:30,801 - __main__ - INFO - ml_pipeline.py:99 - ==========================================
+2026-06-29 16:02:46,983 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 16:02:50,481 - src.data.data_cleaner - INFO - data_cleaner.py:26 - Aggregating credit records to label customers...
+2026-06-29 16:02:50,485 - src.data.data_cleaner - INFO - data_cleaner.py:40 - Credit aggregation complete. Good (0): 2, Bad (1): 1
+2026-06-29 16:02:50,499 - src.data.data_cleaner - INFO - data_cleaner.py:50 - Cleaning application records...
+2026-06-29 16:02:50,502 - src.data.data_cleaner - INFO - data_cleaner.py:77 - Missing values in OCCUPATION_TYPE: 1 (33.33%)
+2026-06-29 16:02:50,503 - src.data.data_cleaner - INFO - data_cleaner.py:87 - Application records cleaned.
+2026-06-29 16:02:50,521 - src.utils.helpers - ERROR - helpers.py:14 - YAML configuration file not found at: non_existent_config.yaml
+2026-06-29 16:02:50,532 - src.features.feature_engineer - INFO - feature_engineer.py:41 - Creating custom features...
+2026-06-29 16:02:55,770 - flask_app.routes - ERROR - routes.py:258 - API Prediction failed:
+Traceback (most recent call last):
+  File "e:\Credit-Card-Approval-Prediction\flask_app\routes.py", line 238, in api_predict
+    X_inf = pd.DataFrame(
+        np.hstack([num_scaled, cat_encoded, bin_vals]),
+        columns=list(num_data.columns) + list(cat_feature_names) + ['FLAG_MOBIL', 'FLAG_WORK_PHONE', 'FLAG_PHONE', 'FLAG_EMAIL']
+    )
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\frame.py", line 827, in __init__
+    mgr = ndarray_to_mgr(
+        data,
+    ...<4 lines>...
+        typ=manager,
+    )
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\internals\construction.py", line 336, in ndarray_to_mgr
+    _check_values_indices_shape_match(values, index, columns)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Lenovo\AppData\Local\Programs\Python\Python313\Lib\site-packages\pandas\core\internals\construction.py", line 420, in _check_values_indices_shape_match
+    raise ValueError(f"Shape of passed values is {passed}, indices imply {implied}")
+ValueError: Shape of passed values is (1, 19), indices imply (1, 13)
+2026-06-29 16:02:56,791 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'mock_model' on test split...
+2026-06-29 16:02:56,792 - src.models.model_evaluator - ERROR - model_evaluator.py:83 - Failed to evaluate model 'mock_model': list indices must be integers or slices, not tuple
+2026-06-29 16:02:56,817 - src.models.model_trainer - INFO - model_trainer.py:28 - Training Logistic Regression...
+2026-06-29 16:02:56,823 - src.models.model_trainer - INFO - model_trainer.py:42 - Logistic Regression training complete.
+2026-06-29 16:03:46,991 - root - INFO - logging_config.py:40 - Logging system configured successfully.
+2026-06-29 16:03:50,282 - src.data.data_cleaner - INFO - data_cleaner.py:26 - Aggregating credit records to label customers...
+2026-06-29 16:03:50,288 - src.data.data_cleaner - INFO - data_cleaner.py:40 - Credit aggregation complete. Good (0): 2, Bad (1): 1
+2026-06-29 16:03:50,298 - src.data.data_cleaner - INFO - data_cleaner.py:50 - Cleaning application records...
+2026-06-29 16:03:50,301 - src.data.data_cleaner - INFO - data_cleaner.py:77 - Missing values in OCCUPATION_TYPE: 1 (33.33%)
+2026-06-29 16:03:50,302 - src.data.data_cleaner - INFO - data_cleaner.py:87 - Application records cleaned.
+2026-06-29 16:03:50,317 - src.utils.helpers - ERROR - helpers.py:14 - YAML configuration file not found at: non_existent_config.yaml
+2026-06-29 16:03:50,330 - src.features.feature_engineer - INFO - feature_engineer.py:41 - Creating custom features...
+2026-06-29 16:03:50,696 - src.models.model_evaluator - INFO - model_evaluator.py:36 - Evaluating model 'mock_model' on test split...
+2026-06-29 16:03:50,705 - src.models.model_evaluator - INFO - model_evaluator.py:55 - Metrics for mock_model:
+2026-06-29 16:03:50,706 - src.models.model_evaluator - INFO - model_evaluator.py:56 -   Accuracy:  0.7500
+2026-06-29 16:03:50,706 - src.models.model_evaluator - INFO - model_evaluator.py:57 -   Precision: 1.0000
+2026-06-29 16:03:50,706 - src.models.model_evaluator - INFO - model_evaluator.py:58 -   Recall:    0.6667
+2026-06-29 16:03:50,706 - src.models.model_evaluator - INFO - model_evaluator.py:59 -   F1-Score:  0.8000
+2026-06-29 16:03:50,706 - src.models.model_evaluator - INFO - model_evaluator.py:60 -   ROC-AUC:   1.0000
+2026-06-29 16:03:51,499 - src.models.model_evaluator - INFO - model_evaluator.py:110 - Confusion matrix plot saved for mock_model to e:/Credit-Card-Approval-Prediction/reports/figures/mock_model_confusion_matrix.png
+2026-06-29 16:03:51,517 - src.models.model_trainer - INFO - model_trainer.py:28 - Training Logistic Regression...
+2026-06-29 16:03:51,525 - src.models.model_trainer - INFO - model_trainer.py:42 - Logistic Regression training complete.

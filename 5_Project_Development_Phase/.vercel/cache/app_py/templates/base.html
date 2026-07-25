@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CreditGuard AI — Enterprise-grade credit card approval prediction powered by machine learning.">
+  <title>{% block title %}CreditGuard AI{% endblock %}</title>
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js (pages that need it) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Design System -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block head %}{% endblock %}
+</head>
+<body id="{% block page_id %}page{% endblock %}">
+
+  <!-- Glowing Background Blobs -->
+  <div class="cg-glow-blob blob-1"></div>
+  <div class="cg-glow-blob blob-2"></div>
+
+  <!-- Page Loader -->
+  <div class="cg-loader" id="pageLoader">
+    <div class="cg-loader-ring"></div>
+    <div class="cg-loader-text">Loading</div>
+  </div>
+
+  <!-- Mobile Header -->
+  <header class="cg-mobile-header">
+    <div class="cg-flex" style="align-items:center;gap:12px;">
+      <button class="cg-menu-btn" id="menuBtn" aria-label="Toggle menu"><i class="fa-solid fa-bars"></i></button>
+      <span style="font-size:14px;font-weight:700;">CreditGuard AI</span>
+    </div>
+    <button class="cg-menu-btn" id="themeToggleMobile" aria-label="Toggle theme"><i class="fa-solid fa-sun"></i></button>
+  </header>
+
+  <!-- Overlay -->
+  <div class="cg-overlay"></div>
+
+  <!-- Sidebar -->
+  <nav class="cg-sidebar" id="sidebar">
+    <div class="cg-sidebar-brand">
+      <div class="cg-sidebar-logo"><i class="fa-solid fa-shield-halved"></i></div>
+      <div>
+        <h2>CreditGuard</h2>
+        <small>AI Decisioning</small>
+      </div>
+    </div>
+
+    <div class="cg-sidebar-nav">
+      <div class="cg-nav-section">Main</div>
+      <a href="{{ url_for('api.index') }}" class="cg-nav-link {% if request.endpoint == 'api.index' %}active{% endif %}">
+        <i class="fa-solid fa-house"></i> Dashboard
+      </a>
+      <a href="{{ url_for('api.about') }}" class="cg-nav-link {% if request.endpoint == 'api.about' %}active{% endif %}">
+        <i class="fa-solid fa-chart-pie"></i> Model Insights
+      </a>
+
+      {% if current_user.is_authenticated %}
+      <div class="cg-nav-section">Predictions</div>
+      <a href="{{ url_for('api.predict_get') }}" class="cg-nav-link {% if request.endpoint in ['api.predict_get', 'api.predict_post'] %}active{% endif %}">
+        <i class="fa-solid fa-bolt"></i> New Assessment
+      </a>
+      <a href="{{ url_for('api.history') }}" class="cg-nav-link {% if request.endpoint == 'api.history' %}active{% endif %}">
+        <i class="fa-solid fa-clock-rotate-left"></i> History
+      </a>
+      <a href="{{ url_for('api.admin') }}" class="cg-nav-link {% if request.endpoint == 'api.admin' %}active{% endif %}">
+        <i class="fa-solid fa-chart-column"></i> Analytics
+      </a>
+
+      <div class="cg-nav-section">Account</div>
+      <a href="{{ url_for('auth.profile') }}" class="cg-nav-link {% if request.endpoint == 'auth.profile' %}active{% endif %}">
+        <i class="fa-solid fa-user"></i> Profile
+      </a>
+      <a href="{{ url_for('auth.logout') }}" class="cg-nav-link">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+      </a>
+      {% else %}
+      <div class="cg-nav-section">Account</div>
+      <a href="{{ url_for('auth.login') }}" class="cg-nav-link {% if request.endpoint == 'auth.login' %}active{% endif %}">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In
+      </a>
+      <a href="{{ url_for('auth.register') }}" class="cg-nav-link {% if request.endpoint == 'auth.register' %}active{% endif %}">
+        <i class="fa-solid fa-user-plus"></i> Register
+      </a>
+      {% endif %}
+    </div>
+
+    <div class="cg-sidebar-footer">
+      <button class="cg-btn cg-btn-ghost cg-w-full" id="themeToggle" style="justify-content:flex-start;">
+        <i class="fa-solid fa-sun"></i> <span style="font-size:12.5px;">Toggle Theme</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="cg-main">
+    <!-- Flash Messages (rendered hidden, picked up by JS Toast system) -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div data-flash="{{ category }}" style="display:none;">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Animation & Library CDNs -->
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css">
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Application Controller -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    // Bind mobile theme toggle
+    document.getElementById('themeToggleMobile')?.addEventListener('click', () => CG.Theme.toggle());
+    
+    // Initialize Animate On Scroll & Lucide Icons
+    document.addEventListener('DOMContentLoaded', () => {
+      AOS.init({
+        duration: 800,
+        easing: 'ease-out-back',
+        once: true
+      });
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

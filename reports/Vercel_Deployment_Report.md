@@ -48,7 +48,7 @@ Configure the following in the Vercel Dashboard under **Settings > Environment V
 Run and verified locally with **100% pass rate**:
 ```bash
 pytest tests/ -v
-# Result: 108 passed, 39 warnings in 20.70s
+# Result: 119 passed, 72 warnings in 50.16s
 ```
 
 ### Route Integrity Testing

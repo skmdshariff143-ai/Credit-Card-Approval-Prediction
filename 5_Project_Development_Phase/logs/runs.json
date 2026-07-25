@@ -1,0 +1,142 @@
+[
+    {
+        "timestamp": "2026-07-07 20:39:08",
+        "model_name": "logistic_regression",
+        "parameters": {
+            "C": "1.0",
+            "class_weight": "balanced",
+            "dual": "False",
+            "fit_intercept": "True",
+            "intercept_scaling": "1",
+            "l1_ratio": "None",
+            "max_iter": "1000",
+            "multi_class": "deprecated",
+            "n_jobs": "None",
+            "penalty": "l2",
+            "random_state": "42",
+            "solver": "lbfgs",
+            "tol": "0.0001",
+            "verbose": "0",
+            "warm_start": "False"
+        },
+        "metrics": {
+            "F1-Score": 0.22589531680440772,
+            "ROC-AUC": 0.6885333333333334,
+            "Balanced_Accuracy": 0.6398198198198197,
+            "Log_Loss": 0.563060423173979,
+            "Training_Time_Sec": 1.624
+        }
+    },
+    {
+        "timestamp": "2026-07-13 18:26:11",
+        "model_name": "logistic_regression",
+        "parameters": {
+            "C": "1.0",
+            "class_weight": "balanced",
+            "dual": "False",
+            "fit_intercept": "True",
+            "intercept_scaling": "1",
+            "l1_ratio": "None",
+            "max_iter": "1000",
+            "multi_class": "deprecated",
+            "n_jobs": "None",
+            "penalty": "l2",
+            "random_state": "42",
+            "solver": "lbfgs",
+            "tol": "0.0001",
+            "verbose": "0",
+            "warm_start": "False"
+        },
+        "metrics": {
+            "F1-Score": 0.22589531680440772,
+            "ROC-AUC": 0.6885333333333334,
+            "Balanced_Accuracy": 0.6398198198198197,
+            "Log_Loss": 0.563060423173979,
+            "Training_Time_Sec": 1.0454
+        }
+    },
+    {
+        "timestamp": "2026-07-13 18:27:01",
+        "model_name": "logistic_regression",
+        "parameters": {
+            "C": "1.0",
+            "class_weight": "balanced",
+            "dual": "False",
+            "fit_intercept": "True",
+            "intercept_scaling": "1",
+            "l1_ratio": "None",
+            "max_iter": "1000",
+            "multi_class": "deprecated",
+            "n_jobs": "None",
+            "penalty": "l2",
+            "random_state": "42",
+            "solver": "lbfgs",
+            "tol": "0.0001",
+            "verbose": "0",
+            "warm_start": "False"
+        },
+        "metrics": {
+            "F1-Score": 0.22589531680440772,
+            "ROC-AUC": 0.6885333333333334,
+            "Balanced_Accuracy": 0.6398198198198197,
+            "Log_Loss": 0.563060423173979,
+            "Training_Time_Sec": 0.999
+        }
+    },
+    {
+        "timestamp": "2026-07-13 18:32:53",
+        "model_name": "logistic_regression",
+        "parameters": {
+            "C": "1.0",
+            "class_weight": "balanced",
+            "dual": "False",
+            "fit_intercept": "True",
+            "intercept_scaling": "1",
+            "l1_ratio": "None",
+            "max_iter": "1000",
+            "multi_class": "deprecated",
+            "n_jobs": "None",
+            "penalty": "l2",
+            "random_state": "42",
+            "solver": "lbfgs",
+            "tol": "0.0001",
+            "verbose": "0",
+            "warm_start": "False"
+        },
+        "metrics": {
+            "F1-Score": 0.22589531680440772,
+            "ROC-AUC": 0.6885333333333334,
+            "Balanced_Accuracy": 0.6398198198198197,
+            "Log_Loss": 0.563060423173979,
+            "Training_Time_Sec": 1.0207
+        }
+    },
+    {
+        "timestamp": "2026-07-13 23:31:44",
+        "model_name": "logistic_regression",
+        "parameters": {
+            "C": "1.0",
+            "class_weight": "balanced",
+            "dual": "False",
+            "fit_intercept": "True",
+            "intercept_scaling": "1",
+            "l1_ratio": "None",
+            "max_iter": "1000",
+            "multi_class": "deprecated",
+            "n_jobs": "None",
+            "penalty": "l2",
+            "random_state": "42",
+            "solver": "lbfgs",
+            "tol": "0.0001",
+            "verbose": "0",
+            "warm_start": "False"
+        },
+        "metrics": {
+            "F1-Score": 0.22589531680440772,
+            "ROC-AUC": 0.6885333333333334,
+            "Balanced_Accuracy": 0.6398198198198197,
+            "Log_Loss": 0.563060423173979,
+            "Training_Time_Sec": 1.7491
+        }
+    }
+]

@@ -17,7 +17,7 @@ The technical stack is defined by the package manager specifications (`requireme
 
 ## 3. Test Coverage Reality
 Running `pytest tests/ -q` confirms:
-- **Exact Pass/Fail Count**: 108 Passed, 0 Failed
+- **Exact Pass/Fail Count**: 119 Passed, 0 Failed
 - **Test File Descriptions**:
   - `test_full_suite.py`: Verifies individual class methods, data validation pipeline fits, model comparisons, and model registry logging across the core `src` and `app` packages.
   - `test_coverage_boost.py`: Validates custom exception paths, route-level business limits (DTI/bad credit), database failures, and XAI local perturbation surrogate edge cases to maximize branch coverage.
