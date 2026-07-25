@@ -5,23 +5,23 @@ Model: LogisticRegression(max_iter=2000, solver='lbfgs', class_weight='balanced'
 Holdout Test Set Support: 7292 samples (7,169 Class 0 / 123 Class 1)
 
 Confusion Matrix:
-[[4644 2525]
- [  70   53]]
+[[4528 2641]
+ [  67   56]]
 
 Classification Report:
               precision    recall  f1-score   support
 
-Approved (0)       0.99      0.65      0.78      7169
-Rejected (1)       0.02      0.43      0.04       123
+Approved (0)       0.99      0.63      0.77      7169
+Rejected (1)       0.02      0.46      0.04       123
 
-    accuracy                           0.64      7292
-   macro avg       0.50      0.54      0.41      7292
-weighted avg       0.97      0.64      0.77      7292
+    accuracy                           0.63      7292
+   macro avg       0.50      0.54      0.40      7292
+weighted avg       0.97      0.63      0.76      7292
 
-Accuracy:                         0.6441 (64.41%)
-Minority Default Recall (Class 1): 0.4309 (43.09%)
-Precision (Class 1):               0.0206 (2.06%)
-F1-Score:                         0.0392 (0.0392)
+Accuracy:                         0.6286 (62.86%)
+Minority Default Recall (Class 1): 0.4553 (45.53%)
+Precision (Class 1):               0.0208 (2.08%)
+F1-Score:                         0.0397 (0.0397)
 
 Status: PASSED - Model trained and evaluated cleanly on scaled 7,292 test split (1.69s train time).
 ============================================================
