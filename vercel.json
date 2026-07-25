@@ -9,11 +9,11 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "5_Project_Development_Phase/index.py"
+      "dest": "/5_Project_Development_Phase/index.py"
     },
     {
       "src": "/(.*)",
-      "dest": "5_Project_Development_Phase/index.py"
+      "dest": "/5_Project_Development_Phase/index.py"
     }
   ]
 }
