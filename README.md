@@ -108,6 +108,11 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 | **Database & Storage** | SQLite3 (`prediction_history.db`), Supabase PostgreSQL integration |
 | **Testing & Quality** | Pytest (`119/119 tests passing`), Selenium Webdriver, Flake8, Black |
 
+## 🌐 Live Demo & Deployment
+
+- **Live Application URL**: [https://credit-card-approval-prediction-10bvcybgg.vercel.app](https://credit-card-approval-prediction-10bvcybgg.vercel.app)
+- **Status**: ● Ready (Vercel Serverless Python 3.10 Runtime)
+
 ---
 
 ## 💻 Local Quickstart
