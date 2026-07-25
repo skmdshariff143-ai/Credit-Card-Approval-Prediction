@@ -110,7 +110,7 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 
 ## 🌐 Live Demo & Deployment
 
-- **Live Application URL**: [https://credit-card-approval-prediction-10bvcybgg.vercel.app](https://credit-card-approval-prediction-10bvcybgg.vercel.app)
+- **Live Application URL**: [https://credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app)
 - **Status**: ● Ready (Vercel Serverless Python 3.10 Runtime)
 
 ---
