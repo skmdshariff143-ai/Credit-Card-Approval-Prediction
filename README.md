@@ -108,10 +108,10 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 | **Database & Storage** | SQLite3 (`prediction_history.db`), Supabase PostgreSQL integration |
 | **Testing & Quality** | Pytest (`119/119 tests passing`), Selenium Webdriver, Flake8, Black |
 
-## 🌐 Live Demo & Deployment
+## 🌐 Live Demo & Deployment Pipeline
 
-- **Live Application URL**: [https://credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app)
-- **Status**: ● Ready (Vercel Serverless Python 3.10 Runtime)
+- **Live Production URL**: [https://credit-card-approval-prediction-lac.vercel.app](https://credit-card-approval-prediction-lac.vercel.app)
+- **Deployment Strategy**: **GitHub-Integrated Continuous Deployment**. Every push to `main` automatically runs Black/Flake8 linting, Pytest suite (119/119 tests), builds `api/index.py`, and promotes the deployment to the production `-lac.vercel.app` alias.
 
 ---
 
