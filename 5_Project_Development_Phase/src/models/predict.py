@@ -25,7 +25,7 @@ class RiskPredictor:
         self.model_path = os.path.join(self.models_dir, "best_model.pkl")
         self.calibrator_path = os.path.join(self.models_dir, "calibrator.pkl")
         self.metrics_path = os.path.join(self.models_dir, "model_metrics.json")
-        
+
         self.pipeline = None
         self.model = None
         self.calibrator = None
@@ -112,7 +112,11 @@ class RiskPredictor:
             "NAME_HOUSING_TYPE": str(form_data.get("name_housing_type", "House / apartment")),
             "OCCUPATION_TYPE": str(form_data.get("occupation_type", "Laborers")),
             "DAYS_BIRTH": -int(float(form_data.get("age_years", 30.0)) * 365.25),
-            "DAYS_EMPLOYED": 0 if int(form_data.get("flag_unemployed", 0)) == 1 else -int(float(form_data.get("years_employed", 1.0)) * 365.25),
+            "DAYS_EMPLOYED": (
+                0
+                if int(form_data.get("flag_unemployed", 0)) == 1
+                else -int(float(form_data.get("years_employed", 1.0)) * 365.25)
+            ),
             "FLAG_MOBIL": 1,
             "FLAG_WORK_PHONE": int(form_data.get("flag_work_phone", 0)),
             "FLAG_PHONE": int(form_data.get("flag_phone", 0)),
@@ -127,11 +131,11 @@ class RiskPredictor:
         """Runs batch or single predictions."""
         if len(input_df) == 1:
             return self.predict_single_sample(input_df)
-        
+
         pipeline = self.load_pipeline()
         calibrator = self.load_calibrator()
         model = calibrator if calibrator is not None else self.load_model()
-        
+
         X_trans = pipeline.transform(input_df)
         probs = model.predict_proba(X_trans)[:, 1]
         preds = [1 if p >= self.threshold else 0 for p in probs]
@@ -219,6 +223,7 @@ class RiskPredictor:
         if explainer is None:
             try:
                 import shap
+
                 explainer = shap.TreeExplainer(model)
             except Exception:
                 explainer = None
@@ -255,7 +260,7 @@ class RiskPredictor:
                             "label": parent_label,
                             "shap_sum": 0.0,
                             "active_dummy_label": None,
-                            "max_active_val": -999.0
+                            "max_active_val": -999.0,
                         }
 
                     grouped_shap[parent_key]["shap_sum"] += s_val
@@ -273,15 +278,21 @@ class RiskPredictor:
                     if mag > 1e-6:
                         display_label = item["active_dummy_label"] or item["label"]
                         is_risk = s_sum > 0
-                        driver_list.append({
-                            "raw_feature": p_key,
-                            "feature": display_label,
-                            "shap_value": round(s_sum, 4),
-                            "magnitude": round(mag, 4),
-                            "is_risk": is_risk,
-                            "direction": "Pushed toward Rejection (Increased Risk)" if is_risk else "Pushed toward Approval (Decreased Risk)",
-                            "impact": round(mag, 4)
-                        })
+                        driver_list.append(
+                            {
+                                "raw_feature": p_key,
+                                "feature": display_label,
+                                "shap_value": round(s_sum, 4),
+                                "magnitude": round(mag, 4),
+                                "is_risk": is_risk,
+                                "direction": (
+                                    "Pushed toward Rejection (Increased Risk)"
+                                    if is_risk
+                                    else "Pushed toward Approval (Decreased Risk)"
+                                ),
+                                "impact": round(mag, 4),
+                            }
+                        )
 
                 # Sort by magnitude descending and take top 5
                 driver_list.sort(key=lambda x: x["magnitude"], reverse=True)
@@ -325,7 +336,7 @@ class RiskPredictor:
         risk_labels = [d["feature"].lower() for d in top_drivers if d["is_risk"]][:2]
         support_labels = [d["feature"].lower() for d in top_drivers if not d["is_risk"]][:2]
         threshold_pct = round(self.threshold * 100.0, 2)
-        
+
         if risk_labels:
             flag_text = f"flagged primarily due to: {', '.join(risk_labels)}"
         else:
@@ -341,7 +352,7 @@ class RiskPredictor:
             "top_risk_drivers": top_drivers,
             "risk_factors": risk_factors,
             "support_factors": support_factors,
-            "plain_english_summary": summary_text
+            "plain_english_summary": summary_text,
         }
 
     def predict_probability(self, input_df: pd.DataFrame) -> list:

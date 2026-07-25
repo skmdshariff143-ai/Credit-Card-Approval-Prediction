@@ -50,7 +50,6 @@ FEATURE_LABEL_MAP = {
     "OCCUPATION_TYPE_IT staff": "Information Technology Specialist",
     "OCCUPATION_TYPE_Realty agents": "Real Estate Agent / Broker",
     "OCCUPATION_TYPE_Missing": "Unspecified / Missing Occupation",
-
     # Continuous & Engineered Features
     "AMT_INCOME_TOTAL": "Total Annual Income ($)",
     "CNT_CHILDREN": "Number of Dependent Children",

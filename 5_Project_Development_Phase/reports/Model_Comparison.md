@@ -6,10 +6,10 @@ This report compares and ranks candidate risk models based on F1-Score, ROC-AUC,
 
 | Rank | Model | F1-Score | ROC-AUC | Accuracy | Precision | Recall | Balanced_Accuracy | Log_Loss | Training_Time_Sec | Prediction_Time_Sec |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | random_forest | 0.2562 | 0.8042 | 0.9793 | 0.3250 | 0.2114 | 0.6019 | 0.2293 | 1.5032 | 0.0804 |
-| 2 | xgboost | 0.2526 | 0.7090 | 0.9805 | 0.3582 | 0.1951 | 0.5946 | 0.0888 | 1.1832 | 0.0323 |
-| 3 | decision_tree | 0.2348 | 0.6878 | 0.9759 | 0.2523 | 0.2195 | 0.6042 | 0.5801 | 0.9102 | 0.0069 |
-| 4 | logistic_regression | 0.0397 | 0.5390 | 0.6286 | 0.0208 | 0.4553 | 0.5434 | 0.6331 | 33.9376 | 0.0082 |
+| 1 | random_forest | 0.2885 | 0.7865 | 0.9797 | 0.3529 | 0.2439 | 0.6181 | 0.2468 | 1.5346 | 0.0976 |
+| 2 | decision_tree | 0.2743 | 0.7047 | 0.9775 | 0.3010 | 0.2520 | 0.6210 | 0.5311 | 0.9211 | 0.0076 |
+| 3 | xgboost | 0.2513 | 0.6980 | 0.9804 | 0.3529 | 0.1951 | 0.5945 | 0.0906 | 1.1520 | 0.0236 |
+| 4 | logistic_regression | 0.0368 | 0.5275 | 0.6194 | 0.0192 | 0.4309 | 0.5268 | 0.6315 | 34.3033 | 0.0077 |
 
 ## 2. Algorithm Strengths & Weaknesses Assessment
 
