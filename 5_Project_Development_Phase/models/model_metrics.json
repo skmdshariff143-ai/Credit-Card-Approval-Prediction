@@ -34,13 +34,14 @@
     "Log_Loss": 0.2292703107358458,
     "Training_Time_Sec": 1.583,
     "Prediction_Time_Sec": 0.0828,
-    "brier_score_before_calibration": 0.882786,
-    "brier_score_after_calibration": 0.01658,
-    "optimal_decision_threshold": 0.0199,
+    "brier_score_before_calibration": 0.017948,
+    "brier_score_after_calibration": 0.01563,
+    "optimal_decision_threshold": 0.0395,
     "cost_ratio_fn_to_fp": "5:1",
-    "cost_sensitive_f1": 0.0,
-    "cost_sensitive_recall": 0.0,
-    "cost_sensitive_precision": 0.0
+    "cost_sensitive_f1": 0.3608,
+    "cost_sensitive_recall": 0.374,
+    "cost_sensitive_precision": 0.3485,
+    "brier_improvement_pct": 12.91
   },
   {
     "Model": "xgboost",

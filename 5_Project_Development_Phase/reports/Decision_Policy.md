@@ -1,8 +1,8 @@
 # Credit Risk Decision Policy & Threshold Governance
 
-**Document Version:** 2.0  
+**Document Version:** 2.1 (Sanity Verified)  
 **Effective Date:** July 25, 2026  
-**Champion Model:** Calibrated RandomForestClassifier (`brier_score`: 0.01658)  
+**Champion Model:** Calibrated RandomForestClassifier (`brier_score`: 0.015630)  
 **Cost Ratio Assumption:** $\text{Cost}_{\text{FN}} : \text{Cost}_{\text{FP}} = 5 : 1$  
 
 ---
@@ -11,7 +11,7 @@
 
 Standard machine learning classifiers apply a default decision threshold of $p = 0.50$. In commercial retail credit risk, this default threshold leads to severe financial under-protection:
 1. **Asymmetric Loss Structure**: Approving a high-risk applicant who defaults (**False Negative**, Class 1 $\rightarrow$ Class 0 approval) incurs direct principal loss (~$5,000–$25,000). Conversely, turning away a creditworthy applicant (**False Positive**, Class 0 $\rightarrow$ Class 1 rejection) incurs only an opportunity cost of lost interest margin (~$1,000).
-2. **Cost-Sensitive Threshold Optimization**: By modeling expected economic loss across probability thresholds $p \in [0.01, 0.99]$ with a **5:1 asymmetric cost ratio**, we derive an operational decision policy threshold of **$p^* = 0.0199$** (and $p = 0.0100$ for maximum F1-score balance).
+2. **Cost-Sensitive Threshold Optimization**: By modeling expected economic loss across probability thresholds $p \in [0.01, 0.99]$ with a **5:1 asymmetric cost ratio**, we derive an operational decision policy threshold of **$p^* = 0.0395$** (approx. 3.95% risk probability).
 
 ---
 
@@ -29,23 +29,23 @@ Where:
 
 | Policy / Threshold ($p$) | Brier Calibration Score | F1-Score | Default Recall (Class 1) | Default Precision | Total Expected Risk Cost |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **Default Threshold ($p = 0.50$)** | 0.8828 | 0.0000 | 0.0000 | 0.0000 | 615.0 |
-| **Cost-Sensitive Optimal ($p^* = 0.0199$)** | **0.0166** | **0.0000** | **0.0000** | **0.0000** | **615.0** |
+| **Default Threshold ($p = 0.50$)** | 0.017948 | 0.1625 | 0.1057 | 0.3514 | 574.0 |
+| **Cost-Sensitive Optimal ($p^* = 0.0395$)** | **0.015630** | **0.3608** | **0.3740** | **0.3485** | **471.0** |
 
 ---
 
 ## Probability Calibration & Reliability
 
-Tree-based ensemble models like Random Forest produce uncalibrated leaf voting probabilities that cluster around boundary extremes. 
+Tree-based ensemble models like Random Forest produce uncalibrated leaf voting probabilities that benefit from post-hoc calibration prior to thresholding.
 
-- **Uncalibrated Brier Score:** `0.88279`
-- **Calibrated Brier Score (Platt Sigmoid Scaling):** `0.01658`
-- **Calibration Improvement:** **98.1% reduction in probability error**.
+- **Uncalibrated Brier Score:** `0.017948`
+- **Calibrated Brier Score (Platt Sigmoid Scaling):** `0.015630`
+- **Calibration Improvement:** **12.91% reduction in probability error**.
 
 The calibrated probability represents a true posterior likelihood of default $P(Y=1 \mid X)$, enabling risk committees to bucket applicants into risk tiers:
-- **Tier 1 (Instant Approval):** $P(\text{Default}) < 0.05$
-- **Tier 2 (Manual Underwriting Review):** $0.05 \le P(\text{Default}) < 0.0199$
-- **Tier 3 (Decline):** $P(\text{Default}) \ge 0.0199$
+- **Tier 1 (Instant Approval):** $P(\text{Default}) < 0.02$
+- **Tier 2 (Manual Underwriting Review):** $0.02 \le P(\text{Default}) < 0.0395$
+- **Tier 3 (Decline / High Risk):** $P(\text{Default}) \ge 0.0395$
 
 ---
 
