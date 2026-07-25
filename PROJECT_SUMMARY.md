@@ -72,13 +72,13 @@ All models were evaluated on the real holdout test set ($N_{\text{test}} = 7,292
 
 | Rank | Model Algorithm | F1-Score | ROC-AUC | Naive Accuracy | Precision | Default Recall (Minority) | Balanced Accuracy | Log Loss | Training Time | Inference Latency |
 |---|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 🏆 **1** | **Random Forest** | **0.2562** | **0.8042** | **97.93%** | **32.50%** | **21.14%** (26/123) | **0.6019** | **0.2589** | 1.28s | 0.1184s |
-| **2** | **XGBoost** | 0.2526 | 0.7090 | 98.05% | 35.82% | 19.51% (24/123) | 0.5946 | 0.3032 | 0.98s | 0.0331s |
-| **3** | **Decision Tree** | 0.2348 | 0.6878 | 97.59% | 25.23% | 21.95% (27/123) | 0.6042 | 1.4766 | **0.66s** | **0.0014s** |
-| **4** | **Logistic Regression** | 0.0336 | 0.5225 | 61.40% | 1.76% | 39.84% (49/123) | 0.5080 | 0.5631 | 16.62s | 0.0032s |
+| 🏆 **1** | **Random Forest** | **0.2562** | **0.8041** | **97.93%** | **32.50%** | **21.14%** (26/123) | **0.6019** | **0.2589** | 1.56s | 0.1184s |
+| **2** | **XGBoost** | 0.2526 | 0.7090 | 98.05% | 35.82% | 19.51% (24/123) | 0.5946 | 0.3032 | 1.18s | 0.0331s |
+| **3** | **Decision Tree** | 0.2348 | 0.6878 | 97.59% | 25.23% | 21.95% (27/123) | 0.6042 | 1.4766 | **0.88s** | **0.0014s** |
+| **4** | **Logistic Regression** | 0.0392 | 0.5386 | 64.41% | 2.06% | 43.09% (53/123) | 0.5386 | 0.5631 | 1.69s | 0.0032s |
 
 ### Champion Model Justification:
-**Random Forest (`RandomForestClassifier`)** is auto-selected as the production champion model. It achieves the top F1-Score (**0.2562**), highest ROC-AUC (**0.8042**), and 97.93% accuracy on the real holdout test set, delivering strong risk discrimination without excessive false alarms.
+**Random Forest (`RandomForestClassifier`)** is auto-selected as the production champion model. It achieves the top F1-Score (**0.2562**), highest ROC-AUC (**0.8041**), and 97.93% accuracy on the real holdout test set, delivering strong risk discrimination without excessive false alarms.
 
 ---
 

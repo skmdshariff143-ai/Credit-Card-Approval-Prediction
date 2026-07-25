@@ -1,15 +1,15 @@
 [
     {
         "Model": "logistic_regression",
-        "Accuracy": 0.613960504662644,
-        "Precision": 0.01756272401433692,
-        "Recall": 0.3983739837398374,
-        "F1-Score": 0.03364229316855476,
-        "ROC-AUC": 0.5224657428608043,
-        "Balanced_Accuracy": 0.5080166752288251,
-        "Log_Loss": 0.633248166812287,
-        "Training_Time_Sec": 15.1131,
-        "Prediction_Time_Sec": 0.0069
+        "Accuracy": 0.6441305540318157,
+        "Precision": 0.020558572536850273,
+        "Recall": 0.43089430894308944,
+        "F1-Score": 0.039244724176231024,
+        "ROC-AUC": 0.5386295103012406,
+        "Balanced_Accuracy": 0.5393417004333246,
+        "Log_Loss": 0.6164881595937167,
+        "Training_Time_Sec": 1.6399,
+        "Prediction_Time_Sec": 0.0045
     },
     {
         "Model": "decision_tree",
@@ -20,8 +20,8 @@
         "ROC-AUC": 0.6878356110942893,
         "Balanced_Accuracy": 0.6041765188191707,
         "Log_Loss": 0.5801212655639046,
-        "Training_Time_Sec": 0.686,
-        "Prediction_Time_Sec": 0.0043
+        "Training_Time_Sec": 0.8819,
+        "Prediction_Time_Sec": 0.0045
     },
     {
         "Model": "random_forest",
@@ -29,11 +29,11 @@
         "Precision": 0.325,
         "Recall": 0.21138211382113822,
         "F1-Score": 0.2561576354679803,
-        "ROC-AUC": 0.8041959112574806,
+        "ROC-AUC": 0.8041040523391704,
         "Balanced_Accuracy": 0.6019248412598507,
-        "Log_Loss": 0.22925857453958104,
-        "Training_Time_Sec": 1.2798,
-        "Prediction_Time_Sec": 0.0655
+        "Log_Loss": 0.2292703107358458,
+        "Training_Time_Sec": 1.5649,
+        "Prediction_Time_Sec": 0.0872
     },
     {
         "Model": "xgboost",
@@ -44,7 +44,7 @@
         "ROC-AUC": 0.7089801732164344,
         "Balanced_Accuracy": 0.5945619520360359,
         "Log_Loss": 0.08882065039439033,
-        "Training_Time_Sec": 0.9796,
-        "Prediction_Time_Sec": 0.0205
+        "Training_Time_Sec": 1.1781,
+        "Prediction_Time_Sec": 0.019
     }
 ]

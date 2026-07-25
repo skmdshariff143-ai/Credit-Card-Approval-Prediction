@@ -1,26 +1,27 @@
 ============================================================
-EPIC 4 - STEP 6: LOGISTIC REGRESSION MODEL (REAL DATASET)
+EPIC 4 - STEP 6: LOGISTIC REGRESSION MODEL (REAL PROPERLY SCALED DATA)
 ============================================================
-Model: LogisticRegression(class_weight='balanced', max_iter=1000)
+Model: LogisticRegression(max_iter=2000, solver='lbfgs', class_weight='balanced')
 Holdout Test Set Support: 7292 samples (7,169 Class 0 / 123 Class 1)
 
 Confusion Matrix:
-[[4428 2741]
- [  74   49]]
+[[4644 2525]
+ [  70   53]]
 
 Classification Report:
               precision    recall  f1-score   support
 
-Approved (0)       0.98      0.62      0.76      7169
-Rejected (1)       0.02      0.40      0.03       123
+Approved (0)       0.99      0.65      0.78      7169
+Rejected (1)       0.02      0.43      0.04       123
 
-    accuracy                           0.61      7292
-   macro avg       0.50      0.51      0.40      7292
-weighted avg       0.97      0.61      0.75      7292
+    accuracy                           0.64      7292
+   macro avg       0.50      0.54      0.41      7292
+weighted avg       0.97      0.64      0.77      7292
 
-Accuracy:                         0.6140 (61.40%)
-Minority Default Recall (Class 1): 0.3984 (39.84%)
-F1-Score:                         0.0336 (0.0336)
+Accuracy:                         0.6441 (64.41%)
+Minority Default Recall (Class 1): 0.4309 (43.09%)
+Precision (Class 1):               0.0206 (2.06%)
+F1-Score:                         0.0392 (0.0392)
 
-Status: PASSED - Model trained and evaluated cleanly on real 7,292 test split.
+Status: PASSED - Model trained and evaluated cleanly on scaled 7,292 test split (1.69s train time).
 ============================================================

@@ -24,18 +24,19 @@ weighted avg       0.97      0.98      0.98      7292
 
 | Model Algorithm | F1-Score | ROC-AUC | Accuracy | Precision | Default Recall (Class 1) | Balanced Accuracy | Training Time |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| 🏆 **Random Forest** | **0.2562** | **0.8042** | 97.93% | **32.50%** | **21.14%** (26/123) | **0.6019** | 1.28s |
-| **XGBoost** | 0.2526 | 0.7090 | **98.05%** | 35.82% | 19.51% (24/123) | 0.5946 | 0.98s |
-| **Decision Tree** | 0.2348 | 0.6878 | 97.59% | 25.23% | 21.95% (27/123) | 0.6042 | **0.66s** |
-| **Logistic Regression** | 0.0336 | 0.5225 | 61.40% | 1.76% | 39.84% (49/123) | 0.5080 | 16.62s |
+| 🏆 **Random Forest** | **0.2562** | **0.8041** | 97.93% | **32.50%** | **21.14%** (26/123) | **0.6019** | 1.56s |
+| **XGBoost** | 0.2526 | 0.7090 | **98.05%** | 35.82% | 19.51% (24/123) | 0.5946 | 1.18s |
+| **Decision Tree** | 0.2348 | 0.6878 | 97.59% | 25.23% | 21.95% (27/123) | 0.6042 | **0.88s** |
+| **Logistic Regression** | 0.0392 | 0.5386 | 64.41% | 2.06% | 43.09% (53/123) | 0.5386 | 1.69s |
 
 ---
 
 ## 3. Key Technical Takeaways
 
-1. **Random Forest is Champion**: Achieves top F1-Score (**0.2562**), highest ROC-AUC (**0.8042**), and 97.93% accuracy on the real 7,292 test split.
-2. **SMOTE Oversampling Impact**: SMOTE oversamples training data to 57,344 rows (28,672 zeros / 28,672 ones), allowing tree ensembles to learn minority default decision boundaries without overfitting.
-3. **Holdout Verification**: Test evaluation is conducted on raw 7,292 holdout samples to guarantee un-leaked, honest production metric estimation.
+1. **Random Forest is Champion**: Achieves top F1-Score (**0.2562**), highest ROC-AUC (**0.8041**), and 97.93% accuracy on the real 7,292 test split.
+2. **Proper Scaling and Convergence**: `StandardScaler` applied to all features allows Logistic Regression to converge in 1.69 seconds with `max_iter=2000`.
+3. **SMOTE Oversampling Impact**: SMOTE oversamples training data to 57,344 rows (28,672 zeros / 28,672 ones), allowing tree ensembles to learn minority default decision boundaries without overfitting.
+4. **Holdout Verification**: Test evaluation is conducted on raw 7,292 holdout samples to guarantee un-leaked, honest production metric estimation.
 
 ---
 *Report compiled from empirical test evaluation logs in `models/model_metrics.json`.*
