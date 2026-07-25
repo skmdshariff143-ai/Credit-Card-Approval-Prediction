@@ -20,15 +20,49 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 
 ## 🚀 Key Performance Metrics
 
-| Metric | Champion Model (Calibrated Random Forest) | Baseline (Logistic Regression) |
-| :--- | :--- | :--- |
-| **Overall Classification Accuracy** | **97.97%** | 61.94% |
-| **ROC-AUC Score** | **0.7865** | 0.5275 |
-| **Calibrated Brier Score** | **0.015387** (+14.0% improvement) | 0.241000 |
-| **Default Recall @ Policy Cutoff ($p^*=3.95\%$)** | **35.77%** (44/123 defaults caught) | 43.09% |
-| **Optimal Decision Threshold ($p^*$)** | **0.0395** (3.95% risk cutoff) | 0.5000 |
+### Traceable Source Artifact (`models/model_metrics.json`)
+```json
+[
+  {
+    "Model": "logistic_regression",
+    "Accuracy": 0.6027153044432254,
+    "Precision": 0.019736842105263157,
+    "Recall": 0.4634146341463415,
+    "F1-Score": 0.03786117568913982,
+    "ROC-AUC": 0.523021999643905,
+    "brier_score": 0.226313
+  },
+  {
+    "Model": "random_forest",
+    "Accuracy": 0.9797037849698299,
+    "Precision": 0.35294117647058826,
+    "Recall": 0.24390243902439024,
+    "F1-Score": 0.28846153846153844,
+    "ROC-AUC": 0.7865000277844876,
+    "brier_score_before_calibration": 0.017893,
+    "brier_score_after_calibration": 0.015387,
+    "brier_improvement_pct": 14.0,
+    "optimal_decision_threshold": 0.0395,
+    "cost_ratio_fn_to_fp": "5:1",
+    "cost_sensitive_f1": 0.3492,
+    "cost_sensitive_recall": 0.3577,
+    "cost_sensitive_precision": 0.3411
+  }
+]
+```
 
-*Note: Measured on a holdout test dataset ($N=7,292$) reflecting real-world class imbalance (98.3% solvent / 1.7% default).*
+### Verified Model Comparison Table
+
+| Metric | Champion Model (Calibrated Random Forest) | Baseline (Logistic Regression `class_weight='balanced'`) |
+| :--- | :--- | :--- |
+| **Overall Classification Accuracy** | **97.97%** (`0.979704`) | **60.27%** (`0.602715`) |
+| **ROC-AUC Score** | **0.7865** (`0.786500`) | **0.5230** (`0.523022`) |
+| **Brier Score (Lower is Better)** | **0.015387** (Calibrated, -14.0%) | **0.226313** (Uncalibrated) |
+| **Default Recall @ Decision Cutoff** | **35.77%** ($p^*=0.0395$, 44/123 defaults caught) | **46.34%** ($p=0.5000$ default) |
+| **F1-Score** | **0.3492** (Cost-sensitive at $p^*=0.0395$) | **0.0379** |
+| **Decision Threshold ($p^*$)** | **0.0395** (3.95% risk cutoff) | **0.5000** |
+
+*Note: Evaluated on holdout test dataset ($N=7,292$) reflecting real-world credit class imbalance (98.3% solvent / 1.7% default).*
 
 ---
 
@@ -95,7 +129,7 @@ python app/app.py
 ```
 Open `http://127.0.0.1:5000` in your web browser.
 
-**Local Admin Credentials**:
+**Local Development Credentials**:
 - **Email**: `admin@creditguard.ai`
 - **Password**: `Admin123!`
 
