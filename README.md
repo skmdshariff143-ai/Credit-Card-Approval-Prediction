@@ -142,13 +142,21 @@ git clone https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction.g
 cd Credit-Card-Approval-Prediction
 ```
 
-### 2. Set Up Virtual Environment
+### 2. Set Up Environment & Recommended IDE
 
-**Using Anaconda (Conda):**
+> 💡 **Recommended IDE**: **PyCharm** (Community or Professional Edition) or **VS Code**. When opening in PyCharm, set the Python Interpreter to your active `venv` or Conda environment.
+
+**Using Anaconda / Conda CLI:**
 ```bash
-conda create --name creditguard python=3.13 -y
+conda env create -f environment.yml
 conda activate creditguard
 ```
+
+**Using Anaconda Navigator (GUI):**
+1. Open **Anaconda Navigator**.
+2. Navigate to **Environments** -> **Import**.
+3. Select `environment.yml` from the root project directory and click **Import**.
+4. Activate the `creditguard` environment.
 
 **Using Standard Python `venv`:**
 ```bash

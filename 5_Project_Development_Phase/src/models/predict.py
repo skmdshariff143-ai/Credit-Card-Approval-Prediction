@@ -1,5 +1,6 @@
 import os
 
+import numpy as np
 import pandas as pd
 
 from config.config import config
@@ -96,8 +97,7 @@ class RiskPredictor:
 
         # Generate explanation map
         try:
-            explainer = ExplanationEngine(model, pipeline)
-            explanation = explainer.explain_instance(input_df)
+            explanation = self.explain_prediction(input_df)
         except Exception as e:
             logger.error(f"Failed to calculate local explanation: {str(e)}")
             explanation = {"error": str(e)}
@@ -106,6 +106,65 @@ class RiskPredictor:
             "decision": decision,
             "approval_probability_percent": float(round(approval_prob, 2)),
             "explanation": explanation,
+        }
+
+    def explain_prediction(self, applicant_data) -> dict:
+        """
+        Returns top 3-5 features driving a specific applicant's prediction,
+        including direction (pushed toward approval/rejection) and magnitude.
+        """
+        pipeline = self.load_pipeline()
+        model = self.load_model()
+
+        if isinstance(applicant_data, dict):
+            df_in = pd.DataFrame([applicant_data])
+        else:
+            df_in = applicant_data
+
+        X_trans = pipeline.transform(df_in)
+
+        # Check for pre-saved SHAP explainer or instantiate TreeExplainer
+        explainer_path = os.path.join(self.models_dir, "shap_explainer.pkl")
+        if os.path.exists(explainer_path):
+            explainer = load_pkl(explainer_path)
+        else:
+            import shap
+            explainer = shap.TreeExplainer(model)
+
+        shap_res = explainer(X_trans, check_additivity=False)
+        if hasattr(shap_res, "values"):
+            vals = shap_res.values[0]
+            if len(vals.shape) == 2:
+                row_vals = vals[:, 1]
+            else:
+                row_vals = vals
+        else:
+            if isinstance(shap_res, list):
+                row_vals = shap_res[1][0]
+            else:
+                row_vals = shap_res[0]
+
+        abs_vals = np.abs(row_vals)
+        top_indices = np.argsort(abs_vals)[::-1][:5]
+
+        top_drivers = []
+        for idx in top_indices:
+            feat_name = X_trans.columns[idx]
+            s_val = float(row_vals[idx])
+            mag = float(abs(s_val))
+            direction = "Pushed toward Rejection (Increased Risk)" if s_val > 0 else "Pushed toward Approval (Decreased Risk)"
+            f_val = float(X_trans.iloc[0, idx])
+            top_drivers.append({
+                "feature": feat_name,
+                "shap_value": round(s_val, 4),
+                "magnitude": round(mag, 4),
+                "direction": direction,
+                "feature_val": round(f_val, 4)
+            })
+
+        return {
+            "applicant_status": "Risk Explanation Complete",
+            "top_risk_drivers": top_drivers
         }
 
     def predict_probability(self, input_df: pd.DataFrame) -> list:
@@ -160,5 +219,10 @@ def predict_probability(input_df: pd.DataFrame) -> list:
     return _predictor.predict_probability(input_df)
 
 
+def explain_prediction(applicant_data) -> dict:
+    return _predictor.explain_prediction(applicant_data)
+
+
 # Backward compatibility alias
 InferenceEngine = RiskPredictor
+

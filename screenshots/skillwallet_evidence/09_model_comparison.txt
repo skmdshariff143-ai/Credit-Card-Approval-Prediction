@@ -3,10 +3,10 @@ EPIC 4 - STEP 9: MODEL COMPARISON & CHAMPION SELECTION (REAL SCALED DATA)
 ============================================================
 Full Model Comparison Ranking Table (Real 7,292 Holdout Test Support):
               Model   Recall  F1-Score  Accuracy  ROC-AUC  Balanced_Accuracy
-logistic_regression 0.430894  0.039245  0.644131 0.538630           0.539342
-      decision_tree 0.219512  0.234783  0.975864 0.687836           0.604177
       random_forest 0.211382  0.256158  0.979292 0.804104           0.601925
             xgboost 0.195122  0.252632  0.980527 0.708980           0.594562
+      decision_tree 0.219512  0.234783  0.975864 0.687836           0.604177
+logistic_regression 0.430894  0.039245  0.644131 0.538630           0.539342
 
 CHAMPION MODEL SELECTED FOR best_model.pkl:
 Random Forest (random_forest)
