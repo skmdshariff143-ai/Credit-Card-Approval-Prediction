@@ -1,5 +1,7 @@
 # CreditGuard AI — Credit Card Approval Prediction System
 
+> 📌 **Recruiters & Technical Reviewers**: For a single, canonical narrative covering the problem, approach, architecture, real model metrics, deployment, and limitations, read **[PROJECT_SUMMARY.md](PROJECT_SUMMARY.md)**.
+
 <p align="center">
   <img src="docs/assets/images/system_architecture.png" width="900" alt="CreditGuard AI System Architecture">
 </p>
@@ -21,6 +23,7 @@
 ---
 
 ## 📑 Table of Contents
+- [Executive Summary (PROJECT_SUMMARY.md)](PROJECT_SUMMARY.md)
 - [Project Overview](#-project-overview)
 - [Business Problem](#-business-problem)
 - [Project Objectives](#-project-objectives)
