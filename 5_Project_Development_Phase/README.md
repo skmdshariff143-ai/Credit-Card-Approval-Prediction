@@ -244,26 +244,28 @@ Candidate Models ──> GridSearchCV (5-Fold CV) ──> Metric Calculation ─
 
 ---
 
-## 📈 Model Evaluation & Comparison
+## 📈 Model Evaluation & Honest Metric Analysis
 
-Performance metrics evaluated on the **holdout test set** ($N_{\text{test}} = 7,292$ samples):
+Performance metrics evaluated on the **holdout test set** ($N_{\text{test}} = 1,000$ samples: 925 solvent Class 0, 75 delinquent Class 1) extracted directly from `models/model_metrics.json`:
 
-| Classification Model | Accuracy | Precision | Recall (Minority) | F1-Score | ROC-AUC | Balanced Accuracy | Log Loss | Inference Latency |
-|---|---|---|---|---|---|---|---|---|
-| 🏆 **Logistic Regression** | **0.8650** | **0.8300** | **0.8540** | **0.8420** | **0.8910** | **0.8600** | **0.3120** | **0.002s** |
-| **Random Forest** | 0.8540 | 0.8150 | 0.8410 | 0.8280 | 0.8840 | 0.8480 | 0.3340 | 0.045s |
-| **XGBoost** | 0.8490 | 0.8020 | 0.8350 | 0.8180 | 0.8790 | 0.8420 | 0.3480 | 0.012s |
-| **Decision Tree** | 0.7820 | 0.7210 | 0.7650 | 0.7420 | 0.7750 | 0.7740 | 0.5120 | 0.001s |
+| Classification Model | Default Recall (Minority Target) | Precision | F1-Score | Naive Accuracy | ROC-AUC | Balanced Accuracy | Log Loss | Inference Latency |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| 🏆 **Logistic Regression** | **54.67%** (41/75) | **14.24%** | **0.2259** | 71.90% | **0.6885** | **0.6398** | 0.5631 | **0.0018s** |
+| **Decision Tree** | 20.00% (15/75) | 16.13% | 0.1786 | 86.20% | 0.6476 | 0.5523 | 1.4766 | 0.0023s |
+| **XGBoost** | 10.67% (8/75) | 36.36% | 0.1649 | 91.90% | 0.6961 | 0.5369 | 0.3032 | 0.0249s |
+| **Random Forest** | 9.33% (7/75) | 46.67% | 0.1556 | **92.40%** | 0.7250 | 0.5234 | **0.2589** | 0.1166s |
+
+> ⚠️ **Why Naive Accuracy is Misleading**: On imbalanced financial datasets (88:12 ratio), Random Forest scores **92.40% naive accuracy** but misses **90.67% of all actual credit defaults** (catching only 7 out of 75 delinquent cases). In commercial banking, default write-offs cost significantly more than rejecting solvent applicants. **Logistic Regression** (with SMOTE balanced weighting) yields a **54.67% default recall** ($5.9\times$ higher than Random Forest!) and the highest F1-score (**0.2259**), making it the safest model for credit risk mitigation.
 
 ---
 
 ## 🏆 Key Results & Champion Model Selection
 
 **Logistic Regression** was auto-selected as the production champion model:
-- **85.4% Minority Recall**: Catches 726 out of 850 credit defaults in holdout testing.
-- **Top F1-Score (0.8420) & ROC-AUC (0.8910)**.
-- **$<2\text{ms}$ Inference Latency**: Guarantees sub-10ms API performance.
-- **100% Mathematical Transparency**: Provides exact log-odds feature weights for compliance.
+- **54.67% Minority Default Recall**: Catches 41 out of 75 credit defaults in holdout testing (vs only 7 caught by Random Forest).
+- **Highest F1-Score (0.2259)** & **Balanced Accuracy (0.6398)** across candidate models.
+- **$<2\text{ms}$ Inference Latency (0.0018s)**: Guarantees sub-10ms API performance.
+- **100% Mathematical Transparency**: Provides exact log-odds feature weights for FCRA/GDPR compliance.
 
 ---
 
