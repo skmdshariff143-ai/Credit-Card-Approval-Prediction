@@ -12,7 +12,7 @@ During an audit of data ingestion pipelines, a critical discrepancy emerged betw
 
 The issue was uncovered when inspecting `OCCUPATION_TYPE` category frequencies: high-cardinality real-world categories (such as `Laborers` and `Core staff`) were replaced by uniformly distributed synthetic strings, distorting categorical dummy encoding. 
 
-Had this pipeline shipped to production, the decision engine would have been trained on low-entropy fabricated data rather than real credit bureau telemetry. The ingestion pipeline was refactored to enforce a single canonical data pipeline (`src/preprocessing/pipeline.py`), reading exclusively from `data/raw/` and saving processed holdout splits ($N_\text{train}=29,165$, $N_\text{test}=7,292$) to `data/processed/`.
+Had this pipeline shipped to production, the decision engine would have been trained on low-entropy fabricated data rather than real credit bureau telemetry. The ingestion pipeline was refactored to enforce a single canonical data pipeline (`src/preprocessing/pipeline.py`), reading exclusively from `data/raw/` and saving processed holdout splits ($N_\text{train}=29,165$ real records, SMOTE-resampled to 57,344 rows for training; $N_\text{test}=7,292$ un-resampled holdout test records) to `data/processed/`.
 
 ---
 
@@ -20,19 +20,19 @@ Had this pipeline shipped to production, the decision engine would have been tra
 
 After training a Random Forest ensemble model with 97.97% accuracy and a 0.7865 ROC-AUC, a probability calibration benchmark (`sklearn.metrics.brier_score_loss`) returned an implausible uncalibrated Brier score of `0.88279` — near the worst possible score for a binary classifier ($1.0$).
 
-Initial diagnostics focused on model calibration curves. However, printing raw output vectors from `model.predict_proba(X_test)[:5]` alongside ground-truth labels `y_test[:5]` and `model.classes_` revealed two distinct root causes:
-1. **Probability Orientation Error**: The evaluation function was indexing column 0 ($P(\text{Solvent})$) instead of column 1 ($P(\text{Default})$), effectively scoring inverse probabilities against ground-truth default labels ($1$).
-2. **Unscaled Evaluation Inputs**: A secondary diagnostic script evaluated raw unscaled features against a model fitted on standardized features.
+Given the model's high accuracy and ROC-AUC, a probability orientation error (indexing column 0 instead of column 1) was suspected first. However, running a diagnostic script (`scratch/check_model_labels.py`) to inspect `model.classes_` `[0, 1]` alongside `predict_proba(X_test)[:5]` and ground-truth labels `y_test[:5]` explicitly confirmed that column index 1 correctly represented class `1` (default/rejection), ruling out the orientation hypothesis.
 
-Correcting the positive-class column indexing (`predict_proba(X_test)[:, 1]`) and enforcing standard scaling restored the true uncalibrated Brier score to `0.017893`. Subsequent probability calibration using `CalibratedClassifierCV` (sigmoid method) further reduced the Brier score to `0.015387`, representing a **14.00% calibration improvement**.
+Further inspection revealed the actual single root cause: unscaled evaluation features were fed directly into a model trained on standardized inputs. Passing raw unscaled features into `predict_proba` caused extreme decision function saturation, generating heavily skewed probabilities that yielded the `0.88279` score. 
+
+Enforcing standard scaling via `models/scaler.pkl` restored the true uncalibrated Brier score to `0.017893`. Subsequent probability calibration using `CalibratedClassifierCV` (sigmoid method) further reduced the Brier score to `0.015387`, representing a **14.00% calibration improvement**.
 
 ---
 
-## 3. The Double-Scaler Architecture Bug
+## 3. The Double-Scaler Architecture Bug & Linear Model Performance
 
 Fixing the evaluation script surfaced a subtle architectural flaw: two separate `StandardScaler` instances were being fitted independently across the codebase. One scaler instance was fitted inside `PreprocessingPipeline`, while a second instance called `.fit_transform()` inside execution scripts during retraining.
 
-While tree ensembles (such as Random Forest and XGBoost) are invariant to monotonic feature scaling, the double-scaler bug severely degraded linear models. Re-fitting the scaler on test or execution subsets caused feature distribution shifts, degrading Logistic Regression accuracy to 60.27%.
+While tree ensembles (Random Forest and XGBoost) are invariant to monotonic scaling, the double-scaler bug severely impacted Logistic Regression. When evaluated on raw unscaled features, Logistic Regression accuracy collapsed. Fitting Logistic Regression on un-oversampled scaled features yielded 61.94% accuracy, while fitting on SMOTE-balanced training features reached 62.86% accuracy (and 60.27% under strict class-weighted un-resampled splits).
 
 The architecture was consolidated so that `models/scaler.pkl`—fitted exclusively during the canonical preprocessing step—became the single source of truth. All downstream scoring modules and inference services were updated to call `scaler.transform()` only, preventing data leakage and distribution drift.
 
@@ -40,7 +40,7 @@ The architecture was consolidated so that `models/scaler.pkl`—fitted exclusive
 
 ## 4. Fair Lending Compliance & ECOA Audit
 
-During explainability testing, inspecting a local SHAP explanation card revealed `"Legal Registry Gender: Female"` listed as a primary factor influencing an applicant's decision. 
+During explainability testing, inspecting a local SHAP explanation card revealed `"Female Applicant"` (`CODE_GENDER_F`) listed as a primary factor driving prediction outputs in `app/services/predict.py`.
 
 Under the Equal Credit Opportunity Act (ECOA, 15 U.S.C. § 1691) and Regulation B, credit scoring models are legally prohibited from using sex or gender as a decision attribute. Leaving `CODE_GENDER` in the feature set posed a severe compliance violation.
 
