@@ -187,14 +187,25 @@ class DatabaseManager:
                 pass
 
     def _seed_default_users(self, cursor):
+        # Default seeding is opt-in (SEED_DEMO_USERS=1 or FLASK_ENV=testing) for security best practices
+        if os.getenv("SEED_DEMO_USERS") != "1" and os.getenv("FLASK_ENV") != "testing":
+            return
+
         from werkzeug.security import generate_password_hash
 
-        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
-        admin_pwd = os.getenv("ADMIN_PASSWORD", "Admin@123")
-        officer_email = os.getenv("OFFICER_EMAIL", "officer@creditguard.ai")
-        officer_pwd = os.getenv("OFFICER_PASSWORD", "Officer@123")
-        demo_email = os.getenv("DEMO_EMAIL", "demo@creditguard.ai")
-        demo_pwd = os.getenv("DEMO_PASSWORD", "Demo@123")
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_pwd = os.getenv("ADMIN_PASSWORD")
+        officer_email = os.getenv("OFFICER_EMAIL")
+        officer_pwd = os.getenv("OFFICER_PASSWORD")
+        demo_email = os.getenv("DEMO_EMAIL")
+        demo_pwd = os.getenv("DEMO_PASSWORD")
+
+        # In testing/dev mode with no env variables specified, use safe test accounts
+        if os.getenv("FLASK_ENV") == "testing":
+            admin_email = admin_email or "admin@example.com"
+            admin_pwd = admin_pwd or "AdminPass123!"
+            demo_email = demo_email or "demo@example.com"
+            demo_pwd = demo_pwd or "DemoPass123!"
 
         default_users = []
         if admin_email and admin_pwd:
@@ -228,14 +239,24 @@ class DatabaseManager:
                 )
 
     def _seed_default_users_postgres(self):
+        # Default seeding is opt-in (SEED_DEMO_USERS=1 or FLASK_ENV=testing) for security best practices
+        if os.getenv("SEED_DEMO_USERS") != "1" and os.getenv("FLASK_ENV") != "testing":
+            return
+
         from werkzeug.security import generate_password_hash
 
-        admin_email = os.getenv("ADMIN_EMAIL", "admin@example.com")
-        admin_pwd = os.getenv("ADMIN_PASSWORD", "Admin@123")
-        officer_email = os.getenv("OFFICER_EMAIL", "officer@creditguard.ai")
-        officer_pwd = os.getenv("OFFICER_PASSWORD", "Officer@123")
-        demo_email = os.getenv("DEMO_EMAIL", "demo@creditguard.ai")
-        demo_pwd = os.getenv("DEMO_PASSWORD", "Demo@123")
+        admin_email = os.getenv("ADMIN_EMAIL")
+        admin_pwd = os.getenv("ADMIN_PASSWORD")
+        officer_email = os.getenv("OFFICER_EMAIL")
+        officer_pwd = os.getenv("OFFICER_PASSWORD")
+        demo_email = os.getenv("DEMO_EMAIL")
+        demo_pwd = os.getenv("DEMO_PASSWORD")
+
+        if os.getenv("FLASK_ENV") == "testing":
+            admin_email = admin_email or "admin@example.com"
+            admin_pwd = admin_pwd or "AdminPass123!"
+            demo_email = demo_email or "demo@example.com"
+            demo_pwd = demo_pwd or "DemoPass123!"
 
         default_users = []
         if admin_email and admin_pwd:
@@ -248,6 +269,29 @@ class DatabaseManager:
             )
         if demo_email and demo_pwd:
             default_users.append((os.getenv("DEMO_USERNAME", "demo"), demo_email, demo_pwd, "Demo User", "User"))
+
+        with self._connection() as conn:
+            with conn.cursor() as cursor:
+                for username, email, pwd, name, role in default_users:
+                    cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
+                    if not cursor.fetchone():
+                        pwd_hash = generate_password_hash(pwd, method="scrypt")
+                        cursor.execute(
+                            """INSERT INTO users
+                               (username, email, password_hash, name, full_name, role, status, created_at)
+                               VALUES (%s, %s, %s, %s, %s, %s, %s, %s)""",
+                            (
+                                username,
+                                email,
+                                pwd_hash,
+                                name,
+                                name,
+                                role,
+                                "Active",
+                                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                            ),
+                        )
+            conn.commit()
 
         with self._connection() as conn:
             with conn.cursor() as cursor:

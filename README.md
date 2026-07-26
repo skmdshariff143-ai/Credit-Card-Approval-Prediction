@@ -1,6 +1,6 @@
 # CreditGuard AI
 
-> **CreditGuard AI** is an explainable, fair-lending-compliant credit risk decision engine with a calibrated 5:1 cost-sensitive policy, not just a binary classifier.
+> **CreditGuard AI** is an explainable credit risk decision engine with a calibrated 5:1 cost-sensitive policy, designed with responsible-modeling considerations; independent legal, fairness, data-governance, and regulatory review is required before real lending use.
 
 ![CreditGuard AI Decision Dashboard](screenshots/ui_redesign/result_low_risk_1440px.png)
 
@@ -14,7 +14,7 @@ Unlike standard academic projects that stop at fitting a default `.fit()` classi
 2. **Diagnosed & Corrected Brier-Score Probability Calibration**: Fixed a column-index orientation bug during probability calibration, reducing Brier score from `0.017893` to `0.015387` (**14.00% improvement**) ([`reports/Decision_Policy.md`](reports/Decision_Policy.md)).
 3. **Cost-Sensitive Decision Policy ($p^* = 0.0395$)**: Derived an optimal decision threshold at $3.95\%$ default risk under an explicit **5:1 False Negative to False Positive loss ratio**, elevating default recall to **35.77%** vs 21.14% at a generic 0.50 cutoff ([`reports/Decision_Policy.md`](reports/Decision_Policy.md)).
 4. **De-duplicated Local SHAP Explainability**: Grouped one-hot dummy columns back to parent features, guaranteeing zero contradictory drivers in per-applicant explanations ([`app/services/predict.py`](5_Project_Development_Phase/app/services/predict.py)).
-5. **Fair Lending Compliance (ECOA / Reg B)**: Explicitly excluded `CODE_GENDER` from the model feature set with zero accuracy cost (**97.97%** accuracy, **0.7865** ROC-AUC) and documented statutory age/marital status treatment against ECOA standards ([`reports/Decision_Policy.md`](reports/Decision_Policy.md)).
+5. **Responsible Attribute Selection**: Explicitly excluded `CODE_GENDER` from the model feature set with zero accuracy cost (**97.97%** accuracy, **0.7865** ROC-AUC) and documented statutory age/marital status treatment against ECOA standards ([`reports/Decision_Policy.md`](reports/Decision_Policy.md)).
 
 📖 **[Read the full engineering case study](CASE_STUDY.md)** for a deep dive into the debugging, calibration, and compliance process.
 
@@ -136,9 +136,8 @@ python app/app.py
 ```
 Open `http://127.0.0.1:5000` in your web browser.
 
-**Local Development Credentials**:
-- **Email**: `admin@creditguard.ai`
-- **Password**: `Admin123!`
+**Account Access**:
+- Register a new account via `/auth/register` or configure demo seed accounts via environment variables (`SEED_DEMO_USERS=1`, `ADMIN_EMAIL=admin@example.com`, `ADMIN_PASSWORD=<set-securely>`).
 
 ---
 
