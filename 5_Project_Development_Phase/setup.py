@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="credit_card_approval_prediction",
-    version="1.0.0",
+    version="1.0.1",
     description="Enterprise Machine Learning project for predicting credit card approval status.",
     author="Mahammad Shariff Shaik",
     author_email="sk.md.shariff143@gmail.com",
