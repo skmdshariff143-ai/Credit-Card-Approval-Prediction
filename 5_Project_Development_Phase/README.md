@@ -18,7 +18,7 @@
 [![Python Test Suite](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/tests.yml/badge.svg)](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction/actions/workflows/tests.yml)
 [![Coverage Status](https://img.shields.io/badge/Coverage-86%25-brightgreen.svg)](#)
 [![Demo Video](https://img.shields.io/badge/Demo--Video-YouTube-red?logo=youtube&logoColor=white)](https://youtu.be/zli5C77xTHg)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Proprietary-blue.svg)](LICENSE)
 
 ---
 
@@ -327,7 +327,7 @@ Performance metrics evaluated on the **holdout test set** ($N_{\text{test}} = 1,
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See the [LICENSE](LICENSE) file for details.
+This project is released under the **Proprietary Commercial & Enterprise Evaluation License**. See the [LICENSE](LICENSE) file for details.
 
 ---
 
