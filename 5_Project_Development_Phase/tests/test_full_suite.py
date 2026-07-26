@@ -162,8 +162,9 @@ def test_data_loader_errors():
         loader.load_credit_records()
 
 
+@patch("os.path.exists", return_value=True)
 @patch("pandas.read_csv")
-def test_data_loader_success(mock_read_csv, mock_app_df, mock_credit_df):
+def test_data_loader_success(mock_read_csv, mock_exists, mock_app_df, mock_credit_df):
     mock_read_csv.side_effect = [mock_app_df, mock_credit_df]
     loader = DataLoader()
     app, credit = loader.load_all()
