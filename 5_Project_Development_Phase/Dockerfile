@@ -25,8 +25,12 @@ COPY config/ config/
 COPY models/ models/
 COPY app.py .
 
+# Create non-root user for security best practices
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
+
 # Expose target port
 EXPOSE 5000
 
 # Execute Gunicorn WSGI server runner
-CMD gunicorn --bind 0.0.0.0:$PORT app:app
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
