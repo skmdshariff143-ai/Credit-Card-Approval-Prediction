@@ -841,3 +841,53 @@ table.cg-table { width: 100%; border-collapse: collapse; }
 @keyframes cg-ripple-effect {
   to { transform: scale(3.5); opacity: 0; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   WCAG 2.1 AA ACCESSIBILITY & REDUCED MOTION
+   ═══════════════════════════════════════════════════════════ */
+
+/* Skip Link */
+.cg-skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--primary);
+  color: var(--text-inverse);
+  padding: 8px 16px;
+  border-radius: var(--r-sm);
+  font-weight: 700;
+  z-index: 1000;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.cg-skip-link:focus {
+  top: 16px;
+  outline: 3px solid var(--accent-cyan);
+}
+
+/* Visible Focus Rings */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+.cg-btn:focus-visible,
+.cg-input:focus-visible,
+.cg-select:focus-visible,
+.cg-nav-link:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .cg-glow-blob {
+    animation: none !important;
+  }
+}
+
