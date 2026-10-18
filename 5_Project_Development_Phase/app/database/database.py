@@ -27,10 +27,12 @@ class DatabaseManager:
     for application prediction history and authentication.
     """
 
+    _postgres_unavailable = False
+
     def __init__(self):
         # Determine engine mode based on SUPABASE_DB_URL presence
         self.db_url = os.getenv("SUPABASE_DB_URL")
-        self.use_postgres = bool(self.db_url)
+        self.use_postgres = bool(self.db_url) and not DatabaseManager._postgres_unavailable
 
         paths = config.get_paths()
         self.db_path = os.path.join(paths["logs_dir"], "prediction_history.db")
@@ -48,6 +50,7 @@ class DatabaseManager:
             logging.getLogger(__name__).warning(f"Database initialization deferred/ignored: {str(e)}")
             if self.use_postgres:
                 logging.getLogger(__name__).warning("PostgreSQL init failed. Defaulting use_postgres to False.")
+                DatabaseManager._postgres_unavailable = True
                 self.use_postgres = False
                 try:
                     self.init_db()
@@ -55,7 +58,7 @@ class DatabaseManager:
                     pass
 
     def _get_connection(self):
-        if self.use_postgres:
+        if self.use_postgres and not DatabaseManager._postgres_unavailable:
             try:
                 if psycopg2 is None:
                     raise ImportError("psycopg2 is not installed but SUPABASE_DB_URL is configured.")
@@ -63,8 +66,8 @@ class DatabaseManager:
                 url = self.db_url
                 if "?" in url:
                     url = url.split("?")[0]
-                # Use DictCursor to emulate sqlite3.Row index/string key access
-                conn = psycopg2.connect(url, cursor_factory=psycopg2.extras.DictCursor)
+                # Use DictCursor to emulate sqlite3.Row index/string key access with quick 2s connect timeout
+                conn = psycopg2.connect(url, connect_timeout=2, cursor_factory=psycopg2.extras.DictCursor)
                 return conn
             except Exception as e:
                 import logging
@@ -72,6 +75,7 @@ class DatabaseManager:
                 logging.getLogger(__name__).warning(
                     f"PostgreSQL connection failed ({e}). Falling back to SQLite backend."
                 )
+                DatabaseManager._postgres_unavailable = True
                 self.use_postgres = False
                 try:
                     self.init_db()

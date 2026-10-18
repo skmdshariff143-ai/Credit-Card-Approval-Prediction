@@ -48,11 +48,17 @@ def google_verification():
         if os.path.exists(p):
             try:
                 with open(p, "r", encoding="utf-8") as f:
-                    return Response(f.read(), mimetype="text/html", status=200)
+                    resp = Response(f.read(), mimetype="text/html; charset=utf-8", status=200)
+                    resp.headers["Cache-Control"] = (
+                        "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+                    )
+                    return resp
             except Exception as e:
                 logger.warning(f"Error reading verification file at {p}: {e}")
 
-    return Response(default_content, mimetype="text/html", status=200)
+    resp = Response(default_content, mimetype="text/html; charset=utf-8", status=200)
+    resp.headers["Cache-Control"] = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+    return resp
 
 
 @api_bp.route("/robots.txt", methods=["GET"])
@@ -89,11 +95,17 @@ def robots_txt():
         if os.path.exists(p):
             try:
                 with open(p, "r", encoding="utf-8") as f:
-                    return Response(f.read(), mimetype="text/plain", status=200)
+                    resp = Response(f.read(), mimetype="text/plain; charset=utf-8", status=200)
+                    resp.headers["Cache-Control"] = (
+                        "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+                    )
+                    return resp
             except Exception as e:
                 logger.warning(f"Error reading robots.txt at {p}: {e}")
 
-    return Response(default_robots, mimetype="text/plain", status=200)
+    resp = Response(default_robots, mimetype="text/plain; charset=utf-8", status=200)
+    resp.headers["Cache-Control"] = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+    return resp
 
 
 @api_bp.route("/sitemap.xml", methods=["GET"])
@@ -130,11 +142,17 @@ def sitemap_xml():
         if os.path.exists(p):
             try:
                 with open(p, "r", encoding="utf-8") as f:
-                    return Response(f.read(), mimetype="application/xml", status=200)
+                    resp = Response(f.read(), mimetype="application/xml; charset=utf-8", status=200)
+                    resp.headers["Cache-Control"] = (
+                        "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+                    )
+                    return resp
             except Exception as e:
                 logger.warning(f"Error reading sitemap.xml at {p}: {e}")
 
-    return Response(default_sitemap, mimetype="application/xml", status=200)
+    resp = Response(default_sitemap, mimetype="application/xml; charset=utf-8", status=200)
+    resp.headers["Cache-Control"] = "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+    return resp
 
 
 @api_bp.route("/about", methods=["GET"])

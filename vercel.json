@@ -11,6 +11,30 @@
   ],
   "routes": [
     {
+      "src": "^/robots\\.txt$",
+      "dest": "/5_Project_Development_Phase/index.py",
+      "headers": {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+      }
+    },
+    {
+      "src": "^/sitemap\\.xml$",
+      "dest": "/5_Project_Development_Phase/index.py",
+      "headers": {
+        "Content-Type": "application/xml; charset=utf-8",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+      }
+    },
+    {
+      "src": "^/google482d22f42a897fe4\\.html$",
+      "dest": "/5_Project_Development_Phase/index.py",
+      "headers": {
+        "Content-Type": "text/html; charset=utf-8",
+        "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800"
+      }
+    },
+    {
       "src": "/static/(.*)",
       "dest": "/5_Project_Development_Phase/index.py"
     },
