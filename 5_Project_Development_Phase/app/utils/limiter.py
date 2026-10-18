@@ -18,8 +18,10 @@ if redis_url:
     try:
         import redis
 
-        # Set short socket timeout to prevent blocking Flask thread if Redis is slow/down
-        _redis_client = redis.Redis.from_url(redis_url, socket_timeout=3, decode_responses=True)
+        # Set short 1s timeout to prevent blocking Flask thread if Redis is slow/down
+        _redis_client = redis.Redis.from_url(
+            redis_url, socket_timeout=1, socket_connect_timeout=1, decode_responses=True
+        )
         # Test connection ping
         _redis_client.ping()
         logger.info("Rate limiter successfully initialized with shared Redis store.")
