@@ -15,6 +15,16 @@ def test_landing_page(client):
     assert b"Risk Assessment Portal" in response.data or b"Credit" in response.data
 
 
+def test_google_site_verification(client):
+    """
+    Test Google Search Console HTML ownership verification endpoint.
+    """
+    response = client.get("/google482d22f42a897fe4.html")
+    assert response.status_code == 200
+    assert b"google-site-verification: google482d22f42a897fe4.html" in response.data
+    assert "text/html" in response.content_type
+
+
 def test_about_page(client):
     """
     Test about page.

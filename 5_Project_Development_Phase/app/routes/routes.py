@@ -30,6 +30,31 @@ def index():
     return render_template("index.html")
 
 
+@api_bp.route("/google482d22f42a897fe4.html", methods=["GET"])
+def google_verification():
+    """Serves Google Search Console HTML ownership verification file."""
+    filename = "google482d22f42a897fe4.html"
+    default_content = f"google-site-verification: {filename}\n"
+
+    candidate_paths = [
+        os.path.join(os.path.dirname(__file__), "..", "static", filename),
+        os.path.join(os.path.dirname(__file__), "..", "..", filename),
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", filename),
+        os.path.join(os.getcwd(), filename),
+        os.path.join(os.getcwd(), "5_Project_Development_Phase", filename),
+        os.path.join(os.getcwd(), "5_Project_Development_Phase", "app", "static", filename),
+    ]
+    for p in candidate_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return Response(f.read(), mimetype="text/html", status=200)
+            except Exception as e:
+                logger.warning(f"Error reading verification file at {p}: {e}")
+
+    return Response(default_content, mimetype="text/html", status=200)
+
+
 @api_bp.route("/about", methods=["GET"])
 def about():
     """Renders the About Project page containing problem definition and metrics."""
