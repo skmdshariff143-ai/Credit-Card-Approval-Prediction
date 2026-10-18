@@ -32,13 +32,12 @@ class DatabaseManager:
         self.db_url = os.getenv("SUPABASE_DB_URL")
         self.use_postgres = bool(self.db_url)
 
-        if not self.use_postgres:
-            paths = config.get_paths()
-            self.db_path = os.path.join(paths["logs_dir"], "prediction_history.db")
-            try:
-                os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-            except Exception:
-                pass
+        paths = config.get_paths()
+        self.db_path = os.path.join(paths["logs_dir"], "prediction_history.db")
+        try:
+            os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
+        except Exception:
+            pass
 
         try:
             self.init_db()
@@ -47,22 +46,40 @@ class DatabaseManager:
             import logging
 
             logging.getLogger(__name__).warning(f"Database initialization deferred/ignored: {str(e)}")
+            if self.use_postgres:
+                logging.getLogger(__name__).warning("PostgreSQL init failed. Defaulting use_postgres to False.")
+                self.use_postgres = False
+                try:
+                    self.init_db()
+                except Exception:
+                    pass
 
     def _get_connection(self):
         if self.use_postgres:
-            if psycopg2 is None:
-                raise ImportError("psycopg2 is not installed but SUPABASE_DB_URL is configured.")
-            # Remove "?pgbouncer=true" or other query parameters because psycopg2 does not support them in DSN
-            url = self.db_url
-            if "?" in url:
-                url = url.split("?")[0]
-            # Use DictCursor to emulate sqlite3.Row index/string key access
-            conn = psycopg2.connect(url, cursor_factory=psycopg2.extras.DictCursor)
-            return conn
-        else:
-            conn = sqlite3.connect(self.db_path)
-            conn.row_factory = sqlite3.Row
-            return conn
+            try:
+                if psycopg2 is None:
+                    raise ImportError("psycopg2 is not installed but SUPABASE_DB_URL is configured.")
+                # Remove "?pgbouncer=true" or other query parameters because psycopg2 does not support them in DSN
+                url = self.db_url
+                if "?" in url:
+                    url = url.split("?")[0]
+                # Use DictCursor to emulate sqlite3.Row index/string key access
+                conn = psycopg2.connect(url, cursor_factory=psycopg2.extras.DictCursor)
+                return conn
+            except Exception as e:
+                import logging
+
+                logging.getLogger(__name__).warning(
+                    f"PostgreSQL connection failed ({e}). Falling back to SQLite backend."
+                )
+                self.use_postgres = False
+                try:
+                    self.init_db()
+                except Exception:
+                    pass
+        conn = sqlite3.connect(self.db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
 
     @contextlib.contextmanager
     def _connection(self):
