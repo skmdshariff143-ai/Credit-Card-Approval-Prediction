@@ -25,6 +25,65 @@ def test_google_site_verification(client):
     assert "text/html" in response.content_type
 
 
+def test_robots_txt(client):
+    """
+    Test robots.txt route returns crawler directives and sitemap URL.
+    """
+    response = client.get("/robots.txt")
+    assert response.status_code == 200
+    assert "text/plain" in response.content_type
+    assert b"User-agent: *" in response.data
+    assert b"Sitemap: https://credit-card-approval-prediction-lac.vercel.app/sitemap.xml" in response.data
+    assert b"Disallow: /predict" in response.data
+    assert b"Disallow: /history" in response.data
+    assert b"Disallow: /admin" in response.data
+    assert b"Disallow: /auth/" in response.data
+
+
+def test_sitemap_xml(client):
+    """
+    Test sitemap.xml route returns valid XML with public indexable pages only.
+    """
+    response = client.get("/sitemap.xml")
+    assert response.status_code == 200
+    assert "xml" in response.content_type
+    assert b"<loc>https://credit-card-approval-prediction-lac.vercel.app/</loc>" in response.data
+    assert b"<loc>https://credit-card-approval-prediction-lac.vercel.app/about</loc>" in response.data
+    assert b"/predict" not in response.data
+    assert b"/history" not in response.data
+    assert b"/admin" not in response.data
+    assert b"/report/" not in response.data
+    assert b"/auth/" not in response.data
+
+
+def test_seo_canonical_and_robots_tags(client):
+    """
+    Test homepage and public pages have canonical URLs and sensitive pages have noindex.
+    """
+    res_home = client.get("/")
+    assert res_home.status_code == 200
+    assert b'rel="canonical" href="https://credit-card-approval-prediction-lac.vercel.app/"' in res_home.data
+    assert b'content="index, follow"' in res_home.data
+    assert b"noindex" not in res_home.data
+
+    res_about = client.get("/about")
+    assert res_about.status_code == 200
+    assert b'rel="canonical" href="https://credit-card-approval-prediction-lac.vercel.app/about"' in res_about.data
+    assert b'content="index, follow"' in res_about.data
+    assert b"noindex" not in res_about.data
+
+    # Authenticated page has noindex
+    res_predict = client.get("/predict")
+    assert res_predict.status_code == 200
+    assert b'content="noindex, nofollow"' in res_predict.data
+
+    # Log out to test unauthenticated login page
+    client.get("/auth/logout")
+    res_login = client.get("/auth/login")
+    assert res_login.status_code == 200
+    assert b'content="noindex, nofollow"' in res_login.data
+
+
 def test_about_page(client):
     """
     Test about page.

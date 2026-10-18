@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CreditGuard AI — Enterprise-grade credit card approval prediction powered by machine learning.">
+  {% block meta_robots %}
+  <meta name="robots" content="index, follow">
+  {% endblock %}
+  {% block canonical %}
+  <link rel="canonical" href="https://credit-card-approval-prediction-lac.vercel.app{{ request.path }}">
+  {% endblock %}
   <title>{% block title %}CreditGuard AI{% endblock %}</title>
 
   <!-- Preconnect -->

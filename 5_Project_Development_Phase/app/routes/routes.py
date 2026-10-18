@@ -55,6 +55,88 @@ def google_verification():
     return Response(default_content, mimetype="text/html", status=200)
 
 
+@api_bp.route("/robots.txt", methods=["GET"])
+def robots_txt():
+    """Serves robots.txt with search crawler instructions and sitemap link."""
+    filename = "robots.txt"
+    default_robots = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Allow: /about\n"
+        "Allow: /static/\n"
+        "Allow: /google482d22f42a897fe4.html\n"
+        "Disallow: /predict\n"
+        "Disallow: /history\n"
+        "Disallow: /admin\n"
+        "Disallow: /report/\n"
+        "Disallow: /auth/\n"
+        "Disallow: /api/\n"
+        "Disallow: /health\n"
+        "Disallow: /version\n"
+        "Disallow: /startup\n\n"
+        "Sitemap: https://credit-card-approval-prediction-lac.vercel.app/sitemap.xml\n"
+    )
+
+    candidate_paths = [
+        os.path.join(os.path.dirname(__file__), "..", "static", filename),
+        os.path.join(os.path.dirname(__file__), "..", "..", filename),
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", filename),
+        os.path.join(os.getcwd(), filename),
+        os.path.join(os.getcwd(), "5_Project_Development_Phase", filename),
+        os.path.join(os.getcwd(), "5_Project_Development_Phase", "app", "static", filename),
+    ]
+    for p in candidate_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return Response(f.read(), mimetype="text/plain", status=200)
+            except Exception as e:
+                logger.warning(f"Error reading robots.txt at {p}: {e}")
+
+    return Response(default_robots, mimetype="text/plain", status=200)
+
+
+@api_bp.route("/sitemap.xml", methods=["GET"])
+def sitemap_xml():
+    """Serves XML sitemap containing public, indexable pages only."""
+    filename = "sitemap.xml"
+    default_sitemap = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        "  <url>\n"
+        "    <loc>https://credit-card-approval-prediction-lac.vercel.app/</loc>\n"
+        "    <lastmod>2026-10-18</lastmod>\n"
+        "    <changefreq>weekly</changefreq>\n"
+        "    <priority>1.0</priority>\n"
+        "  </url>\n"
+        "  <url>\n"
+        "    <loc>https://credit-card-approval-prediction-lac.vercel.app/about</loc>\n"
+        "    <lastmod>2026-10-18</lastmod>\n"
+        "    <changefreq>monthly</changefreq>\n"
+        "    <priority>0.8</priority>\n"
+        "  </url>\n"
+        "</urlset>\n"
+    )
+
+    candidate_paths = [
+        os.path.join(os.path.dirname(__file__), "..", "static", filename),
+        os.path.join(os.path.dirname(__file__), "..", "..", filename),
+        os.path.join(os.path.dirname(__file__), "..", "..", "..", filename),
+        os.path.join(os.getcwd(), filename),
+        os.path.join(os.getcwd(), "5_Project_Development_Phase", filename),
+        os.path.join(os.getcwd(), "5_Project_Development_Phase", "app", "static", filename),
+    ]
+    for p in candidate_paths:
+        if os.path.exists(p):
+            try:
+                with open(p, "r", encoding="utf-8") as f:
+                    return Response(f.read(), mimetype="application/xml", status=200)
+            except Exception as e:
+                logger.warning(f"Error reading sitemap.xml at {p}: {e}")
+
+    return Response(default_sitemap, mimetype="application/xml", status=200)
+
+
 @api_bp.route("/about", methods=["GET"])
 def about():
     """Renders the About Project page containing problem definition and metrics."""

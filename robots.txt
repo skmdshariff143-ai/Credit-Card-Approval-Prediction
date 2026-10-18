@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /static/
+Allow: /google482d22f42a897fe4.html
+Disallow: /predict
+Disallow: /history
+Disallow: /admin
+Disallow: /report/
+Disallow: /auth/
+Disallow: /api/
+Disallow: /health
+Disallow: /version
+Disallow: /startup
+
+Sitemap: https://credit-card-approval-prediction-lac.vercel.app/sitemap.xml
