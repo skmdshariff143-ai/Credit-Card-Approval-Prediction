@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="CreditGuard AI — Enterprise-grade credit card approval prediction powered by machine learning.">
+  <meta name="author" content="Shaik Mahammad Shariff">
   {% block meta_robots %}
   <meta name="robots" content="index, follow">
   {% endblock %}
@@ -11,6 +12,45 @@
   <link rel="canonical" href="https://credit-card-approval-prediction-lac.vercel.app{{ request.path }}">
   {% endblock %}
   <title>{% block title %}CreditGuard AI{% endblock %}</title>
+
+  <!-- Open Graph & Social Metadata -->
+  <meta property="og:title" content="{% block og_title %}CreditGuard AI — Enterprise Credit Decisioning Engine{% endblock %}">
+  <meta property="og:description" content="Enterprise-grade credit card approval prediction powered by calibrated machine learning. Developed by Shaik Mahammad Shariff.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://credit-card-approval-prediction-lac.vercel.app{{ request.path }}">
+  <meta property="og:site_name" content="CreditGuard AI">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="CreditGuard AI — Enterprise Credit Decisioning Engine">
+  <meta name="twitter:description" content="Enterprise-grade credit card approval prediction powered by machine learning. Developed by Shaik Mahammad Shariff.">
+
+  <!-- Structured Data (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "CreditGuard AI",
+    "url": "https://credit-card-approval-prediction-lac.vercel.app/",
+    "description": "Enterprise-grade credit card approval prediction powered by calibrated machine learning.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "All",
+    "author": {
+      "@type": "Person",
+      "name": "Shaik Mahammad Shariff",
+      "url": "https://skmdshariff143-ai-github-io.vercel.app/",
+      "sameAs": [
+        "https://github.com/skmdshariff143-ai"
+      ]
+    },
+    "creator": {
+      "@type": "Person",
+      "name": "Shaik Mahammad Shariff",
+      "url": "https://skmdshariff143-ai-github-io.vercel.app/",
+      "sameAs": [
+        "https://github.com/skmdshariff143-ai"
+      ]
+    }
+  }
+  </script>
 
   <!-- Preconnect -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -129,6 +169,46 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+
+    <!-- Professional Platform Footer -->
+    <footer class="cg-footer">
+      <div class="cg-footer-container">
+        <div class="cg-footer-brand">
+          <div class="cg-flex" style="align-items:center;gap:10px;">
+            <div class="cg-sidebar-logo" style="width:28px;height:28px;font-size:13px;"><i class="fa-solid fa-shield-halved"></i></div>
+            <span style="font-family:var(--font-heading);font-weight:700;font-size:15px;color:var(--text-primary);">CreditGuard AI</span>
+          </div>
+          <p class="cg-footer-desc">
+            Enterprise credit risk decisioning engine featuring calibrated ensemble models and transparent SHAP factor explanations.
+          </p>
+        </div>
+
+        <div class="cg-footer-links">
+          <div class="cg-footer-col">
+            <span class="cg-footer-heading">Platform</span>
+            <a href="{{ url_for('api.index') }}">Home Dashboard</a>
+            <a href="{{ url_for('api.about') }}">Model Insights</a>
+            <a href="{{ url_for('api.predict_get') }}">Risk Assessment</a>
+          </div>
+          <div class="cg-footer-col">
+            <span class="cg-footer-heading">Architect &amp; Developer</span>
+            <a href="https://skmdshariff143-ai-github-io.vercel.app/" target="_blank" rel="noopener noreferrer">Portfolio</a>
+            <a href="https://github.com/skmdshariff143-ai" target="_blank" rel="noopener noreferrer">GitHub Profile</a>
+            <a href="https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction" target="_blank" rel="noopener noreferrer">Repository</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="cg-footer-bottom">
+        <p class="cg-footer-copyright">
+          &copy; 2026 CreditGuard AI. Designed &amp; Developed by <a href="https://skmdshariff143-ai-github-io.vercel.app/" target="_blank" rel="noopener noreferrer" class="cg-footer-author">Shaik Mahammad Shariff</a>.
+        </p>
+        <div class="cg-footer-badges">
+          <span class="cg-footer-pill"><i class="fa-solid fa-scale-balanced"></i> Fair Lending Aligned</span>
+          <span class="cg-footer-pill"><i class="fa-solid fa-shield-check"></i> Enterprise Calibrated</span>
+        </div>
+      </div>
+    </footer>
   </main>
 
   <!-- Animation & Library CDNs -->

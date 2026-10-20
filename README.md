@@ -2,6 +2,8 @@
 
 > **CreditGuard AI** is an explainable credit risk decision engine with a calibrated 5:1 cost-sensitive policy, designed with responsible-modeling considerations; independent legal, fairness, data-governance, and regulatory review is required before real lending use.
 
+**Author & Lead Engineer**: [Shaik Mahammad Shariff](https://skmdshariff143-ai-github-io.vercel.app/) ([@skmdshariff143-ai](https://github.com/skmdshariff143-ai))
+
 ![CreditGuard AI Decision Dashboard](screenshots/ui_redesign/result_low_risk_1440px.png)
 
 ---
@@ -147,6 +149,21 @@ Open `http://127.0.0.1:5000` in your web browser.
 2. **Minority Class Recall Tradeoff**: Default prevalence is ~1.7% in the holdout test dataset. The 35.77% default recall at $p^* = 0.0395$ reflects an explicit cost-sensitive decision tradeoff designed to minimize costly False Negatives without over-saturating underwriting queues with false alarms.
 
 ---
+
+## 👨‍💻 Author & Engineering Leadership
+
+**Shaik Mahammad Shariff**  
+*Lead Machine Learning Engineer & Full-Stack Architect*  
+- 🌐 **Portfolio**: [skmdshariff143-ai-github-io.vercel.app](https://skmdshariff143-ai-github-io.vercel.app/)  
+- 🐙 **GitHub**: [@skmdshariff143-ai](https://github.com/skmdshariff143-ai)  
+- 💼 **Project Repository**: [Credit-Card-Approval-Prediction](https://github.com/skmdshariff143-ai/Credit-Card-Approval-Prediction)  
+
+### Architectural & Engineering Highlights
+- **End-to-End System Design**: Conceived, architected, and built CreditGuard AI from ideation through requirement analysis, system modeling, ML pipeline development, and cloud deployment.
+- **Calibrated ML Champion**: Trained and evaluated competing classifiers on ~438k real credit records, selecting a calibrated Random Forest (`0.9797` accuracy, `0.7865` ROC-AUC, `14.0%` Brier score calibration improvement).
+- **5:1 Cost-Sensitive Decision Engine**: Formulated an optimal loss-weighted decision cutoff at $p^* = 0.0395$, capturing 35.77% of defaults vs 21.14% under standard uncalibrated cutoffs.
+- **Explainability & Compliance**: Implemented de-duplicated parent-aggregated SHAP explainability and audited statutory feature compliance (explicit exclusion of `CODE_GENDER` per ECOA principles).
+- **Production Architecture**: Implemented robust full-stack Flask application, rate limiting, responsive WCAG 2.1 AA accessible UI design system, comprehensive automated test suite, and Vercel cloud deployment.
 
 ## 🎓 Academic Submission Details
 For rubric mappings, course phase deliverables, and SkillWallet submission artifacts, see **[ACADEMIC_SUBMISSION.md](ACADEMIC_SUBMISSION.md)**.

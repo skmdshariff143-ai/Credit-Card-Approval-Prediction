@@ -84,6 +84,36 @@ def test_seo_canonical_and_robots_tags(client):
     assert b'content="noindex, nofollow"' in res_login.data
 
 
+def test_developer_branding_and_attribution(client):
+    """
+    Test landing page renders prominent developer attribution, portfolio links,
+    JSON-LD structured author data, and footer branding for Shaik Mahammad Shariff.
+    """
+    response = client.get("/")
+    assert response.status_code == 200
+
+    # Verify Developer Name and URLs are present
+    assert b"Shaik Mahammad Shariff" in response.data
+    assert b"https://skmdshariff143-ai-github-io.vercel.app/" in response.data
+    assert b"https://github.com/skmdshariff143-ai" in response.data
+
+    # Verify Meta Tags and OpenGraph/Twitter attribution
+    assert b'<meta name="author" content="Shaik Mahammad Shariff">' in response.data
+    assert b"Developed by Shaik Mahammad Shariff" in response.data
+
+    # Verify Schema.org JSON-LD Person structured data
+    assert b'"@type": "Person"' in response.data
+
+    # Verify Hero Attribution Badge & Developer Section
+    assert b"Designed &amp; Developed by" in response.data or b"Designed & Developed by" in response.data
+    assert b'id="developer"' in response.data
+    assert b"Architected &amp; Engineered by" in response.data or b"Architected & Engineered by" in response.data
+
+    # Verify Global Responsive Footer Branding
+    assert b"cg-footer-author" in response.data
+    assert b"&copy; 2026 CreditGuard AI." in response.data
+
+
 def test_about_page(client):
     """
     Test about page.
